@@ -1,0 +1,41 @@
+{
+  "name": "builder",
+  "version": "1.0.0",
+  "main": "dist-desktop/main/index.js",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "npm run pre-clean && npm run copy && electron-builder && npm run post-clean",
+    "pre-clean": "npm run post-clean && shx rm -rf dist",
+    "post-clean": "shx rm -rf dist-desktop && shx rm -rf dist-web",
+    "copy": "npm run copy-desktop && npm run copy-web",
+    "copy-desktop": "shx cp -R ../app/dist dist-desktop",
+    "copy-web": "shx cp -R ../web/dist dist-web"
+  },
+  "build": {
+    "appId": "turbotron",
+    "npmRebuild": false,
+    "files": {
+      "filter": [
+        "./dist-desktop/**/*",
+        "./dist-web/**/*"
+      ]
+    },
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "signAndEditExecutable": false
+    },
+    "electronVersion": "31.3.1"
+  },
+  "devDependencies": {
+    "electron-builder": "25.1.8",
+    "shx": "^0.3.4"
+  }
+}

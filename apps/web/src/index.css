@@ -1,0 +1,265 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@500;600;700&display=swap');
+@import "tailwindcss";
+
+/* ─── Joy ────────────────────────────────────────────── */
+:root,
+[data-theme="joy"] {
+  --scheme: light;
+  --bg: #FFF8F0;
+  --surface: #FFFFFF;
+  --surface-2: #FBE9D8;
+  --border: #EBD4B0;
+  --border-strong: #DFBE93;
+  --text: #2D1B0E;
+  --text-muted: #8A6D4F;
+  --accent: #FF5C39;
+  --accent-soft: #FFE5DE;
+  --danger: #E5484D;
+  --success: #2F9E63;
+  --notes: #E8963D;
+  --agents: #8B5CF6;
+  --diary: #EC4899;
+  --timer: #FF5C39;
+  --calendar: #0EA5E9;
+}
+
+/* ─── Zen ─────────────────────────────────────────────── */
+[data-theme="zen"] {
+  --scheme: light;
+  --bg: #F8F9FA;
+  --surface: #FFFFFF;
+  --surface-2: #F1F3F5;
+  --border: #E9ECEF;
+  --border-strong: #DEE2E6;
+  --text: #212529;
+  --text-muted: #868E96;
+  --accent: #4263EB;
+  --accent-soft: #EDF2FF;
+  --danger: #E03131;
+  --success: #2F9E63;
+  --notes: #D9480F;
+  --agents: #7048E8;
+  --diary: #C2255C;
+  --timer: #E03131;
+  --calendar: #0C8599;
+}
+
+/* ─── Midnight ────────────────────────────────────────── */
+[data-theme="midnight"] {
+  --scheme: dark;
+  --bg: #0B0F19;
+  --surface: #111827;
+  --surface-2: #1A2234;
+  --border: #1E293B;
+  --border-strong: #334155;
+  --text: #F1F5F9;
+  --text-muted: #64748B;
+  --accent: #818CF8;
+  --accent-soft: #1E1B4B;
+  --danger: #FB7185;
+  --success: #34D399;
+  --notes: #FBBF24;
+  --agents: #A78BFA;
+  --diary: #F472B6;
+  --timer: #FB7185;
+  --calendar: #22D3EE;
+}
+
+/* ─── Base ────────────────────────────────────────────── */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  color-scheme: var(--scheme);
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ─── Fonts per theme ─────────────────────────────────── */
+[data-theme="joy"] body {
+  font-family: 'Outfit', ui-rounded, system-ui, sans-serif;
+  background: linear-gradient(160deg, #FFF8F0 0%, #FFF0E3 50%, #FFE8D6 100%);
+  background-attachment: fixed;
+}
+
+[data-theme="zen"] body {
+  font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  background: #F8F9FA;
+}
+
+[data-theme="midnight"] body {
+  font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  background: linear-gradient(180deg, #0B0F19 0%, #0F172A 100%);
+  background-attachment: fixed;
+}
+
+/* ─── Keyframes ───────────────────────────────────────── */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes zen-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ─── Entrance ────────────────────────────────────────── */
+.page-enter {
+  animation: rise-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+[data-theme="zen"] .page-enter {
+  animation: zen-fade-in 0.35s ease-out forwards;
+}
+
+.modal-backdrop {
+  animation: backdrop-in 0.18s ease-out both;
+}
+
+.modal-panel {
+  animation: panel-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.widget-window {
+  animation: rise-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ─── Joy polish ──────────────────────────────────────── */
+[data-theme="joy"] .rounded-2xl {
+  box-shadow: 0 1px 3px color-mix(in srgb, #E8C9A8 40%, transparent),
+              0 4px 12px color-mix(in srgb, #F5DFC8 25%, transparent);
+}
+
+[data-theme="joy"] button:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+[data-theme="joy"] a:hover,
+[data-theme="joy"] button:hover {
+  transition-duration: 0.15s;
+}
+
+/* ─── Zen polish ──────────────────────────────────────── */
+[data-theme="zen"] .rounded-2xl {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  border-color: transparent;
+}
+
+[data-theme="zen"] .rounded-2xl:hover {
+  border-color: var(--border);
+}
+
+[data-theme="zen"] button:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+[data-theme="zen"] * {
+  transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* ─── Midnight polish ─────────────────────────────────── */
+[data-theme="midnight"] .rounded-2xl {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4),
+              0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="midnight"] .rounded-2xl:hover {
+  border-color: color-mix(in srgb, var(--accent) 20%, var(--border));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4),
+              0 4px 16px rgba(0, 0, 0, 0.3),
+              0 0 24px -6px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+[data-theme="midnight"] button:focus-visible {
+  box-shadow: 0 0 0 2px var(--bg),
+              0 0 0 4px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+[data-theme="midnight"] ::selection {
+  background: color-mix(in srgb, var(--accent) 70%, transparent);
+}
+
+/* ─── Scrollbar ───────────────────────────────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+.scroll-thin::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}

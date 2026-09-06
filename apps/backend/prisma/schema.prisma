@@ -1,0 +1,156 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  runtime  = "workerd"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                     String    @id @default(cuid())
+  email                  String    @unique
+  name                   String
+  passwordHash           String
+  emailVerified          Boolean   @default(false)
+  refreshTokenDigest     String?   @unique
+  refreshTokenExpiresAt  DateTime?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
+
+  tasks             Task[]
+  appointments      Appointment[]
+  diaryEntries      DiaryEntry[]
+  agents            Agent[]
+  timerSettings     TimerSettings?
+  reminders         Reminder[]
+  verificationToken EmailVerificationToken?
+  resetToken        PasswordResetToken?
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @unique
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String   @unique
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+enum TaskStatus {
+  todo
+  doing
+  done
+}
+
+enum TaskPriority {
+  low
+  medium
+  high
+}
+
+enum CalendarEventKind {
+  appointment
+  birthday
+  task
+}
+
+enum Mood {
+  great
+  good
+  okay
+  low
+  rough
+}
+
+model Task {
+  id       String       @id @default(cuid())
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId   String
+  title    String
+  text     String       @default("")
+  priority TaskPriority @default(medium)
+  status   TaskStatus   @default(todo)
+  position Int          @default(0)
+  dueDate  String? // "YYYY-MM-DD"
+  createdAt DateTime    @default(now())
+  doneAt   DateTime?
+
+  @@unique([userId, status, position])
+  @@index([userId, status])
+}
+
+model Appointment {
+  id        String             @id @default(cuid())
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  kind      CalendarEventKind  @default(appointment)
+  title     String
+  date      String // "YYYY-MM-DD"
+  startTime String // "HH:mm"
+  endTime   String?
+  color     String
+  notes     String             @default("")
+
+  @@index([userId, date])
+}
+
+model DiaryEntry {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  date      String // "YYYY-MM-DD"
+  title     String
+  content   String
+  mood      Mood     @default(okay)
+  tags      String[] @default([])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, date])
+}
+
+model Agent {
+  id           String   @id @default(cuid())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  name         String
+  role         String
+  icon         String
+  color        String
+  description  String
+  preferences  String[] @default([])
+  enabled      Boolean  @default(true)
+}
+
+model TimerSettings {
+  id              String   @id @default(cuid())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String   @unique
+  presets         Int[]    @default([10, 15, 25, 45])
+  soundOn         Boolean  @default(true)
+  notificationsOn Boolean  @default(false)
+}
+
+model Reminder {
+  id              String   @id @default(cuid())
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String
+  kind            String   @default("focus") // 'focus' | 'break'
+  message         String
+  level           Int      @default(1) // 1 | 2 | 3
+  createdAt       DateTime @default(now())
+  lastEscalatedAt DateTime @default(now())
+
+  @@index([userId])
+}

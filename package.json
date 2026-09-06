@@ -1,0 +1,32 @@
+{
+  "name": "turbotron",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "prettier": "@goatee/prettier",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md,js,jsx}\""
+  },
+  "devDependencies": {
+    "@goatee/prettier": "^0.0.4",
+    "prettier": "latest",
+    "turbo": "2.4.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "packageManager": "npm@11.2.0",
+  "devEngines": {
+    "packageManager": {
+      "name": "npm",
+      "version": "11.2.0"
+    }
+  }
+}
