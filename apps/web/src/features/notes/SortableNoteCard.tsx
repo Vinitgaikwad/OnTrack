@@ -26,7 +26,7 @@ export function NoteCardVisual({ task, overlay = false }: NoteCardVisualProps) {
     <div
       className={`rounded-2xl border p-3 ${
         overlay
-          ? 'cursor-grabbing rotate-2 border-(--accent)/40 bg-(--surface-2) shadow-xl ring-2 ring-(--accent)/20'
+          ? 'cursor-grabbing border-(--accent)/40 bg-(--surface-2) shadow-xl ring-2 ring-(--accent)/20'
           : 'group cursor-grab border-(--border) bg-(--surface-2) shadow-sm transition hover:border-(--border-strong)'
       }`}
     >
@@ -80,19 +80,16 @@ export function SortableNoteCard({ task }: { task: NoteTask }) {
     id: task.id,
   })
 
-  // The visual lives in the DragOverlay while dragging. Keep this copy in-flow and
-  // only slide horizontally, so sibling cards part smoothly instead of the card
-  // itself lagging after the cursor.
-  const slideTransform = { x: transform?.x ?? 0, y: 0, scaleX: 1, scaleY: 1 }
-
+  // The ghost (see DragGhost) is the only visible copy while dragging. Pin and
+  // hide this in-flow card so its rect stays put and feeds nothing back into dnd-kit.
   return (
     <div
       ref={setNodeRef}
+      data-task-id={task.id}
       style={{
-        transform: CSS.Transform.toString(slideTransform),
-        transition: isDragging ? 'opacity 0.2s ease' : transition,
-        opacity: isDragging ? 0.35 : 1,
-        zIndex: isDragging ? 40 : undefined,
+        transform: isDragging ? undefined : CSS.Transform.toString(transform),
+        transition: isDragging ? undefined : transition,
+        opacity: isDragging ? 0 : 1,
       }}
       {...attributes}
       {...listeners}

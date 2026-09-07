@@ -26,7 +26,7 @@ export type NoteTask = {
   doneAt: number | null
 }
 
-type TaskColumn = Record<TaskStatus, NoteTask[]>
+export type TaskColumn = Record<TaskStatus, NoteTask[]>
 
 export type NotesStore = {
   board: TaskColumn
