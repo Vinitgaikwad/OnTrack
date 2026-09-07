@@ -4,9 +4,9 @@ Source of truth for the data that flows between the frontend and the backend. Fu
 implementing the backend (Prisma ORM + Postgres) or changing frontend entity shapes must keep
 this file in sync (see the rule in `AGENTS.md`).
 
-> **Status: PARTIAL.** Auth, Tasks, and Calendar are implemented end-to-end: Hono API on
+> **Status: PARTIAL.** Auth, Tasks, Calendar, and Diary are implemented end-to-end: Hono API on
 > Cloudflare Workers → Postgres via Prisma, with transactional email via Resend. The remaining
-> feature stores (Diary, Agents, Timer prefs) are still client-side (`zustand` →
+> feature stores (Agents, Timer prefs) are still client-side (`zustand` →
 > `localStorage`) and not yet synced. See §1 and §4 for what is live vs. planned.
 
 ---
@@ -25,7 +25,7 @@ this file in sync (see the rule in `AGENTS.md`).
 | `ontrack-user`                      | `AppUser`, session     | `User`         | **Yes — auth (live)**       |
 | `ontrack-notes`                     | `NoteTask`, board      | `Task`         | **Yes (live)**              |
 | `ontrack-calendar`                  | `Appointment`, `CalendarEventKind` | `Appointment` | **Yes (live)**            |
-| `ontrack-diary`                     | `DiaryEntry`           | `DiaryEntry`   | Planned (schema exists)     |
+| `ontrack-diary`                     | `DiaryEntry`           | `DiaryEntry`   | **Yes (live)**              |
 | `ontrack-agents`                    | `Agent`                | `Agent`        | Planned (schema exists)     |
 | `ontrack-timer`                     | timer settings         | `TimerSettings`| Planned (schema exists; prefs only) |
 | `ontrack-timer`                     | reminders              | `Reminder`     | Planned                    |
@@ -112,11 +112,37 @@ longer touch `useNotesStore`. The Today page and Today widget list **only** cale
 entries are uploaded; the demo seed (Morning meds / Therapy call / Gym) uploads for a brand-new
 account.
 
-### DiaryEntry, Agent, TimerSettings + Reminder
+### DiaryEntry
 
-Contracts unchanged from the planned spec (server models exist in the schema; the API and the
-frontend sync layer are not implemented yet). See the entity tables below the Appointment table
-in the original doc — those fields are still accurate.
+Front source: `apps/web/src/global/stores/useDiaryStore.ts` — `DiaryEntry`, `Mood`, `LoadStatus`.
+
+| Field       | Type               | Notes                                                        |
+| ----------- | ------------------ | ------------------------------------------------------------ |
+| `id`        | string (cuid)      | may be client-generated and sent in `POST` body              |
+| `date`      | string             | `YYYY-MM-DD`                                                 |
+| `title`     | string             | optional in the UI; stored `""`                              |
+| `content`   | string             | optional in the UI; stored `""`                              |
+| `mood`      | `great\|good\|okay\|low\|rough` | defaults `okay`                                  |
+| `tags`      | string[]           | defaults `[]`                                                |
+| `hidden`    | boolean            | defaults `false`. Hidden entries return `content: ""` in every list response until unlocked |
+| `createdAt` | datetime           | client sends epoch ms on create → API stores ISO (preserves seed order) |
+| `updatedAt` | datetime           | maintained by the API                                        |
+
+**Hidden-entry contract:** list/create/update/delete responses **strip `content` to `""`** for
+`hidden: true` rows. `POST /api/diary/unlock` verifies the account password (bcrypt vs
+`passwordHash`) and then **persists `hidden = false`** in the DB — revealing is one-way and
+permanent; the entry becomes fully visible everywhere, and the user can re-hide it later via the
+editor toggle (a plain `PATCH {hidden:true}`, no password needed, since the entry is already
+visible). `PATCH`/`DELETE` on a still-hidden entry (direct API call) still require `password`
+(`HIDDEN_ENTRY` 403 when missing, `INVALID_PASSWORD` 403 when wrong) — the frontend never hits
+this path because it routes hidden-entry mutations through the reveal modal first.
+
+**Sync semantics:** optimistic, mirroring notes/calendar. First `ensureLoaded()` on a fresh
+server seeds the legacy `ontrack-diary` localStorage cache up (one-time, only when the server has
+zero entries). The list is **month-paginated** (5-row pages, `date DESC, createdAt DESC`); the
+month dropdown covers the last 24 months up to the newest entry month. The store keeps the union
+of loaded months in `entries` (sorted); `entries[0]` is therefore the globally newest entry and
+feeds the Today page + dashboard widget (hidden latest → "Hidden entry" placeholder).
 
 ---
 
@@ -230,6 +256,7 @@ model DiaryEntry {
   content   String
   mood      Mood     @default(okay)
   tags      String[] @default([])
+  hidden    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@index([userId, date])
@@ -298,7 +325,8 @@ as a **SHA-256 digest** (it is the long-lived credential, so it never sits in th
 | POST   | `/api/auth/reset-password`     | `{ token, newPassword }`           | `204`                        |
 
 Error codes used: `EMAIL_TAKEN`, `INVALID_CREDENTIALS`, `EMAIL_UNVERIFIED`, `UNAUTHORIZED`,
-`INVALID_VERIFICATION`, `INVALID_RESET_TOKEN`, `INVALID_PASSWORD`, `VALIDATION`, `INTERNAL`.
+`INVALID_VERIFICATION`, `INVALID_RESET_TOKEN`, `INVALID_PASSWORD`, `HIDDEN_ENTRY`, `VALIDATION`,
+`INTERNAL`.
 
 ### Tasks (implemented)
 
@@ -331,10 +359,21 @@ Validation: `kind` ∈ `appointment|birthday|task`, `title` 1..200, `date` `YYYY
 `startTime`/`endTime` `HH:mm` or empty (birthdays), `color` 1..50. All scoped to the authed
 user; `404 NOT_FOUND` for another user's id.
 
-### Diary, Agents, Timer (planned — endpoints unchanged from the original spec)
+### Diary (implemented)
 
-Not implemented yet; models exist. Future implementers: follow the envelope, auth middleware,
-and per-user scoping used by the tasks endpoints.
+| Method | Path                      | Body / Query                  | Returns |
+| ------ | ------------------------- | ----------------------------- | ------- |
+| GET    | `/api/diary`              | `?month=YYYY-MM&offset&limit` (auth) | `{ data: { entries, hasMore } }`; hidden → `content:""`; `month` omitted = all months |
+| POST   | `/api/diary`              | `{ id?, title?, content?, mood?, tags?, date, hidden?, createdAt? }` | `201 { data: DiaryEntry }` (client `id`/`createdAt` honored) |
+| POST   | `/api/diary/unlock`       | `{ id, password }`            | verifies password, **persists `hidden=false`**, returns `{ data: DiaryEntry }` full (content included); `403 INVALID_PASSWORD` |
+| PATCH  | `/api/diary/:id`          | any subset of `title/content/mood/tags/date/hidden` + `password?` (at least one field) | `{ data: DiaryEntry }` — hidden rows require `password` |
+| DELETE | `/api/diary/:id`          | `{ password? }`               | `204` — hidden rows require `password` |
+
+Validation: `date` `YYYY-MM-DD`, `month` `YYYY-MM`, `mood` ∈ `great|good|okay|low|rough`,
+`tags` string[] ≤ 20 × ≤ 50 chars, `content` ≤ 50_000, `title` ≤ 200, `offset` int ≥ 0,
+`limit` int 1..50 (default 5). List ordered `date DESC, createdAt DESC` (existing
+`@@index([userId, date])` serves the month range). All routes auth + scoped to the owner,
+`404 NOT_FOUND` for another user's id.
 
 ---
 
@@ -343,13 +382,16 @@ and per-user scoping used by the tasks endpoints.
 - **API base:** `/api` (relative) via the Vite dev proxy. Electron packaged builds must set an
   absolute backend origin (e.g. `VITE_API_BASE`) — still outstanding.
 - **Lazy loading:** stores expose a non-persisted `loadStatus: 'idle' | 'loading' | 'loaded' |
-  'error'` and `ensureLoaded()`. Pages call `ensureLoaded()` on mount (Today, Notes, Calendar for
-  now); nothing is fetched at app start.
+  'error'` and `ensureLoaded()`. Pages call `ensureLoaded()` on mount (Today, Notes, Calendar,
+  Diary for now); nothing is fetched at app start. Diary additionally loads per-month pages and
+  paginates (`ensureMonth` / `loadMore`).
 - **Optimistic writes:** the notes store mutates locally, pushes in the background, and on
   failure reloads the board from the server and toasts (`useToastStore`). The calendar store
   follows the same pattern (add/update/remove are optimistic; on failure it re-fetches and
-  toasts). The dashboard widget's Today wedge calls `ensureLoaded()` itself on mount since the
-  widget window does not render the pages that would trigger it.
+  toasts). The diary store follows the same pattern; `INVALID_PASSWORD` and `AUTH_REQUIRED`
+  errors skip the toast (the reveal modal surfaces the former inline, the auth redirect handles
+  the latter). The dashboard widget's Today wedge calls `ensureLoaded()` itself on mount since
+  the widget window does not render the pages that would trigger it.
 - `ontrack-dashboard` and `ontrack-theme` stay client-only (device-local preferences).
 - Keep the reminder escalation loop in `useTimerStore` intact; reminders stay local-first.
 
@@ -370,7 +412,8 @@ and per-user scoping used by the tasks endpoints.
 1. ~~Auth strategy~~ **Resolved:** email + password, custom JWT, email verification + password
    reset via Resend. The `RESEND_API_KEY` was pasted in a session once — **revoke/rotate it**.
 2. Sync strategy for the remaining stores (Diary/Agents/Timer prefs) — same
-   optimistic lazy-load pattern as notes/calendar. Calendar resolved with the appointments API.
+   optimistic lazy-load pattern as notes/calendar. Calendar resolved with the appointments API;
+   Diary resolved with the diary API (§4).
 3. Whether dashboard widgets/theme should ever sync across devices (currently device-local).
 4. Reminder `lastEscalatedAt`/level semantics offline (local-first).
 5. Production Electron: absolute API origin + token rehydration for `file://` builds.

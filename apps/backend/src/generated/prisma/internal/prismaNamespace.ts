@@ -1206,6 +1206,7 @@ export const DiaryEntryScalarFieldEnum = {
   content: 'content',
   mood: 'mood',
   tags: 'tags',
+  hidden: 'hidden',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

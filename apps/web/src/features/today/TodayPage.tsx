@@ -15,11 +15,13 @@ export function TodayPage() {
   const ensureLoaded = useCalendarStore((state) => state.ensureLoaded)
   const timer = useTimerStore()
   const entries = useDiaryStore((state) => state.entries)
+  const ensureDiaryLoaded = useDiaryStore((state) => state.ensureLoaded)
   const agents = useAgentsStore((state) => state.agents)
 
   useEffect(() => {
     void ensureLoaded()
-  }, [ensureLoaded])
+    void ensureDiaryLoaded()
+  }, [ensureLoaded, ensureDiaryLoaded])
 
   const today = todayKey()
   const todayEntries = appointments
@@ -129,10 +131,14 @@ export function TodayPage() {
             </Link>
           </div>
           {latestEntry ? (
-            <>
-              <p className="text-lg">{MOOD_META[latestEntry.mood].emoji}</p>
-              <p className="mt-1 line-clamp-2 text-sm text-(--text-muted)">{latestEntry.content}</p>
-            </>
+            latestEntry.hidden ? (
+              <p className="py-4 text-sm text-(--text-muted)">A hidden entry is waiting. Open the diary to unlock it.</p>
+            ) : (
+              <>
+                <p className="text-lg">{MOOD_META[latestEntry.mood].emoji}</p>
+                <p className="mt-1 line-clamp-2 text-sm text-(--text-muted)">{latestEntry.content}</p>
+              </>
+            )
           ) : (
             <p className="py-4 text-sm text-(--text-muted)">
               No entry yet. One honest sentence can change the day.

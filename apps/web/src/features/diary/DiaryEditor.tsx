@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Lock } from 'lucide-react'
 import type { DiaryEntry, Mood } from '../../global/stores/useDiaryStore'
 import { useDiaryStore } from '../../global/stores/useDiaryStore'
 import { MOOD_META } from './DiaryPage'
@@ -22,6 +23,7 @@ export function DiaryEditor({ open, initial, onClose }: DiaryEditorProps) {
   const [mood, setMood] = useState<Mood>(initial?.mood ?? 'okay')
   const [content, setContent] = useState(initial?.content ?? '')
   const [tagsText, setTagsText] = useState(initial?.tags.join(', ') ?? '')
+  const [hideEntry, setHideEntry] = useState(initial?.hidden ?? false)
 
   const handleSave = () => {
     if (!content.trim() && !title.trim()) return
@@ -30,9 +32,9 @@ export function DiaryEditor({ open, initial, onClose }: DiaryEditorProps) {
       .map((tag) => tag.trim().replace(/^#/, ''))
       .filter(Boolean)
     if (initial) {
-      updateEntry(initial.id, { title: title.trim(), content: content.trim(), mood, tags, date })
+      updateEntry(initial.id, { title: title.trim(), content: content.trim(), mood, tags, date, hidden: hideEntry })
     } else {
-      addEntry({ title: title.trim(), content: content.trim(), mood, tags, date })
+      addEntry({ title: title.trim(), content: content.trim(), mood, tags, date, hidden: hideEntry })
     }
     onClose()
   }
@@ -100,6 +102,35 @@ export function DiaryEditor({ open, initial, onClose }: DiaryEditorProps) {
             placeholder="work, win"
           />
         </Field>
+
+        <button
+          type="button"
+          role="switch"
+          aria-checked={hideEntry}
+          onClick={() => setHideEntry((value) => !value)}
+          className="flex w-full items-center justify-between rounded-xl border border-(--border) bg-(--surface) px-3 py-2.5 text-sm transition hover:border-(--border-strong) hover:bg-(--surface-2)"
+        >
+          <span className="flex items-center gap-2 text-(--text)">
+            <Lock size={14} className="text-(--accent)" />
+            Keep this private
+          </span>
+          <span
+            className={`relative h-5 w-9 shrink-0 rounded-full transition ${
+              hideEntry ? 'bg-(--accent)' : 'bg-(--surface-3)'
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${
+                hideEntry ? 'left-4.5' : 'left-0.5'
+              }`}
+            />
+          </span>
+        </button>
+        {hideEntry ? (
+          <p className="text-xs text-(--text-muted)">
+            Only visible with your account password — stays blurred on the dashboard.
+          </p>
+        ) : null}
 
         <div className="flex justify-end gap-2 border-t border-(--border) pt-4">
           <Button variant="ghost" onClick={onClose}>

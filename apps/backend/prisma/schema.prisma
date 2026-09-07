@@ -114,6 +114,7 @@ model DiaryEntry {
   content   String
   mood      Mood     @default(okay)
   tags      String[] @default([])
+  hidden    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

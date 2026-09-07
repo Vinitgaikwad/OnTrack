@@ -31,6 +31,7 @@ export type DiaryEntryMinAggregateOutputType = {
   title: string | null
   content: string | null
   mood: $Enums.Mood | null
+  hidden: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -42,6 +43,7 @@ export type DiaryEntryMaxAggregateOutputType = {
   title: string | null
   content: string | null
   mood: $Enums.Mood | null
+  hidden: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -54,6 +56,7 @@ export type DiaryEntryCountAggregateOutputType = {
   content: number
   mood: number
   tags: number
+  hidden: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -67,6 +70,7 @@ export type DiaryEntryMinAggregateInputType = {
   title?: true
   content?: true
   mood?: true
+  hidden?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -78,6 +82,7 @@ export type DiaryEntryMaxAggregateInputType = {
   title?: true
   content?: true
   mood?: true
+  hidden?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -90,6 +95,7 @@ export type DiaryEntryCountAggregateInputType = {
   content?: true
   mood?: true
   tags?: true
+  hidden?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -175,6 +181,7 @@ export type DiaryEntryGroupByOutputType = {
   content: string
   mood: $Enums.Mood
   tags: string[]
+  hidden: boolean
   createdAt: Date
   updatedAt: Date
   _count: DiaryEntryCountAggregateOutputType | null
@@ -208,6 +215,7 @@ export type DiaryEntryWhereInput = {
   content?: Prisma.StringFilter<"DiaryEntry"> | string
   mood?: Prisma.EnumMoodFilter<"DiaryEntry"> | $Enums.Mood
   tags?: Prisma.StringNullableListFilter<"DiaryEntry">
+  hidden?: Prisma.BoolFilter<"DiaryEntry"> | boolean
   createdAt?: Prisma.DateTimeFilter<"DiaryEntry"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"DiaryEntry"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -221,6 +229,7 @@ export type DiaryEntryOrderByWithRelationInput = {
   content?: Prisma.SortOrder
   mood?: Prisma.SortOrder
   tags?: Prisma.SortOrder
+  hidden?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -237,6 +246,7 @@ export type DiaryEntryWhereUniqueInput = Prisma.AtLeast<{
   content?: Prisma.StringFilter<"DiaryEntry"> | string
   mood?: Prisma.EnumMoodFilter<"DiaryEntry"> | $Enums.Mood
   tags?: Prisma.StringNullableListFilter<"DiaryEntry">
+  hidden?: Prisma.BoolFilter<"DiaryEntry"> | boolean
   createdAt?: Prisma.DateTimeFilter<"DiaryEntry"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"DiaryEntry"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -250,6 +260,7 @@ export type DiaryEntryOrderByWithAggregationInput = {
   content?: Prisma.SortOrder
   mood?: Prisma.SortOrder
   tags?: Prisma.SortOrder
+  hidden?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.DiaryEntryCountOrderByAggregateInput
@@ -268,6 +279,7 @@ export type DiaryEntryScalarWhereWithAggregatesInput = {
   content?: Prisma.StringWithAggregatesFilter<"DiaryEntry"> | string
   mood?: Prisma.EnumMoodWithAggregatesFilter<"DiaryEntry"> | $Enums.Mood
   tags?: Prisma.StringNullableListFilter<"DiaryEntry">
+  hidden?: Prisma.BoolWithAggregatesFilter<"DiaryEntry"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"DiaryEntry"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"DiaryEntry"> | Date | string
 }
@@ -279,6 +291,7 @@ export type DiaryEntryCreateInput = {
   content: string
   mood?: $Enums.Mood
   tags?: Prisma.DiaryEntryCreatetagsInput | string[]
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutDiaryEntriesInput
@@ -292,6 +305,7 @@ export type DiaryEntryUncheckedCreateInput = {
   content: string
   mood?: $Enums.Mood
   tags?: Prisma.DiaryEntryCreatetagsInput | string[]
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -303,6 +317,7 @@ export type DiaryEntryUpdateInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   mood?: Prisma.EnumMoodFieldUpdateOperationsInput | $Enums.Mood
   tags?: Prisma.DiaryEntryUpdatetagsInput | string[]
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutDiaryEntriesNestedInput
@@ -316,6 +331,7 @@ export type DiaryEntryUncheckedUpdateInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   mood?: Prisma.EnumMoodFieldUpdateOperationsInput | $Enums.Mood
   tags?: Prisma.DiaryEntryUpdatetagsInput | string[]
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -328,6 +344,7 @@ export type DiaryEntryCreateManyInput = {
   content: string
   mood?: $Enums.Mood
   tags?: Prisma.DiaryEntryCreatetagsInput | string[]
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -339,6 +356,7 @@ export type DiaryEntryUpdateManyMutationInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   mood?: Prisma.EnumMoodFieldUpdateOperationsInput | $Enums.Mood
   tags?: Prisma.DiaryEntryUpdatetagsInput | string[]
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -351,6 +369,7 @@ export type DiaryEntryUncheckedUpdateManyInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   mood?: Prisma.EnumMoodFieldUpdateOperationsInput | $Enums.Mood
   tags?: Prisma.DiaryEntryUpdatetagsInput | string[]
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -381,6 +400,7 @@ export type DiaryEntryCountOrderByAggregateInput = {
   content?: Prisma.SortOrder
   mood?: Prisma.SortOrder
   tags?: Prisma.SortOrder
+  hidden?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -392,6 +412,7 @@ export type DiaryEntryMaxOrderByAggregateInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   mood?: Prisma.SortOrder
+  hidden?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -403,6 +424,7 @@ export type DiaryEntryMinOrderByAggregateInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   mood?: Prisma.SortOrder
+  hidden?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -469,6 +491,7 @@ export type DiaryEntryCreateWithoutUserInput = {
   content: string
   mood?: $Enums.Mood
   tags?: Prisma.DiaryEntryCreatetagsInput | string[]
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -480,6 +503,7 @@ export type DiaryEntryUncheckedCreateWithoutUserInput = {
   content: string
   mood?: $Enums.Mood
   tags?: Prisma.DiaryEntryCreatetagsInput | string[]
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -521,6 +545,7 @@ export type DiaryEntryScalarWhereInput = {
   content?: Prisma.StringFilter<"DiaryEntry"> | string
   mood?: Prisma.EnumMoodFilter<"DiaryEntry"> | $Enums.Mood
   tags?: Prisma.StringNullableListFilter<"DiaryEntry">
+  hidden?: Prisma.BoolFilter<"DiaryEntry"> | boolean
   createdAt?: Prisma.DateTimeFilter<"DiaryEntry"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"DiaryEntry"> | Date | string
 }
@@ -532,6 +557,7 @@ export type DiaryEntryCreateManyUserInput = {
   content: string
   mood?: $Enums.Mood
   tags?: Prisma.DiaryEntryCreatetagsInput | string[]
+  hidden?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -543,6 +569,7 @@ export type DiaryEntryUpdateWithoutUserInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   mood?: Prisma.EnumMoodFieldUpdateOperationsInput | $Enums.Mood
   tags?: Prisma.DiaryEntryUpdatetagsInput | string[]
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -554,6 +581,7 @@ export type DiaryEntryUncheckedUpdateWithoutUserInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   mood?: Prisma.EnumMoodFieldUpdateOperationsInput | $Enums.Mood
   tags?: Prisma.DiaryEntryUpdatetagsInput | string[]
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -565,6 +593,7 @@ export type DiaryEntryUncheckedUpdateManyWithoutUserInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   mood?: Prisma.EnumMoodFieldUpdateOperationsInput | $Enums.Mood
   tags?: Prisma.DiaryEntryUpdatetagsInput | string[]
+  hidden?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -579,6 +608,7 @@ export type DiaryEntrySelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   content?: boolean
   mood?: boolean
   tags?: boolean
+  hidden?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -592,6 +622,7 @@ export type DiaryEntrySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   content?: boolean
   mood?: boolean
   tags?: boolean
+  hidden?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -605,6 +636,7 @@ export type DiaryEntrySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   content?: boolean
   mood?: boolean
   tags?: boolean
+  hidden?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -618,11 +650,12 @@ export type DiaryEntrySelectScalar = {
   content?: boolean
   mood?: boolean
   tags?: boolean
+  hidden?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type DiaryEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "date" | "title" | "content" | "mood" | "tags" | "createdAt" | "updatedAt", ExtArgs["result"]["diaryEntry"]>
+export type DiaryEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "date" | "title" | "content" | "mood" | "tags" | "hidden" | "createdAt" | "updatedAt", ExtArgs["result"]["diaryEntry"]>
 export type DiaryEntryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -646,6 +679,7 @@ export type $DiaryEntryPayload<ExtArgs extends runtime.Types.Extensions.Internal
     content: string
     mood: $Enums.Mood
     tags: string[]
+    hidden: boolean
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["diaryEntry"]>
@@ -1079,6 +1113,7 @@ export interface DiaryEntryFieldRefs {
   readonly content: Prisma.FieldRef<"DiaryEntry", 'String'>
   readonly mood: Prisma.FieldRef<"DiaryEntry", 'Mood'>
   readonly tags: Prisma.FieldRef<"DiaryEntry", 'String[]'>
+  readonly hidden: Prisma.FieldRef<"DiaryEntry", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"DiaryEntry", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"DiaryEntry", 'DateTime'>
 }
