@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { format } from 'date-fns'
-import { toErrorMessage } from '../lib/api'
+import { isAuthError, toErrorMessage } from '../lib/api'
 import { uid } from '../lib/id'
 import { DATE_KEY, todayKey } from '../lib/dates'
 import {
@@ -86,6 +86,7 @@ const seed = (): Appointment[] => [
 ]
 
 function pushSyncError(error: unknown): void {
+  if (isAuthError(error)) return
   useToastStore.getState().push({
     title: 'Couldn’t sync calendar',
     message: toErrorMessage(error),

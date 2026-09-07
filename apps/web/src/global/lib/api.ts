@@ -39,8 +39,8 @@ async function exchangeRefreshToken(): Promise<boolean> {
 }
 
 /** Returns true when a usable access token is available, refreshing if needed. */
-export async function ensureFreshSession(): Promise<boolean> {
-  if (getAccessToken()) return true
+export async function ensureFreshSession(force = false): Promise<boolean> {
+  if (!force && getAccessToken()) return true
   if (!getRefreshToken()) return false
   refreshPromise ??= exchangeRefreshToken().finally(() => {
     refreshPromise = null
@@ -66,8 +66,10 @@ export async function api<T>(
   })
 
   if (response.status === 401 && retryOnUnauthorized) {
-    const refreshed = await ensureFreshSession()
+    const refreshed = await ensureFreshSession(true)
     if (refreshed) return api<T>(path, init, false)
+    clearSession()
+    throw new ApiError('AUTH_REQUIRED', 'Your session has expired. Please sign in again.', 401)
   }
 
   if (response.status === 204) return undefined as T
@@ -79,6 +81,11 @@ export async function api<T>(
     throw new ApiError(code, message, response.status)
   }
   return body?.data as T
+}
+
+/** Returns true when the error means the session is gone (user must re-authenticate). */
+export function isAuthError(error: unknown): boolean {
+  return error instanceof ApiError && error.code === 'AUTH_REQUIRED'
 }
 
 export function toErrorMessage(error: unknown): string {

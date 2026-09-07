@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { toErrorMessage } from '../lib/api'
+import { isAuthError, toErrorMessage } from '../lib/api'
 import { uid } from '../lib/id'
 import {
   createTask,
@@ -87,6 +87,7 @@ async function fetchBoard(): Promise<TaskColumn> {
 }
 
 function pushSyncError(error: unknown): void {
+  if (isAuthError(error)) return
   useToastStore.getState().push({
     title: 'Couldn’t sync tasks',
     message: toErrorMessage(error),
