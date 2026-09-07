@@ -10,6 +10,7 @@
   "prettier": "@goatee/prettier",
   "scripts": {
     "build": "turbo run build",
+    "predev": "node scripts/dev-cleanup.mjs",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md,js,jsx}\""
