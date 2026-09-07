@@ -29,9 +29,23 @@ const appointmentSchema = z.object({
   notes: z.string().max(20_000).optional().default(''),
 })
 
-const updateAppointmentSchema = appointmentSchema
-  .omit({ id: true })
-  .partial()
+// Plain .optional() fields (no .default()) — zod applies .default() even through
+// .partial(), which would re-inject e.g. color:'#8b5cf6' and clobber values on a PATCH.
+const updateAppointmentSchema = z
+  .object({
+    kind: z.enum(['appointment', 'birthday', 'task']).optional(),
+    title: z.string().trim().min(1, 'Title is required').max(200).optional(),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD').optional(),
+    startTime: z
+      .string()
+      .regex(timePattern, 'Use HH:mm or empty')
+      .optional(),
+    endTime: z
+      .union([z.string().regex(timePattern, 'Use HH:mm'), z.null()])
+      .optional(),
+    color: z.string().trim().min(1).max(50).optional(),
+    notes: z.string().max(20_000).optional(),
+  })
   .refine((value) => Object.keys(value).length > 0, 'At least one field is required')
 
 export const handleListAppointments = (c: Context) =>
