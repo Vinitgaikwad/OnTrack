@@ -11,13 +11,14 @@ import {
   startOfMonth,
   startOfWeek,
 } from 'date-fns'
-import { CalendarCheck, Cake, CheckSquare, ChevronDown, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
+import { CalendarCheck, Cake, CheckSquare, ChevronDown, ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react'
 import type { Appointment, CalendarEventKind } from '../../global/stores/useCalendarStore'
 import { TASK_EVENT_COLOR, useCalendarStore } from '../../global/stores/useCalendarStore'
 import { AppointmentModal } from './AppointmentModal'
 import { TaskModal } from './TaskModal'
 import { Button } from '../../global/ui/Button'
 import { Card } from '../../global/ui/Card'
+import { Modal } from '../../global/ui/Modal'
 import { DATE_KEY } from '../../global/lib/dates'
 
 export function CalendarPage() {
@@ -35,6 +36,7 @@ export function CalendarPage() {
     appointment: Appointment | null
   } | null>(null)
   const [addOpen, setAddOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<Appointment | null>(null)
   const agendaRef = useRef<HTMLDivElement>(null)
   const firstRender = useRef(true)
 
@@ -63,12 +65,19 @@ export function CalendarPage() {
 
   const openAdd = (kind: CalendarEventKind | 'task') => {
     setAddOpen(false)
+    setDeleteTarget(null)
     setEntry({ date: selectedKey, kind, appointment: null })
   }
 
   const openEdit = (appointment: Appointment) => {
     setAddOpen(false)
+    setDeleteTarget(null)
     setEntry({ date: appointment.date, kind: appointment.kind, appointment })
+  }
+
+  const deleteAppointment = (id: string) => {
+    useCalendarStore.getState().removeAppointment(id)
+    setDeleteTarget(null)
   }
 
   const monthStart = startOfMonth(cursor)
@@ -264,13 +273,12 @@ export function CalendarPage() {
             ) : (
               <div className="flex flex-col gap-2">
                 {dayAppointments.map((appointment) => (
-                  <button
+                  <div
                     key={appointment.id}
-                    onClick={() => openEdit(appointment)}
-                    className="flex items-center gap-3 rounded-xl border border-(--border) p-2.5 text-left transition hover:border-(--border-strong)"
+                    className="flex items-center gap-3 rounded-xl border border-(--border) p-2.5 transition hover:border-(--border-strong)"
                   >
                     <span className="h-full w-1 self-stretch rounded-full" style={{ backgroundColor: appointment.color }} />
-                    <div className="min-w-0 flex-1">
+                    <div className="min-w-0 flex-1 cursor-pointer" onClick={() => openEdit(appointment)}>
                       <p className="truncate text-sm font-medium">{appointment.title}</p>
                       <p className="text-[11px] text-(--text-muted)">
                         {appointment.kind === 'birthday' ? (
@@ -286,20 +294,51 @@ export function CalendarPage() {
                         )}
                       </p>
                     </div>
-                  </button>
+                    <div className="flex shrink-0 gap-1">
+                      <button
+                        onClick={() => openEdit(appointment)}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-(--text-muted) transition hover:bg-(--surface-2) hover:text-(--accent)"
+                        aria-label={`Edit ${appointment.title}`}
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      <button
+                        onClick={() => setDeleteTarget(appointment)}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-(--text-muted) transition hover:bg-(--surface-2) hover:text-(--danger)"
+                        aria-label={`Delete ${appointment.title}`}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
                 ))}
                 {dayTasks.map((task) => (
-                  <button
+                  <div
                     key={task.id}
-                    onClick={() => openEdit(task)}
-                    className="flex items-center gap-3 rounded-xl border border-dashed border-(--border-strong) p-2.5 text-left transition hover:border-(--border)"
+                    className="flex items-center gap-3 rounded-xl border border-dashed border-(--border-strong) p-2.5 transition hover:border-(--border)"
                   >
                     <span className="h-full w-1 self-stretch rounded-full bg-(--notes)" />
-                    <div className="min-w-0 flex-1">
+                    <div className="min-w-0 flex-1 cursor-pointer" onClick={() => openEdit(task)}>
                       <p className="truncate text-sm font-medium">{task.title}</p>
                       <p className="text-[11px] text-(--text-muted)">Task</p>
                     </div>
-                  </button>
+                    <div className="flex shrink-0 gap-1">
+                      <button
+                        onClick={() => openEdit(task)}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-(--text-muted) transition hover:bg-(--surface-2) hover:text-(--accent)"
+                        aria-label={`Edit ${task.title}`}
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      <button
+                        onClick={() => setDeleteTarget(task)}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg text-(--text-muted) transition hover:bg-(--surface-2) hover:text-(--danger)"
+                        aria-label={`Delete ${task.title}`}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
                 ))}
               </div>
             )}
@@ -316,6 +355,30 @@ export function CalendarPage() {
           </Card>
         </div>
       </div>
+
+      {deleteTarget && (
+        <Modal
+          open
+          onClose={() => setDeleteTarget(null)}
+          title={deleteTarget.kind === 'birthday' ? 'Delete birthday' : deleteTarget.kind === 'task' ? 'Delete task' : 'Delete appointment'}
+          width="max-w-sm"
+        >
+          <div className="flex flex-col gap-4">
+            <p className="text-sm text-(--text-muted)">
+              Are you sure you want to delete <span className="font-medium text-(--text)">“{deleteTarget.title}”</span>? This can&apos;t be undone.
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button variant="ghost" onClick={() => setDeleteTarget(null)}>
+                Cancel
+              </Button>
+              <Button variant="danger" onClick={() => deleteAppointment(deleteTarget.id)}>
+                <Trash2 size={14} />
+                Delete
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
 
       {entry?.kind === 'task' ? (
         <TaskModal
