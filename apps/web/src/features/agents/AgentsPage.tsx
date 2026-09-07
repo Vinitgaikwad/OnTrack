@@ -33,7 +33,7 @@ export function AgentsPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <header className="mb-6 flex items-end justify-between gap-4">
+      <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Agents</h1>
           <p className="text-sm text-(--text-muted)">
@@ -58,7 +58,7 @@ export function AgentsPage() {
           {agents.map((agent) => {
             const Icon = AGENT_ICONS[agent.icon as AgentIconKey] ?? Bot
             return (
-              <Card key={agent.id} className="flex flex-col p-5">
+              <Card key={agent.id} className="flex min-w-0 flex-col p-5">
                 <div className="flex items-start gap-3">
                   <span
                     className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl"

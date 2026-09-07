@@ -66,10 +66,12 @@ export function subscribeAuthEvents(): void {
     if (event.key === 'ontrack-user') {
       const stored = localStorage.getItem('ontrack-user')
       const parsed = stored ? JSON.parse(stored).state : null
-      useUserStore.setState((state) => ({
+      useUserStore.setState({
         user: parsed?.user ?? null,
-        status: parsed?.user ? state.status : 'signedOut',
-      }))
+        // The value was just written by another window signing in/out, so the
+        // stored user IS the current auth truth — don't keep a stale local status.
+        status: parsed?.user ? 'signedIn' : 'signedOut',
+      })
     }
   })
 }

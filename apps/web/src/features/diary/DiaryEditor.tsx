@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { addMonths, format, startOfMonth } from 'date-fns'
 import { Lock } from 'lucide-react'
 import type { DiaryEntry, Mood } from '../../global/stores/useDiaryStore'
 import { useDiaryStore } from '../../global/stores/useDiaryStore'
@@ -17,6 +18,10 @@ type DiaryEditorProps = {
 export function DiaryEditor({ open, initial, onClose }: DiaryEditorProps) {
   const addEntry = useDiaryStore((state) => state.addEntry)
   const updateEntry = useDiaryStore((state) => state.updateEntry)
+
+  // New entries may be back-dated no further than the previous month; edits keep the original date.
+  const minDate = initial ? undefined : format(startOfMonth(addMonths(new Date(), -1)), 'yyyy-MM-dd')
+  const maxDate = initial ? undefined : todayKey()
 
   const [date, setDate] = useState(initial?.date ?? todayKey())
   const [title, setTitle] = useState(initial?.title ?? '')
@@ -43,7 +48,13 @@ export function DiaryEditor({ open, initial, onClose }: DiaryEditorProps) {
     <Modal open={open} onClose={onClose} title={initial ? 'Edit entry' : 'New diary entry'}>
       <div className="flex flex-col gap-5">
         <Field label="Date">
-          <Input type="date" value={date} onChange={(event) => setDate(event.target.value)} />
+          <Input
+            type="date"
+            min={minDate}
+            max={maxDate}
+            value={date}
+            onChange={(event) => setDate(event.target.value)}
+          />
         </Field>
 
         <div>

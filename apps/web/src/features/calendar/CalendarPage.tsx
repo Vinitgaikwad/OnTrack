@@ -109,7 +109,7 @@ export function CalendarPage() {
           >
             <ChevronLeft size={16} />
           </Button>
-          <span className="min-w-36 text-center text-sm font-semibold">
+          <span className="min-w-0 text-center text-sm font-semibold sm:min-w-36">
             {format(cursor, 'MMMM yyyy')}
           </span>
           <Button

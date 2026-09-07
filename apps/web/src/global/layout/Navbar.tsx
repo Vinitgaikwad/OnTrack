@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { HelpCircle, LogOut, Settings, Sparkles } from 'lucide-react'
+import { HelpCircle, LogOut, Menu, Settings, Sparkles } from 'lucide-react'
 import { ThemeSwitcher } from '../ui/ThemeSwitcher'
 import { useUserStore } from '../stores/useUserStore'
 
@@ -17,7 +17,7 @@ const FALLBACK_PROFILE = {
   initials: 'VN',
 }
 
-export function Navbar() {
+export function Navbar({ menuOpen, onToggleMenu }: { menuOpen: boolean; onToggleMenu: () => void }) {
   const [open, setOpen] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -36,7 +36,17 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 flex items-center gap-2 border-b border-(--border) bg-(--surface) px-3 py-3 sm:gap-4 sm:px-6">
-      <NavLink to="/" onClick={closeAll} className="flex shrink-0 items-center gap-2.5">
+      <button
+        onClick={onToggleMenu}
+        aria-label={menuOpen ? 'Close navigation' : 'Open navigation'}
+        aria-haspopup="dialog"
+        aria-expanded={menuOpen}
+        className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-(--text) transition hover:bg-(--surface-2) md:hidden"
+      >
+        {menuOpen ? <Sparkles size={18} /> : <Menu size={20} />}
+      </button>
+
+      <NavLink to="/" onClick={closeAll} className="hidden shrink-0 items-center gap-2.5 md:flex">
         <span className="grid h-9 w-9 place-items-center rounded-xl bg-(--accent) text-white shadow-sm">
           <Sparkles size={18} />
         </span>

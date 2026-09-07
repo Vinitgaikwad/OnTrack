@@ -21,6 +21,21 @@ export const MOOD_META: Record<Mood, { label: string; emoji: string; color: stri
 const CURRENT_MONTH = format(new Date(), 'yyyy-MM')
 const MONTH_SPAN = 24
 
+const MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+]
+
 function buildMonthOptions(entries: DiaryEntry[]): string[] {
   const newest = entries.reduce(
     (latest, entry) => (entry.date.slice(0, 7) > latest ? entry.date.slice(0, 7) : latest),
@@ -82,6 +97,25 @@ export function DiaryPage() {
   const loading = loadStatus === 'loading' || loadStatus === 'idle'
   const loaded = loadStatus === 'loaded'
 
+  const selectedYear = selectedMonth.slice(0, 4)
+  const selectedMonthNum = selectedMonth.slice(5, 7)
+
+  const years = useMemo(
+    () =>
+      Array.from(new Set(monthOptions.map((month) => month.slice(0, 4)))).sort((a, b) =>
+        b.localeCompare(a)
+      ),
+    [monthOptions]
+  )
+
+  const handleMonthChange = (monthNum: string) => {
+    void ensureMonth(`${selectedYear}-${monthNum}`)
+  }
+
+  const handleYearChange = (year: string) => {
+    void ensureMonth(`${year}-${selectedMonthNum}`)
+  }
+
   const handleDelete = () => {
     if (!deleteTarget) return
     if (deleteTarget.hidden) {
@@ -102,17 +136,32 @@ export function DiaryPage() {
             Daily entries, or whenever you feel like it. Yours to keep.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <CalendarDays size={14} className="shrink-0 text-(--text-muted)" />
           <label className="flex items-center gap-2 text-xs font-medium text-(--text-muted)">
-            <CalendarDays size={14} />
+            <span className="sr-only">Diary month</span>
             <select
-              value={selectedMonth}
-              onChange={(event) => void ensureMonth(event.target.value)}
+              value={selectedMonthNum}
+              onChange={(event) => handleMonthChange(event.target.value)}
               className="rounded-xl border border-(--border) bg-(--surface) px-3 py-1.5 text-sm text-(--text) outline-none transition focus:border-(--accent) focus:ring-2 focus:ring-(--accent)/20"
             >
-              {monthOptions.map((month) => (
-                <option key={month} value={month}>
-                  {format(parse(`${month}-01`, 'yyyy-MM-dd', new Date()), 'MMMM yyyy')}
+              {MONTH_NAMES.map((name, index) => (
+                <option key={name} value={String(index + 1).padStart(2, '0')}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex items-center gap-2 text-xs font-medium text-(--text-muted)">
+            <span className="sr-only">Diary year</span>
+            <select
+              value={selectedYear}
+              onChange={(event) => handleYearChange(event.target.value)}
+              className="rounded-xl border border-(--border) bg-(--surface) px-3 py-1.5 text-sm text-(--text) outline-none transition focus:border-(--accent) focus:ring-2 focus:ring-(--accent)/20"
+            >
+              {years.map((year) => (
+                <option key={year} value={year}>
+                  {year}
                 </option>
               ))}
             </select>
