@@ -4,6 +4,7 @@ import { TodayPage } from './features/today/TodayPage'
 import { NotesPage } from './features/notes/NotesPage'
 import { AgentsPage } from './features/agents/AgentsPage'
 import { DiaryPage } from './features/diary/DiaryPage'
+import { DiaryEntryPage } from './features/diary/DiaryEntryPage'
 import { TimerPage } from './features/timer/TimerPage'
 import { CalendarPage } from './features/calendar/CalendarPage'
 import { DashboardPage } from './features/dashboard/DashboardPage'
@@ -37,6 +38,8 @@ export function App() {
                 <Route path="notes" element={<NotesPage />} />
                 <Route path="agents" element={<AgentsPage />} />
                 <Route path="diary" element={<DiaryPage />} />
+                <Route path="diary/new" element={<DiaryEntryPage />} />
+                <Route path="diary/:id" element={<DiaryEntryPage />} />
                 <Route path="timer" element={<TimerPage />} />
                 <Route path="calendar" element={<CalendarPage />} />
               </Route>

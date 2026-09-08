@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { addMonths, format, parse } from 'date-fns'
 import { BookOpen, CalendarDays, Loader2, Lock, Pencil, Plus, Trash2 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import type { DiaryEntry, Mood } from '../../global/stores/useDiaryStore'
 import { useDiaryStore } from '../../global/stores/useDiaryStore'
-import { DiaryEditor } from './DiaryEditor'
 import { DiaryRevealModal } from './DiaryRevealModal'
 import { Card } from '../../global/ui/Card'
 import { Button } from '../../global/ui/Button'
@@ -62,7 +62,7 @@ export function DiaryPage() {
   const loadMore = useDiaryStore((state) => state.loadMore)
   const removeEntry = useDiaryStore((state) => state.removeEntry)
 
-  const [editing, setEditing] = useState<DiaryEntry | 'new' | null>(null)
+  const navigate = useNavigate()
   const [revealId, setRevealId] = useState<string | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<DiaryEntry | null>(null)
   const sentinelRef = useRef<HTMLDivElement | null>(null)
@@ -166,7 +166,7 @@ export function DiaryPage() {
               ))}
             </select>
           </label>
-          <Button onClick={() => setEditing('new')}>
+          <Button onClick={() => navigate('/diary/new')}>
             <Plus size={16} />
             New entry
           </Button>
@@ -224,7 +224,7 @@ export function DiaryPage() {
                         </p>
                       </div>
                       <div className="flex gap-1 opacity-0 transition group-hover:opacity-100">
-                        <IconButton icon={Pencil} label="Edit entry" onClick={() => setEditing(entry)} />
+                        <IconButton icon={Pencil} label="Edit entry" onClick={() => navigate(`/diary/${entry.id}`)} />
                         <IconButton
                           icon={Trash2}
                           label="Delete entry"
@@ -263,13 +263,6 @@ export function DiaryPage() {
           ) : null}
         </div>
       )}
-
-      <DiaryEditor
-        key={editing === 'new' ? 'new' : editing?.id ?? 'closed'}
-        open={editing !== null}
-        initial={editing === 'new' ? null : editing}
-        onClose={() => setEditing(null)}
-      />
 
       {revealId ? (
         <DiaryRevealModal entryId={revealId} onClose={() => setRevealId(null)} />
