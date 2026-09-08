@@ -20,6 +20,7 @@ const rowMotion = {
 } as const
 
 const PRIORITY_DOT: Record<NoteTask['priority'], string> = {
+  daily: '#8B5CF6',
   high: '#EF4444',
   medium: '#F97316',
   low: '#3B82F6',

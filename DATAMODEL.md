@@ -77,7 +77,7 @@ Front source: `apps/web/src/global/stores/useNotesStore.ts` — `NoteTask`, `Tas
 | `id`       | string (cuid)      | may be client-generated and sent in `POST` body              |
 | `title`    | string             | required                                                     |
 | `text`     | string             | defaults `""`                                                |
-| `priority` | `low \| medium \| high` | defaults `medium`                                        |
+| `priority` | `low \| medium \| high \| daily` | defaults `medium`; `daily` tasks auto-reset to `todo` on their next day |
 | `status`   | `todo \| doing \| done` | derived from board column; stored as a column             |
 | `position` | int                | stable ordering within a status column (drag & drop order)   |
 | `dueDate`  | `string \| null`   | `YYYY-MM-DD` or `null`                                       |
@@ -86,6 +86,11 @@ Front source: `apps/web/src/global/stores/useNotesStore.ts` — `NoteTask`, `Tas
 
 Board = `{ todo: NoteTask[], doing: NoteTask[], done: NoteTask[] }`; storage flattens into
 `status` + `position`. Ordering invariant: **dense, unique positions per `(userId, status)`**.
+
+**Daily-priority reset (client-driven):** when a `daily` task's `dueDate` is before today, the
+notes store moves it back to `todo` (from `doing`/`done`), clears `doneAt`, and bumps `dueDate`
+to today on the next board load — then syncs via `/move` + `PATCH`. The server stores whatever
+state it's given; it does not roll daily tasks itself.
 
 ### Appointment / calendar entity (implemented)
 
@@ -215,7 +220,7 @@ model PasswordResetToken {
 }
 
 enum TaskStatus   { todo doing done }
-enum TaskPriority { low medium high }
+enum TaskPriority { low medium high daily }
 enum CalendarEventKind { appointment birthday task }
 enum Mood         { great good okay low rough }
 
@@ -306,7 +311,7 @@ as a **SHA-256 digest** (it is the long-lived credential, so it never sits in th
 - **Envelope:** success → `{ "data": T }` (mutations return the entity; deletes/void → `204`).
   Errors → `{ "error": { "code", "message" } }` with 4xx/5xx status.
 - Validation: zod in the backend. Timestamps cross as ISO 8601; the frontend converts.
-- Dev: Vite proxies `/api` → `http://127.0.0.1:8787` (`wrangler dev` default).
+- Dev: Vite proxies `/api` → `http://127.0.0.1:7891` (`wrangler dev --port 7891`).
 
 ### Auth (implemented)
 

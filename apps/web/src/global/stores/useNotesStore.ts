@@ -11,9 +11,10 @@ import {
   type TaskDto,
 } from '../repositories/tasks.repository'
 import { useToastStore } from './useToastStore'
+import { todayKey } from '../lib/dates'
 
 export type TaskStatus = 'todo' | 'doing' | 'done'
-export type TaskPriority = 'low' | 'medium' | 'high'
+export type TaskPriority = 'low' | 'medium' | 'high' | 'daily'
 export type LoadStatus = 'idle' | 'loading' | 'loaded' | 'error'
 
 export type NoteTask = {
@@ -51,6 +52,44 @@ const emptyBoard = (): TaskColumn => ({ todo: [], doing: [], done: [] })
 
 const mapColumns = (board: TaskColumn, fn: (column: NoteTask[]) => NoteTask[]): TaskColumn =>
   Object.fromEntries(Object.entries(board).map(([key, column]) => [key, fn(column)])) as TaskColumn
+
+type DailyReset = { task: NoteTask; from: TaskStatus }
+
+// Daily-priority notes roll back to To Do at the start of each new day: any daily note whose
+// dueDate is before today is moved to To Do (from Doing/Done) and its dueDate is bumped to
+// today, so it reads as "for today" again. Returns the reconciled board plus what needs a
+// server-side sync.
+function reconcileDailyBoard(board: TaskColumn): { board: TaskColumn; resets: DailyReset[] } {
+  const today = todayKey()
+  const resets: DailyReset[] = []
+  const next = Object.fromEntries(
+    Object.entries(board).map(([key, column]) => [
+      key,
+      column.filter((task) => {
+        const stale = task.priority === 'daily' && task.dueDate !== null && task.dueDate < today
+        if (stale) resets.push({ task, from: key as TaskStatus })
+        return !stale
+      }),
+    ])
+  ) as TaskColumn
+  next.todo = [
+    ...next.todo,
+    ...resets.map(({ task }) => ({ ...task, dueDate: today, doneAt: null })),
+  ]
+  return { board: next, resets }
+}
+
+async function syncDailyResets(resets: DailyReset[]): Promise<void> {
+  const today = todayKey()
+  for (const { task, from } of resets) {
+    try {
+      if (from !== 'todo') await moveTaskRequest(task.id, 'todo')
+      if (task.dueDate !== today) await updateTaskRequest(task.id, { dueDate: today })
+    } catch (error) {
+      pushSyncError(error)
+    }
+  }
+}
 
 const toNoteTask = (dto: TaskDto): NoteTask => ({
   id: dto.id,
@@ -95,6 +134,14 @@ function pushSyncError(error: unknown): void {
   })
 }
 
+const installRefetch = (set: (state: Partial<NotesState>) => void) => {
+  void fetchBoard().then((fetched) => {
+    const { board, resets } = reconcileDailyBoard(fetched)
+    set({ board })
+    if (resets.length > 0) void syncDailyResets(resets)
+  })
+}
+
 export const useNotesStore = create<NotesState>()(
   persist(
     (set, get) => ({
@@ -107,8 +154,10 @@ export const useNotesStore = create<NotesState>()(
         set({ loadStatus: 'loading' })
         try {
           const epoch = get().epoch
-          const board = await fetchBoard()
+          const fetched = await fetchBoard()
+          const { board, resets } = reconcileDailyBoard(fetched)
           if (get().epoch === epoch) set({ board, loadStatus: 'loaded' })
+          if (resets.length > 0) void syncDailyResets(resets)
         } catch (error) {
           set({ loadStatus: 'error' })
           pushSyncError(error)
@@ -130,7 +179,7 @@ export const useNotesStore = create<NotesState>()(
           createdAt: note.createdAt,
         }).catch((error) => {
           pushSyncError(error)
-          void fetchBoard().then((board) => set({ board }))
+          installRefetch(set)
         })
       },
 
@@ -148,7 +197,7 @@ export const useNotesStore = create<NotesState>()(
           dueDate: patch.dueDate,
         }).catch((error) => {
           pushSyncError(error)
-          void fetchBoard().then((board) => set({ board }))
+          installRefetch(set)
         })
       },
 
@@ -159,7 +208,7 @@ export const useNotesStore = create<NotesState>()(
         }))
         void deleteTask(id).catch((error) => {
           pushSyncError(error)
-          void fetchBoard().then((board) => set({ board }))
+          installRefetch(set)
         })
       },
 
@@ -181,7 +230,7 @@ export const useNotesStore = create<NotesState>()(
             })
             void moveTaskRequest(id, to).catch((error) => {
               pushSyncError(error)
-              void fetchBoard().then((board) => set({ board }))
+              installRefetch(set)
             })
             return
           }
@@ -191,7 +240,7 @@ export const useNotesStore = create<NotesState>()(
       commitRowMove: (id, to, toIndex) => {
         void moveTaskRequest(id, to, toIndex).catch((error) => {
           pushSyncError(error)
-          void fetchBoard().then((board) => set({ board }))
+          installRefetch(set)
         })
       },
     }),

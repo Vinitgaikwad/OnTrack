@@ -21,7 +21,8 @@ export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus]
 export const TaskPriority = {
   low: 'low',
   medium: 'medium',
-  high: 'high'
+  high: 'high',
+  daily: 'daily'
 } as const
 
 export type TaskPriority = (typeof TaskPriority)[keyof typeof TaskPriority]

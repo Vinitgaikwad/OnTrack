@@ -57,6 +57,7 @@ enum TaskPriority {
   low
   medium
   high
+  daily
 }
 
 enum CalendarEventKind {

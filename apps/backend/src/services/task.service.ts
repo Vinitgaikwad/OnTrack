@@ -39,7 +39,7 @@ export async function createTask(
     id?: string
     title: string
     text: string
-    priority: 'low' | 'medium' | 'high'
+    priority: 'low' | 'medium' | 'high' | 'daily'
     dueDate: string | null
     createdAt?: number | null
   }
@@ -70,7 +70,7 @@ export async function updateTask(
   patch: {
     title?: string
     text?: string
-    priority?: 'low' | 'medium' | 'high'
+    priority?: 'low' | 'medium' | 'high' | 'daily'
     dueDate?: string | null
   }
 ) {

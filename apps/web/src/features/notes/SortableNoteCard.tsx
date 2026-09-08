@@ -7,6 +7,7 @@ import { useNotesStore } from '../../global/stores/useNotesStore'
 import { IconButton } from '../../global/ui/IconButton'
 
 const PRIORITY_STYLES: Record<NoteTask['priority'], { label: string; color: string; bg: string }> = {
+  daily: { label: 'Daily', color: 'var(--accent)', bg: 'color-mix(in srgb, var(--accent) 14%, transparent)' },
   high: { label: 'High', color: 'var(--danger)', bg: 'color-mix(in srgb, var(--danger) 14%, transparent)' },
   medium: { label: 'Mid', color: 'var(--notes)', bg: 'color-mix(in srgb, var(--notes) 14%, transparent)' },
   low: { label: 'Low', color: 'var(--calendar)', bg: 'color-mix(in srgb, var(--calendar) 14%, transparent)' },

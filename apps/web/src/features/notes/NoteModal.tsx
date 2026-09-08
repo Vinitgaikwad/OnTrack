@@ -43,6 +43,7 @@ export function NoteModal({ open, onClose, task }: NoteModalProps) {
         <div className="grid grid-cols-2 gap-3">
           <Field label="Priority">
             <Select value={priority} onChange={(event) => setPriority(event.target.value as TaskPriority)}>
+              <option value="daily">Daily</option>
               <option value="high">High</option>
               <option value="medium">Medium</option>
               <option value="low">Low</option>

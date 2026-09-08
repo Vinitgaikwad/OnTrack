@@ -13,7 +13,7 @@ const createTaskSchema = z.object({
   id: idSchema.optional(),
   title: z.string().trim().min(1, 'Title is required').max(200),
   text: z.string().max(20_000).optional().default(''),
-  priority: z.enum(['low', 'medium', 'high']).optional().default('medium'),
+  priority: z.enum(['low', 'medium', 'high', 'daily']).optional().default('medium'),
   dueDate: z
     .union([z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD'), z.null()])
     .optional()
@@ -24,7 +24,7 @@ const createTaskSchema = z.object({
 const updateTaskSchema = z.object({
   title: z.string().trim().min(1).max(200).optional(),
   text: z.string().max(20_000).optional(),
-  priority: z.enum(['low', 'medium', 'high']).optional(),
+  priority: z.enum(['low', 'medium', 'high', 'daily']).optional(),
   dueDate: z
     .union([z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD'), z.null()])
     .optional(),
