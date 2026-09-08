@@ -1,7 +1,7 @@
 import { execFileSync } from 'node:child_process'
 import process from 'node:process'
 
-const PORTS = [3000, 8787]
+const PORTS = [3456, 7891]
 const KILL_NAMES = new Set(['node.exe', 'electron.exe'])
 
 function run(cmd, args) {

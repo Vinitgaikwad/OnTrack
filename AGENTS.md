@@ -1,16 +1,16 @@
 # AGENTS.md
 
-Turborepo + npm workspaces. All commands from repo root. Layout: `apps/web` (React 19 + Vite 5, port 3000, Tailwind v4 — no tailwind.config), `apps/app` (Electron; build via `build.mjs` → `dist/`, preload is `index.mjs`), `apps/backend` (Hono / Cloudflare Worker; `wrangler.jsonc`, secrets in `.dev.vars`), `apps/builder` (packs `dist-web` + `dist-desktop` after app+web builds), `DATAMODEL.md` (contract between stores and backend — read before backend/entity work), `packages/eslint-config-turbotron` (flat configs; no root eslint config).
+Turborepo + npm workspaces. All commands from repo root. Layout: `apps/web` (React 19 + Vite 5, port 3456, Tailwind v4 — no tailwind.config), `apps/app` (Electron; build via `build.mjs` → `dist/`, preload is `index.mjs`), `apps/backend` (Hono / Cloudflare Worker; `wrangler.jsonc`, secrets in `.dev.vars`), `apps/builder` (packs `dist-web` + `dist-desktop` after app+web builds), `DATAMODEL.md` (contract between stores and backend — read before backend/entity work), `packages/eslint-config-turbotron` (flat configs; no root eslint config).
 
 ## Commands
-- `npm run dev` — web (3000) + app + backend (`wrangler dev`, needs Cloudflare login); per-workspace: `-w web` / `-w app` / `-w backend`.
+- `npm run dev` — web (3456) + app + backend (`wrangler dev --port 7891`, needs Cloudflare login); per-workspace: `-w web` / `-w app` / `-w backend`.
 - `npm run build` — turbo order web → app → builder; never run builder directly without both dists first.
 - `npm run lint` — web and app only; `npm run format` — prettier.
 - No typecheck script: type errors surface via `npm run build -w web` / `-w app`.
 - Backend: `npm run deploy -w backend`; after `wrangler.jsonc` binding changes, run `npm run cf-typegen -w backend`.
 
 ## Gotchas
-- HashRouter; auth routes hyphenated (`#/sign-in`); dashboard widget = `?widget=1` + `#/dashboard`; tray + `isQuitting` before-quit; preload exposes `window.ontrack.closeDashboard()`. App calls go through Vite proxy `/api` → **8787**; backend must run or requests fail "Failed to fetch".
+- HashRouter; auth routes hyphenated (`#/sign-in`); dashboard widget = `?widget=1` + `#/dashboard`; tray + `isQuitting` before-quit; preload exposes `window.ontrack.closeDashboard()`. App calls go through Vite proxy `/api` → **7891**; backend must run or requests fail "Failed to fetch".
 - Notes board in `ontrack-notes` / `useNotesStore` is `Record<TaskStatus, NoteTask[]>` (object, not array — don't `.map`).
 
 ## Notes drag (do not regress)

@@ -7,7 +7,7 @@
     "nodejs_compat"
   ],
   "vars": {
-    "WEB_URL": "http://localhost:3000"
+    "WEB_URL": "http://localhost:3456"
   }
   // "compatibility_flags": [
   //   "nodejs_compat"

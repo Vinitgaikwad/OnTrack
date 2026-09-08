@@ -24,7 +24,7 @@ When running the build script from the root this will be done automatically.
 To start the web section of the project in dev mode manually you can do the following:
 1. `npm run dev`
 2. ...
-3. The web project should now be up and running on `http://localhost:3000`
+3. The web project should now be up and running on `http://localhost:3456`
 
 ### Prod
 

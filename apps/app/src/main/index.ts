@@ -32,7 +32,7 @@ const writeDashboardSize = (width: number, height: number) => {
 }
 
 const getUrl = (): string => {
-  if (isDev) return 'http://localhost:3000/'
+  if (isDev) return 'http://localhost:3456/'
 
   return fileURLToPath(
     new URL(/* @vite-ignore */ '../../dist-web/index.html', import.meta.url)
@@ -129,7 +129,7 @@ const createDashboardWindow = () => {
   })
 
   if (isDev) {
-    win.loadURL(`http://localhost:3000/?${DASHBOARD_QUERY}#${DASHBOARD_HASH}`)
+    win.loadURL(`http://localhost:3456/?${DASHBOARD_QUERY}#${DASHBOARD_HASH}`)
   } else {
     win.loadFile(getUrl(), { search: DASHBOARD_QUERY, hash: DASHBOARD_HASH })
   }

@@ -12,7 +12,7 @@ const envRaw = readFileSync(join(here, '..', '.env'), 'utf8')
 const databaseUrl = envRaw.match(/^DATABASE_URL="?([^"\r\n]+)"?$/m)?.[1]
 if (!databaseUrl) throw new Error('DATABASE_URL not found in .env')
 
-const BASE = process.env.PROBE_BASE ?? 'http://127.0.0.1:8787'
+const BASE = process.env.PROBE_BASE ?? 'http://127.0.0.1:7891'
 const PASSWORD = 'ProbePass123!'
 const EMAIL = `probe-${Date.now()}@on-track.test`
 
