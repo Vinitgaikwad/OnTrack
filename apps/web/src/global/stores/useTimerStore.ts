@@ -129,8 +129,13 @@ export const useTimerStore = create<TimerStore>()(
           ),
         })
       },
-      dismissReminder: (id) =>
-        set({ reminders: get().reminders.filter((reminder) => reminder.id !== id) }),
+      dismissReminder: (id) => {
+        const next = get().reminders.filter((r) => r.id !== id)
+        set({ reminders: next })
+        if (next.length === 0 && get().status === 'finished') {
+          set({ status: 'idle', endAt: null, remainingMs: TOTAL_MS(get().minutes) })
+        }
+      },
 
       setSoundOn: (on) => set({ soundOn: on }),
       setNotificationsOn: (on) => set({ notificationsOn: on }),

@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session Retro — mistakes, hallucinations, misused tooling (OnTrack)</title>
+<style>
+  :root {
+    --bg: #0f1115; --surface: #171a21; --surface-2: #1d2130;
+    --line: #262b3a; --text: #e6e8ee; --muted: #9aa1b5;
+    --bad: #f87171; --warn: #fbbf24; --ok: #34d399; --accent: #8ab4ff;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.55 -apple-system, "Segoe UI", system-ui, sans-serif; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+  header h1 { font-size: 26px; margin: 0 0 6px; }
+  header .sub { color: var(--muted); margin: 0 0 28px; font-size: 14px; }
+  h2 { font-size: 19px; margin: 42px 0 10px; padding-bottom: 8px;
+       border-bottom: 1px solid var(--line); }
+  h3 { font-size: 15px; margin: 26px 0 8px; color: var(--accent); }
+  p { color: var(--text); }
+  code { background: var(--surface-2); border: 1px solid var(--line);
+         border-radius: 5px; padding: 1px 6px; font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 20px; font-size: 13.5px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line);
+           vertical-align: top; }
+  th { background: var(--surface); color: var(--muted); font-weight: 600; }
+  td.c { font-weight: 600; white-space: nowrap; }
+  .bad  { color: var(--bad); }
+  .warn { color: var(--warn); }
+  .ok   { color: var(--ok); }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+          padding: 14px 18px; margin: 10px 0; }
+  .timeline { list-style: none; margin: 0; padding: 0; }
+  .timeline li { position: relative; padding: 0 0 16px 22px; border-left: 2px solid var(--line);
+                 margin-left: 6px; }
+  .timeline li::before { content: ""; position: absolute; left: -6px; top: 4px; width: 10px;
+                 height: 10px; border-radius: 50%; background: var(--warn); }
+  .timeline li.ok::before { background: var(--ok); }
+  .timeline li.bad::before { background: var(--bad); }
+  .tag { display: inline-block; border-radius: 999px; padding: 1px 9px; font-size: 11.5px;
+         font-weight: 600; }
+  .tag.mistake { background: rgba(248,113,113,.14); color: var(--bad); }
+  .tag.halluc { background: rgba(139,92,246,.16); color: #a78bfa; }
+  .tag.tool   { background: rgba(139,180,255,.12); color: var(--accent); }
+  .tag.skill  { background: rgba(52,211,153,.12); color: var(--ok); }
+  ul.tight { margin: 4px 0 14px; padding-left: 20px; }
+  ul.tight li { margin: 3px 0; }
+  .note { color: var(--muted); font-size: 13px; }
+  footer { margin-top: 60px; padding-top: 16px; border-top: 1px solid var(--line);
+           color: var(--muted); font-size: 12.5px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Session Retro — what went wrong on the drag bug</h1>
+  <p class="sub">Compiled from the current + previous OnTrack sessions · ~20 probe scripts · 1 genuine bug ·
+  reviewed honestly, root-cause on each item</p>
+</header>
+
+<h2>Executive summary</h2>
+<div class="card">
+<p>The task was one bug: <b>“the note jumps by a fixed distance when you pick it up.”</b>
+End state: fixed and committed in <code>feat(notes): rewrite drag visuals with pointer-tracked ghost</code>.
+But the path there burned ~8 architecture iterations and ~20 Playwright probe scripts. The debugging was
+<em>diligent but undisciplined</em> — theory-first instead of evidence-first, at least three confidently wrong
+explanations, a real crash discovered five runs late, and a pile of self-inflicted script bugs.</p>
+<p class="ok"><b>What actually mattered:</b> there were really only <b>two</b> problems — (1) the dnd-kit
+<code>DragOverlay</code> visual was unreliable in this app (rotated ghost + overlay/rect mismatch), and
+(2) more importantly, the live-reorder <code>handleDragOver</code> caused an <b>infinite
+<code>moveTask</code> → <code>setState</code> loop</b> every time the ambient flicker of a collision target
+happened, crashing React (<code>Maximum update depth exceeded</code>) and unmounting everything mid-drag.</p>
+</div>
+
+<h2>1. The displacement bug — the false causal story</h2>
+<p>This is where most of the hallucinations and wasted tool calls happened. I picked a plausible villain and
+then spent the session confirming it instead of looking for what actually slowed the drag down.</p>
+
+<table>
+  <thead><tr><th style="width:16%">Explanation</th><th>Claimed cause</th><th style="width:30%">Verdict</th></tr></thead>
+  <tbody>
+    <tr><td class="c bad">1</td>
+      <td>“dnd-kit’s active-node rect cache is poisoned; overlay measures (+232,+93) from the real source.”</td>
+      <td><b>Plausible sounding, unproven.</b> The offset was real (source <code>(245,238)</code> vs overlay wrapper
+      <code>(477,331)</code>) but the “cache poisoning” mechanism was never demonstrated — the DnD event log showed
+      <code>active.rect.current.initial = null</code>, which contradicts the story I told at the time.</td></tr>
+    <tr><td class="c bad">2</td>
+      <td>“the drop-animation / <code>rotate-2</code> on the ghost inflates its measured bounding box to
+      216×145.”</td>
+      <td><b>True as a side fact</b> (bbox of a 2°-rotated 211×138 box) — and entirely irrelevant to the pickup jump.
+      It was a red herring I kept in the story.</td></tr>
+    <tr><td class="c bad">3</td>
+      <td>“a <code>transform: matrix(1,0,0,1,0,0)</code> on an ancestor re-anchors the fixed ghost, shifting it
+      by the column offset.”</td>
+      <td><b>Wrong.</b> Identity transforms do not move anything. I jumped from
+      “identity transform creates a containing block” (true, and harmless) straight to “therefore it shifts
+      = containing-block bug” (false). The ancestor-chain dumps disproved it; I still wrote the shifted-ghost
+      story in a message instead of saying the anomaly was unexplained.</td></tr>
+    <tr><td class="c ok">4</td>
+      <td>“own the ghost: portal it to <code>body</code>, pin+hide the in-flow copy, latch the grab offset.”</td>
+      <td><b>This panned out</b> — but chiefly as a side-step, not an explanation. The portaled ghost glued
+      correctly (<code>Δ(0,0)</code> drift across the drag).</td></tr>
+  </tbody>
+</table>
+
+<h3>The actual root cause (found in the last three runs)</h3>
+<div class="card">
+<p>The “ghost vanishes mid-drag” symptom finally got its <code>console</code>/<code>pageerror</code>
+listener attached — I had been asserting symptoms 5 runs without wiring error capture. It printed:</p>
+<p><code><b>Maximum update depth exceeded</b> … error in the &lt;DndContext2&gt; component.</code></p>
+<p><b>Mechanism:</b> <code>pointerWithin</code> returned <em>both</em> the hovered card <b>and</b> its column
+(the pointer is inside both — a card nested in a droppable column). The active sortable item had been
+excluded from the filter, but the <code>over</code> value then flip-flopped between <code>t3</code> and
+<code>doing</code> <em>every frame</em>, and <code>handleDragOver</code> called <code>moveTask()</code> on
+every flip → <code>setState</code> → re-render → new geometry → flip back → infinite React loop → crash →
+whole tree unmounts → ghost gone with it.</p>
+<p class="ok"><b>Fix (committed):</b> freeze the board during the drag — only the ghost + pinned in-flow copy
+move; the reorder happens exactly once on release, target resolved by pointer position (card-first collision,
+column fallback). This removed both the crash <em>and</em> the displacement in one stroke.</p>
+</div>
+
+<h2>2. Hallucinations & confidence without evidence</h2>
+<p>Claims I made that were stated too confidently relative to my evidence:</p>
+<ul class="tight">
+  <li><span class="tag halluc">halluc</span> “The overlay/active-rect is recursively self-displacing through the
+  rect cache” — asserted as a conclusion, never proven.</li>
+  <li><span class="tag halluc">halluc</span> “Wiring <code>modifiers</code> on <code>DndContext</code> will fix
+  the overlay” — overlay positioning is governed by <code>DragOverlay</code>’s own modifier pipe; DndContext
+  modifiers only affect the source translation. Corrected only after a trace.</li>
+  <li><span class="tag halluc">halluc</span> “Identity-transform ancestor shifts the ghost” — see table above;
+  contradicted by my own chain dump.</li>
+  <li><span class="tag halluc">halluc</span> Two pairings in the sign-in episode: “Form isn’t rendering / inputs
+  missing” was actually my own wrong hash route (<code>#/signin</code> vs the real <code>#/sign-in</code>);
+  I also wrote <code>…includes('Today') or …</code> Python-<code>or</code> inside a JS <code>evaluate()</code>
+  string → <code>SyntaxError</code> on the very last assertion of an otherwise passing test.</li>
+  <li><span class="tag halluc">halluc</span> “Board is an array so I can <code>.map</code> it” in a probe
+  (<code>ui-fail.py</code>) — the store stores a <em>record keyed by column</em>; the probe crashed with
+  <code>TypeError: … .map is not a function</code>. Data shape I already knew, misremembered mid-debug.</li>
+</ul>
+
+<h2>3. Tool-call waste & unnecessary probes</h2>
+<p class="note">20 <code>ui-*.py</code> scripts exist under <code>%TEMP%\opencode\</code>. A few were useful;
+many were speculative or redundant. Explanations below.</p>
+
+<table>
+  <thead><tr><th style="width:22%">Probe script</th><th>What it cost</th><th style="width:34%">Why it wasted time</th></tr></thead>
+  <tbody>
+    <tr><td class="c">ui-drag-trace / probe / probe2 / debug</td><td>Measuring dnd-kit’s rects &amp; transforms
+      into the “cache poisoning” story</td><td>Repeated confirmation of one number (+232,+93) instead of a bisect.
+      The number was real; the story was wrong; 4 scripts to prove a non-cause.</td></tr>
+    <tr><td class="c">ui-chain, ui-chain2, ui-cs</td><td>3 full dev-server cycles testing the
+      “transformed ancestor” theory</td><td>The theory contradicted the computed styles <em>in the first dump</em>;
+      I verified it again twice anyway. These three should have been one.</td></tr>
+    <tr><td class="c">ui-dump</td><td>One dumpshot — <b>this one paid for itself</b></td><td>It revealed the ghost
+      div had correct inline style <em>but</em> a shifted layout rect → pointed at the portal fix.</td></tr>
+    <tr><td class="c">ui-drag-verify</td><td>The real regression test (kept)</td><td>Validated glue (drift ≤ 4px),
+      cross-column landing, no crash. This was the second milestone that actually mattered.</td></tr>
+    <tr><td class="c">ui-signin / ui-signin2 / ui-dump2</td><td>Debugging “Failed to fetch”</td><td>50% self-inflicted:
+      wrong route (<code>#/signin</code>), empty-<code>root</code> confusion, then a Python-in-JS syntax error.
+      Final result: <b>sign-in works end-to-end</b> (token set, redirect to <code>#/</code>) — not a bug in the app.</td></tr>
+  </tbody>
+</table>
+
+<h3>The deeper pattern</h3>
+<ul class="tight">
+  <li><span class="tag tool">tool</span> <b>No error capture until run #6.</b> The infinite-loop crash could and
+  should have been found on the first cross-column run. I asserted DOM symptoms vaguely but never attached
+  <code>pageerror</code>/<code>requestfailed</code>/full-console listeners by default.</li>
+  <li><span class="tag tool">tool</span> <b>One probe per hypothesis</b> instead of one probe that bisects multiple
+  hypotheses. I kept re-writing throwaway scripts as theories evolved.</li>
+  <li><span class="tag tool">tool</span> <b>Inline PowerShell heredocs (<code>@' … '@ | Set-Content</code>) for
+  scripts</b> — directly against my own AGENTS rule (“one probe script per feature; no inline shell test
+  one-liners”). It also silently rewrote line endings/indentation, which caused a real <code>IndentationError</code>.</li>
+  <li><span class="tag tool">tool</span> Probe bugs I introduced while probing: destructuring bug
+  (<code>(ref, _), st = …</code> → float), <code>KeyError: 'width'</code> (passed a bare dict to a box helper),
+  an over-asserted ordering expectation, then splitting an edit and losing the indent on one line.</li>
+</ul>
+
+<h2>4. Skill calls — the biggest miss</h2>
+<table>
+  <thead><tr><th style="width:30%">Skill (name)</th><th>When it should have loaded</th><th>What happened instead</th></tr></thead>
+  <tbody>
+    <tr><td class="c ok">systematic-debugging</td><td>Immediately, per “failure → logs first”, and it’s my own
+      documented mid/large-debug skill</td><td><b>Not loaded once.</b> I free-styled the debug instead — which is
+      precisely the “beachhead” mistake the skill exists to prevent.</td></tr>
+    <tr><td class="c ok">verification-before-completion</td><td>Before every “fixed” / “PASS” claim</td><td>Partially —
+      I did run the build &amp; verify, but I also claimed root causes (“cache poisoning”, “containing block”)
+      before proof existed.</td></tr>
+    <tr><td class="c">webapp-testing</td><td>First browser interaction</td><td>Used its scripts directory directly
+      (<code>with_server.py</code>) but never loaded the skill’s guidance — the exact source of my
+      “no error capture” and “adhoc heredoc probe” habits.</td></tr>
+    <tr><td class="c">tdd / test-driven-development</td><td>Problem was reproduction-led</td><td>Not applicable
+      cleanly (no unit harness for this UI), but the discipline — force the failing state, red → green — applies;
+      I skipped straight to “green” repeatedly.</td></tr>
+  </tbody>
+</table>
+
+<h2>5. AGENTS.md compliance (global + local)</h2>
+<h3>Global — <code>~/.config/opencode/AGENTS.md</code></h3>
+<table>
+  <thead><tr><th style="width:34%">Rule</th><th style="width:12%">Verdict</th><th>Session evidence</th></tr></thead>
+  <tbody>
+    <tr><td>Failure → logs first, code second</td><td class="c bad">Violated</td><td>Spent several iterations
+      re-architecting (modifiers, overlay removal) before attaching console/error capture.</td></tr>
+    <tr><td>Force the failing state; never trust a lucky pass</td><td class="c warn">Partial</td><td>Verified with
+      real DOM assertions, but changed multiple variables (overlay, collisions, modifiers) per run at least once.</td></tr>
+    <tr><td>No defensive hardening unless the failure proves it</td><td class="c bad">Violated</td><td>Bolt-on
+      <code>snapCenterToCursor</code> + pin + filters + overlay surgery before the actual crash was identified.</td></tr>
+    <tr><td>Verify by data, not page text</td><td class="c ok">Kept</td><td>All assertions against
+      <code>localStorage['ontrack-notes']</code> board, not <code>inner_text</code>.</td></tr>
+    <tr><td>One probe script per feature; no inline one-liners</td><td class="c bad">Violated</td><td>20 scripts +
+      inline heredocs; some threw probe-only errors (destructure, KeyError, indentation).</td></tr>
+    <tr><td>One clarifying question beats a clever guess</td><td class="c bad">Violated</td><td>Guessed large
+      uncertainties (rect cache, containing block) repeatedly instead of stopping.</td></tr>
+    <tr><td>Skills are payload — load <code>systematic-debugging</code> for this size/type</td><td class="c bad">Violated</td>
+      <td>No skill loaded for the single most skill-shaped task in the session.</td></tr>
+    <tr><td>Plan first for multi-step; TODO checklist</td><td class="c warn">Partial</td><td>Small sniff “plan” comments,
+      no real re-plan when the plan kept failing. The <code>todowrite</code> tool was never used.</td></tr>
+  </tbody>
+</table>
+
+<h3>Project — <code>OnTrack/AGENTS.md</code></h3>
+<table>
+  <thead><tr><th style="width:34%">Rule</th><th style="width:12%">Verdict</th><th>Session evidence</th></tr></thead>
+  <tbody>
+    <tr><td>Never install a dependency without asking</td><td class="c ok">Kept</td><td>Notably: I had the shelf
+      fix (<code>@dnd-kit/modifiers</code>) in hand, didn’t install — and compensated by rewriting
+      SnapCenterToCursor locally, which was the wrong layer anyway.</td></tr>
+    <tr><td>Keep <code>DATAMODEL.md</code> in sync</td><td class="c ok">Kept</td><td>Behavior-only change
+      (no store shape / endpoint changes) — no doc delta needed.</td></tr>
+    <tr><td>Type checks surface through builds (no typecheck script)</td><td class="c ok">Kept</td><td>
+      <code>npm run build -w web</code> ran green every iteration.</td></tr>
+    <tr><td>Lint covers only web + app; build+lint per change</td><td class="c ok">Kept</td><td>Lint green at each
+      checkpoint (only the pre-existing React-version warning).</td></tr>
+    <tr><td>HashRouter / overlay-path constraints &amp; widget window invariants</td><td class="c ok">Kept</td>
+      <td>No tampering with routing or the dashboard-window contract.</td></tr>
+  </tbody>
+</table>
+
+<h2>6. Mistakes I made editing code (not just debugging)</h2>
+<ul class="tight">
+  <li><span class="tag mistake">code</span> While surgically deleting the old ghost-effect block, I accidentally
+  <b>deleted the <code>ensureLoaded()</code> effect</b> too (a hasty <code>oldString</code> that swallowed the
+  neighboring hook). Caught and restored in the next edit/re-read — but it proves edits without re-reading the
+  surrounding hook block are risky.</li>
+  <li><span class="tag mistake">code</span> Kept three generations of drag-visual code alive concurrently
+  (overlay → modifier → DIY ghost) — each refactor stacked on the previous instead of replacing it, feeding
+  the “ghost/overlay confusion” and doubling the debugging surface.</li>
+  <li><span class="tag mistake">code</span> Left debug-only <code>console.log</code>s in (<code>[start]</code>,
+  <code>[overlay]</code>, <code>[mod]</code>, <code>[drag] over</code>) — pruned only in the final cleanup.</li>
+</ul>
+
+<h2>7. What actually went right (credit where due)</h2>
+<ul class="tight">
+  <li class="ok"><b>Sign-in was verified working end-to-end</b> against the real backend + Vite proxy
+  (<code>200</code>, token persisted, redirect to <code>#/</code>) — the reported “Failed to fetch” was an
+  environment issue (dev stack not fully up), not a regression from the drag work.</li>
+  <li class="ok">Final drag mechanics are <b>0.0px drift</b> glue (≤ 4px tolerance asserted), cross-column drop
+  lands exactly at the pointer, no crash, same-column + done-column reorders persist via
+  <code>commitRowMove</code>.</li>
+  <li class="ok">Committed as two clean conventional commits; pushed; no secrets touched; working tree clean.
+  No <code>DATAMODEL.md</code> drift (behavior-only).</li>
+</ul>
+
+<h2>8. Rules of engagement for the next bug</h2>
+<ul class="tight">
+  <li>Attach <code>pageerror</code> + <code>console</code> + <code>requestfailed</code> capture <b>before</b> the
+  first assertion, on every browser probe.</li>
+  <li>Load <code>systematic-debugging</code> / <code>verification-before-completion</code> skills for this class
+  of failure — no free-styling.</li>
+  <li>When a “root cause” number is measured, write it as a <b>symptom</b> until a clean experiment isolates the
+  mechanism.</li>
+  <li>One probe script per feature, git-ignorable, no inline heredocs; delete when done.</li>
+  <li>Change one variable per run; the moment two theories survive a run, split them into a bisecting probe.</li>
+  <li>Prefer deleting a fragile code path over propping it up (the fix that actually landed: board frozen during
+  drag + one-shot reorder on release).</li>
+</ul>
+
+<footer>
+  Autopsy generated from working-tree history (<code>c47b656…64bf235</code>) + probe scripts in
+  <code>%TEMP%\opencode</code>. Numbers cited (rects, drift, board states) are the actual measurements logged
+  during the session.
+</footer>
+
+</div>
+</body>
+</html>
