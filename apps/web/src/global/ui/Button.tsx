@@ -7,15 +7,15 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-xl font-medium transition ' +
+  'inline-flex items-center justify-center gap-2 rounded-xl font-medium ' +
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-color-(--accent) ' +
   'disabled:opacity-50 disabled:pointer-events-none select-none'
 
 const variants: Record<NonNullable<ButtonProps['variant']>, string> = {
-  primary: 'bg-(--accent) text-white hover:opacity-90 active:scale-[0.98] shadow-sm',
-  soft: 'bg-(--accent-soft) text-(--accent) hover:brightness-95 active:scale-[0.98]',
-  ghost: 'text-(--text-muted) hover:text-(--text) hover:bg-(--surface-2) active:scale-[0.98]',
-  danger: 'bg-(--danger) text-white hover:opacity-90 active:scale-[0.98]',
+  primary: 'bg-(--accent) text-white hover:opacity-90 active:scale-[0.97] shadow-sm transition-all duration-200',
+  soft: 'bg-(--accent-soft) text-(--accent) hover:brightness-95 active:scale-[0.97] transition-all duration-200',
+  ghost: 'text-(--text-muted) hover:text-(--text) hover:bg-(--surface-2) active:scale-[0.97] transition-all duration-200',
+  danger: 'bg-(--danger) text-white hover:opacity-90 active:scale-[0.97] shadow-sm transition-all duration-200',
 }
 
 const sizes: Record<NonNullable<ButtonProps['size']>, string> = {

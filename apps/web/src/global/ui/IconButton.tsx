@@ -11,7 +11,7 @@ export function IconButton({ icon: Icon, label, className = '', ...props }: Icon
     <button
       title={label}
       aria-label={label}
-      className={`grid h-9 w-9 place-items-center rounded-xl text-(--text-muted) transition hover:bg-(--surface-2) hover:text-(--text) active:scale-95 ${className}`}
+      className={`grid h-9 w-9 place-items-center rounded-xl text-(--text-muted) transition-all duration-200 hover:bg-(--surface-2) hover:text-(--text) active:scale-90 ${className}`}
       {...props}
     >
       <Icon size={18} />

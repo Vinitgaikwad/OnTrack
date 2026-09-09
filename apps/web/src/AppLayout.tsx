@@ -29,7 +29,7 @@ export function AppLayout() {
       <Navbar menuOpen={navOpen} onToggleMenu={() => setNavOpen((value) => !value)} />
       <div className="flex flex-1 flex-col md:flex-row">
         <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-52 shrink-0 flex-col gap-1 overflow-y-auto border-r border-(--border) bg-(--surface) p-4 scroll-thin md:flex lg:w-60">
-          <div className="px-3 pb-2 pt-1 text-xs font-semibold tracking-widest text-(--text-muted)">
+          <div className="px-3 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-widest text-(--text-muted)">
             Focus Hub
           </div>
           {NAV_ITEMS.map((item) => (
@@ -38,10 +38,10 @@ export function AppLayout() {
               to={item.to}
               end={item.to === '/'}
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
                   isActive
-                    ? 'bg-(--accent-soft) text-(--accent)'
-                    : 'text-(--text-muted) hover:bg-(--surface-2) hover:text-(--text)'
+                    ? 'bg-(--accent-soft) text-(--accent) shadow-sm'
+                    : 'text-(--text-muted) hover:bg-(--surface-2) hover:text-(--text) active:scale-[0.98]'
                 }`
               }
             >
@@ -63,7 +63,11 @@ export function AppLayout() {
 
       {navOpen ? (
         <>
-          <div className="fixed inset-0 z-[35] bg-black/40 md:hidden" onClick={closeNav} aria-hidden="true" />
+          <div
+            className="fixed inset-0 z-[35] bg-black/40 backdrop-blur-sm md:hidden"
+            onClick={closeNav}
+            aria-hidden="true"
+          />
           <div
             role="dialog"
             aria-modal="true"
@@ -83,10 +87,10 @@ export function AppLayout() {
                 end={item.to === '/'}
                 onClick={closeNav}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                  `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
                     isActive
-                      ? 'bg-(--accent-soft) text-(--accent)'
-                      : 'text-(--text-muted) hover:bg-(--surface-2) hover:text-(--text)'
+                      ? 'bg-(--accent-soft) text-(--accent) shadow-sm'
+                      : 'text-(--text-muted) hover:bg-(--surface-2) hover:text-(--text) active:scale-[0.98]'
                   }`
                 }
               >

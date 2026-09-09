@@ -1,29 +1,40 @@
-export type ThemeId = 'joy' | 'zen' | 'midnight'
+export type ThemeId = 'fun' | 'mild' | 'crazy' | 'night'
 
 export type ThemeMeta = {
   id: ThemeId
   label: string
   tagline: string
   swatches: [string, string, string, string, string]
+  emoji: string
 }
 
 export const THEMES: ThemeMeta[] = [
   {
-    id: 'joy',
-    label: 'Joy',
-    tagline: 'Warm and vibrant',
-    swatches: ['#FF5C39', '#E8963D', '#8B5CF6', '#EC4899', '#0EA5E9'],
+    id: 'fun',
+    label: 'Fun',
+    tagline: 'Playful and warm',
+    swatches: ['#FF6B35', '#FFB347', '#7C3AED', '#EC4899', '#06B6D4'],
+    emoji: '🎉',
   },
   {
-    id: 'zen',
-    label: 'Zen',
-    tagline: 'Clean and focused',
-    swatches: ['#4263EB', '#D9480F', '#7048E8', '#C2255C', '#0C8599'],
+    id: 'mild',
+    label: 'Mild',
+    tagline: 'Calm and focused',
+    swatches: ['#6366F1', '#F59E0B', '#8B5CF6', '#EF4444', '#14B8A6'],
+    emoji: '🍃',
   },
   {
-    id: 'midnight',
-    label: 'Midnight',
-    tagline: 'Deep and electric',
-    swatches: ['#818CF8', '#FBBF24', '#A78BFA', '#F472B6', '#22D3EE'],
+    id: 'crazy',
+    label: 'Crazy',
+    tagline: 'Bold and electric',
+    swatches: ['#A3E635', '#FACC15', '#F43F5E', '#8B5CF6', '#06B6D4'],
+    emoji: '⚡',
+  },
+  {
+    id: 'night',
+    label: 'Night',
+    tagline: 'Deep and sleek',
+    swatches: ['#818CF8', '#FBBF24', '#F472B6', '#34D399', '#22D3EE'],
+    emoji: '🌙',
   },
 ]

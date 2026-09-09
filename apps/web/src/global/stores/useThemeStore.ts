@@ -10,7 +10,7 @@ type ThemeState = {
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
-      theme: 'joy',
+      theme: 'fun',
       setTheme: (theme) => set({ theme }),
     }),
     { name: 'ontrack-theme' }

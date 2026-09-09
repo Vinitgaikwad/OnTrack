@@ -6,7 +6,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-(--bg) px-4 text-(--text)">
       <NavLink to="/" className="flex items-center gap-2.5">
-        <span className="grid h-10 w-10 place-items-center rounded-xl bg-(--accent) text-white shadow-sm">
+        <span className="grid h-10 w-10 place-items-center rounded-xl bg-(--accent) text-white shadow-sm transition-transform duration-200 hover:scale-105">
           <Sparkles size={20} />
         </span>
         <span className="text-xl font-bold tracking-tight">OnTrack</span>

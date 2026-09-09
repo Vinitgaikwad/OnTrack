@@ -35,19 +35,19 @@ export function Navbar({ menuOpen, onToggleMenu }: { menuOpen: boolean; onToggle
   }
 
   return (
-    <header className="sticky top-0 z-40 flex items-center gap-2 border-b border-(--border) bg-(--surface) px-3 py-3 sm:gap-4 sm:px-6">
+    <header className="sticky top-0 z-40 flex items-center gap-2 border-b border-(--border) bg-(--surface)/80 backdrop-blur-xl px-3 py-3 sm:gap-4 sm:px-6">
       <button
         onClick={onToggleMenu}
         aria-label={menuOpen ? 'Close navigation' : 'Open navigation'}
         aria-haspopup="dialog"
         aria-expanded={menuOpen}
-        className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-(--text) transition hover:bg-(--surface-2) md:hidden"
+        className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-(--text) transition-all duration-200 hover:bg-(--surface-2) active:scale-95 md:hidden"
       >
         {menuOpen ? <Sparkles size={18} /> : <Menu size={20} />}
       </button>
 
       <NavLink to="/" onClick={closeAll} className="hidden shrink-0 items-center gap-2.5 md:flex">
-        <span className="grid h-9 w-9 place-items-center rounded-xl bg-(--accent) text-white shadow-sm">
+        <span className="grid h-9 w-9 place-items-center rounded-xl bg-(--accent) text-white shadow-sm transition-transform duration-200 hover:scale-105">
           <Sparkles size={18} />
         </span>
         <span className="hidden text-lg font-bold tracking-tight sm:block">OnTrack</span>
@@ -60,7 +60,7 @@ export function Navbar({ menuOpen, onToggleMenu }: { menuOpen: boolean; onToggle
           <button
             onClick={() => setHelpOpen((value) => !value)}
             aria-label="Help"
-            className="grid h-9 w-9 place-items-center rounded-xl text-(--text-muted) transition hover:bg-(--surface-2) hover:text-(--text)"
+            className="grid h-9 w-9 place-items-center rounded-xl text-(--text-muted) transition-all duration-200 hover:bg-(--surface-2) hover:text-(--text) active:scale-95"
           >
             <HelpCircle size={18} />
           </button>
@@ -68,13 +68,13 @@ export function Navbar({ menuOpen, onToggleMenu }: { menuOpen: boolean; onToggle
             <>
               <div className="fixed inset-0 z-40" onClick={() => setHelpOpen(false)} />
               <div className="absolute right-0 z-50 mt-2 w-64 rounded-2xl border border-(--border) bg-(--surface) p-2 shadow-xl">
-                <p className="px-3 py-2 text-xs font-medium text-(--text-muted)">Help</p>
+                <p className="px-3 py-2 text-xs font-semibold text-(--text-muted)">Help</p>
                 <button
                   onClick={() => {
                     closeAll()
                     navigate('/calendar')
                   }}
-                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-(--text) transition hover:bg-(--surface-2)"
+                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-(--text) transition-all duration-150 hover:bg-(--surface-2) active:scale-[0.98]"
                 >
                   <Settings size={16} className="text-(--text-muted)" />
                   Get oriented in Calendar
@@ -84,7 +84,7 @@ export function Navbar({ menuOpen, onToggleMenu }: { menuOpen: boolean; onToggle
                     closeAll()
                     navigate('/timer')
                   }}
-                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-(--text) transition hover:bg-(--surface-2)"
+                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-(--text) transition-all duration-150 hover:bg-(--surface-2) active:scale-[0.98]"
                 >
                   <HelpCircle size={16} className="text-(--text-muted)" />
                   Try a timer session
@@ -100,9 +100,9 @@ export function Navbar({ menuOpen, onToggleMenu }: { menuOpen: boolean; onToggle
             onClick={() => setOpen((value) => !value)}
             aria-haspopup="menu"
             aria-expanded={open}
-            className="flex items-center gap-2.5 rounded-xl p-1.5 transition hover:bg-(--surface-2)"
+            className="flex items-center gap-2.5 rounded-xl p-1.5 transition-all duration-200 hover:bg-(--surface-2) active:scale-95"
           >
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-(--accent-soft) text-sm font-semibold text-(--accent)">
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-(--accent-soft) text-sm font-semibold text-(--accent) transition-transform duration-200 hover:scale-105">
               {profile.initials}
             </span>
           </button>
@@ -138,7 +138,7 @@ export function Navbar({ menuOpen, onToggleMenu }: { menuOpen: boolean; onToggle
                     closeAll()
                     void signOut().then(() => navigate('/sign-in'))
                   }}
-                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-(--text) transition hover:bg-(--surface-2)"
+                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-(--text) transition-all duration-150 hover:bg-(--surface-2) active:scale-[0.98]"
                 >
                   <LogOut size={16} />
                   Sign out

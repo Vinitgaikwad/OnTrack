@@ -17,8 +17,10 @@ export function Field({ label, hint, children }: FieldProps) {
 }
 
 const control =
-  'w-full rounded-xl border border-(--border) bg-(--surface) px-3 py-2 text-sm text-(--text) ' +
-  'placeholder:text-(--text-muted) outline-none transition focus:border-(--accent) focus:ring-2 focus:ring-(--accent)/20'
+  'w-full rounded-xl border border-(--border) bg-(--surface) px-3 py-2.5 text-sm text-(--text) ' +
+  'placeholder:text-(--text-muted) outline-none transition-all duration-200 ' +
+  'focus:border-(--accent) focus:ring-2 focus:ring-(--accent)/20 ' +
+  'hover:border-(--border-strong)'
 
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={`${control} ${props.className ?? ''}`} />

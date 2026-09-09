@@ -1,55 +1,88 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@500;600;700&display=swap');
 @import "tailwindcss";
 
-/* ─── Joy ────────────────────────────────────────────── */
+/* ─── Fun ─────────────────────────────────────────────── */
 :root,
-[data-theme="joy"] {
+[data-theme="fun"] {
   --scheme: light;
-  --bg: #FFF8F0;
+  --bg: #FFF7ED;
   --surface: #FFFFFF;
-  --surface-2: #FBE9D8;
-  --border: #EBD4B0;
-  --border-strong: #DFBE93;
-  --text: #2D1B0E;
-  --text-muted: #8A6D4F;
-  --accent: #FF5C39;
-  --accent-soft: #FFE5DE;
-  --danger: #E5484D;
-  --success: #2F9E63;
-  --notes: #E8963D;
+  --surface-2: #FEF3E2;
+  --border: #FED7AA;
+  --border-strong: #FDBA74;
+  --text: #1C1917;
+  --text-muted: #78716C;
+  --accent: #FF6B35;
+  --accent-soft: #FFF1EB;
+  --danger: #EF4444;
+  --success: #22C55E;
+  --notes: #F59E0B;
   --agents: #8B5CF6;
   --diary: #EC4899;
-  --timer: #FF5C39;
-  --calendar: #0EA5E9;
+  --timer: #FF6B35;
+  --calendar: #06B6D4;
+  --radius: 1rem;
+  --shadow-card: 0 2px 8px rgba(255, 107, 53, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 4px 16px rgba(255, 107, 53, 0.14), 0 2px 6px rgba(0, 0, 0, 0.06);
+  --shadow-dropdown: 0 8px 32px rgba(255, 107, 53, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-/* ─── Zen ─────────────────────────────────────────────── */
-[data-theme="zen"] {
+/* ─── Mild ─────────────────────────────────────────────── */
+[data-theme="mild"] {
   --scheme: light;
-  --bg: #F8F9FA;
+  --bg: #F8FAFC;
   --surface: #FFFFFF;
-  --surface-2: #F1F3F5;
-  --border: #E9ECEF;
-  --border-strong: #DEE2E6;
-  --text: #212529;
-  --text-muted: #868E96;
-  --accent: #4263EB;
-  --accent-soft: #EDF2FF;
-  --danger: #E03131;
-  --success: #2F9E63;
-  --notes: #D9480F;
-  --agents: #7048E8;
-  --diary: #C2255C;
-  --timer: #E03131;
-  --calendar: #0C8599;
+  --surface-2: #F1F5F9;
+  --border: #E2E8F0;
+  --border-strong: #CBD5E1;
+  --text: #0F172A;
+  --text-muted: #64748B;
+  --accent: #6366F1;
+  --accent-soft: #EEF2FF;
+  --danger: #EF4444;
+  --success: #22C55E;
+  --notes: #F59E0B;
+  --agents: #8B5CF6;
+  --diary: #EC4899;
+  --timer: #EF4444;
+  --calendar: #14B8A6;
+  --radius: 0.75rem;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-dropdown: 0 10px 40px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-/* ─── Midnight ────────────────────────────────────────── */
-[data-theme="midnight"] {
+/* ─── Crazy ────────────────────────────────────────────── */
+[data-theme="crazy"] {
   --scheme: dark;
-  --bg: #0B0F19;
+  --bg: #0A0A0A;
+  --surface: #171717;
+  --surface-2: #262626;
+  --border: #333333;
+  --border-strong: #525252;
+  --text: #FAFAFA;
+  --text-muted: #A3A3A3;
+  --accent: #A3E635;
+  --accent-soft: #1A2E05;
+  --danger: #F43F5E;
+  --success: #A3E635;
+  --notes: #FACC15;
+  --agents: #C084FC;
+  --diary: #FB7185;
+  --timer: #A3E635;
+  --calendar: #22D3EE;
+  --radius: 0.5rem;
+  --shadow-card: 0 0 0 1px #333333, 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-card-hover: 0 0 0 1px #A3E635, 0 0 24px rgba(163, 230, 53, 0.15), 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-dropdown: 0 0 0 1px #333333, 0 16px 48px rgba(0, 0, 0, 0.6);
+}
+
+/* ─── Night ────────────────────────────────────────────── */
+[data-theme="night"] {
+  --scheme: dark;
+  --bg: #0B0F1A;
   --surface: #111827;
-  --surface-2: #1A2234;
+  --surface-2: #1E293B;
   --border: #1E293B;
   --border-strong: #334155;
   --text: #F1F5F9;
@@ -63,6 +96,10 @@
   --diary: #F472B6;
   --timer: #FB7185;
   --calendar: #22D3EE;
+  --radius: 0.875rem;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0 1px 3px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(0, 0, 0, 0.3), 0 0 20px -4px rgba(129, 140, 248, 0.15);
+  --shadow-dropdown: 0 8px 32px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* ─── Base ────────────────────────────────────────────── */
@@ -76,7 +113,7 @@ body {
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   color-scheme: var(--scheme);
 }
 
@@ -86,20 +123,25 @@ body {
 }
 
 /* ─── Fonts per theme ─────────────────────────────────── */
-[data-theme="joy"] body {
+[data-theme="fun"] body {
   font-family: 'Outfit', ui-rounded, system-ui, sans-serif;
-  background: linear-gradient(160deg, #FFF8F0 0%, #FFF0E3 50%, #FFE8D6 100%);
+  background: linear-gradient(160deg, #FFF7ED 0%, #FFF1EB 50%, #FFE8D6 100%);
   background-attachment: fixed;
 }
 
-[data-theme="zen"] body {
+[data-theme="mild"] body {
   font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
-  background: #F8F9FA;
+  background: #F8FAFC;
 }
 
-[data-theme="midnight"] body {
+[data-theme="crazy"] body {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  background: #0A0A0A;
+}
+
+[data-theme="night"] body {
   font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
-  background: linear-gradient(180deg, #0B0F19 0%, #0F172A 100%);
+  background: linear-gradient(180deg, #0B0F1A 0%, #0F172A 100%);
   background-attachment: fixed;
 }
 
@@ -107,27 +149,81 @@ body {
 @keyframes rise-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@keyframes zen-fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+@keyframes fun-bounce-in {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.95);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-/* ─── Entrance ────────────────────────────────────────── */
-.page-enter {
-  animation: rise-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+@keyframes mild-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-[data-theme="zen"] .page-enter {
-  animation: zen-fade-in 0.35s ease-out forwards;
+@keyframes crazy-glitch-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-4px) skewX(-1deg);
+  }
+  25% {
+    opacity: 1;
+    transform: translateX(2px) skewX(0.5deg);
+  }
+  50% {
+    transform: translateX(-1px) skewX(0deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) skewX(0deg);
+  }
 }
 
+@keyframes night-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Entrance per theme ──────────────────────────────── */
+[data-theme="fun"] .page-enter {
+  animation: fun-bounce-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+[data-theme="mild"] .page-enter {
+  animation: mild-fade-in 0.3s ease-out forwards;
+}
+
+[data-theme="crazy"] .page-enter {
+  animation: crazy-glitch-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+[data-theme="night"] .page-enter {
+  animation: night-slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ─── Modal animations ────────────────────────────────── */
 .modal-backdrop {
   animation: backdrop-in 0.18s ease-out both;
 }
@@ -156,58 +252,95 @@ body {
   animation: rise-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* ─── Joy polish ──────────────────────────────────────── */
-[data-theme="joy"] .rounded-2xl {
-  box-shadow: 0 1px 3px color-mix(in srgb, #E8C9A8 40%, transparent),
-              0 4px 12px color-mix(in srgb, #F5DFC8 25%, transparent);
+/* ─── Fun polish ──────────────────────────────────────── */
+[data-theme="fun"] .rounded-2xl,
+[data-theme="fun"] .rounded-xl {
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
-[data-theme="joy"] button:focus-visible {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+[data-theme="fun"] .rounded-2xl:hover,
+[data-theme="fun"] .rounded-xl:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-1px);
 }
 
-[data-theme="joy"] a:hover,
-[data-theme="joy"] button:hover {
+[data-theme="fun"] button:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+[data-theme="fun"] a:hover,
+[data-theme="fun"] button:hover {
   transition-duration: 0.15s;
 }
 
-/* ─── Zen polish ──────────────────────────────────────── */
-[data-theme="zen"] .rounded-2xl {
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+/* ─── Mild polish ─────────────────────────────────────── */
+[data-theme="mild"] .rounded-2xl,
+[data-theme="mild"] .rounded-xl {
+  box-shadow: var(--shadow-card);
   border-color: transparent;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
-[data-theme="zen"] .rounded-2xl:hover {
+[data-theme="mild"] .rounded-2xl:hover,
+[data-theme="mild"] .rounded-xl:hover {
   border-color: var(--border);
+  box-shadow: var(--shadow-card-hover);
 }
 
-[data-theme="zen"] button:focus-visible {
+[data-theme="mild"] button:focus-visible {
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 15%, transparent);
 }
 
-[data-theme="zen"] * {
+[data-theme="mild"] * {
   transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
-/* ─── Midnight polish ─────────────────────────────────── */
-[data-theme="midnight"] .rounded-2xl {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4),
-              0 4px 16px rgba(0, 0, 0, 0.3);
+/* ─── Crazy polish ────────────────────────────────────── */
+[data-theme="crazy"] .rounded-2xl,
+[data-theme="crazy"] .rounded-xl {
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
 }
 
-[data-theme="midnight"] .rounded-2xl:hover {
+[data-theme="crazy"] .rounded-2xl:hover,
+[data-theme="crazy"] .rounded-xl:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
+}
+
+[data-theme="crazy"] button:focus-visible {
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+}
+
+[data-theme="crazy"] ::selection {
+  background: var(--accent);
+  color: #0A0A0A;
+}
+
+[data-theme="crazy"] a,
+[data-theme="crazy"] button {
+  transition: all 0.15s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─── Night polish ────────────────────────────────────── */
+[data-theme="night"] .rounded-2xl,
+[data-theme="night"] .rounded-xl {
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+[data-theme="night"] .rounded-2xl:hover,
+[data-theme="night"] .rounded-xl:hover {
   border-color: color-mix(in srgb, var(--accent) 20%, var(--border));
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4),
-              0 4px 16px rgba(0, 0, 0, 0.3),
-              0 0 24px -6px color-mix(in srgb, var(--accent) 12%, transparent);
+  box-shadow: var(--shadow-card-hover);
 }
 
-[data-theme="midnight"] button:focus-visible {
-  box-shadow: 0 0 0 2px var(--bg),
-              0 0 0 4px color-mix(in srgb, var(--accent) 40%, transparent);
+[data-theme="night"] button:focus-visible {
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 
-[data-theme="midnight"] ::selection {
+[data-theme="night"] ::selection {
   background: color-mix(in srgb, var(--accent) 70%, transparent);
 }
 
@@ -262,4 +395,58 @@ body {
 
 .no-scrollbar {
   scrollbar-width: none;
+}
+
+/* ─── Crazy neon border animation ─────────────────────── */
+@keyframes neon-pulse {
+  0%, 100% {
+    border-color: var(--accent);
+    box-shadow: 0 0 8px rgba(163, 230, 53, 0.2);
+  }
+  50% {
+    border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+    box-shadow: 0 0 16px rgba(163, 230, 53, 0.35);
+  }
+}
+
+[data-theme="crazy"] .neon-pulse {
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+
+/* ─── Fun floating animation for accents ───────────────── */
+@keyframes fun-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+[data-theme="fun"] .fun-float {
+  animation: fun-float 3s ease-in-out infinite;
+}
+
+/* ─── Night shimmer for dark surfaces ─────────────────── */
+@keyframes night-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+[data-theme="night"] .night-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--accent) 5%, transparent) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: night-shimmer 6s ease-in-out infinite;
+}
+
+/* ─── Theme transition for all elements ───────────────── */
+* {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0s;
+}
+
+body * {
+  transition-duration: 0.3s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }

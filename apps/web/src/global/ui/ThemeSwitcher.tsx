@@ -1,78 +1,99 @@
-import { useState, type ReactNode } from 'react'
-import { Check, ChevronDown } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { Check, Palette } from 'lucide-react'
 import { THEMES } from '../theme/themes'
 import { useTheme } from '../theme/useTheme'
 
 export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme()
   const [open, setOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
   const current = THEMES.find((meta) => meta.id === theme) ?? THEMES[0]
 
+  useEffect(() => {
+    if (!open) return
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [open])
+
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => setOpen((value) => !value)}
-        className="flex items-center gap-2 rounded-xl border border-(--border) px-2.5 py-1.5 text-sm text-(--text-muted) transition hover:bg-(--surface-2) hover:text-(--text)"
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-2 rounded-xl border border-(--border) bg-(--surface) px-2.5 py-1.5 text-sm text-(--text-muted) transition hover:bg-(--surface-2) hover:text-(--text)"
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        <span className="flex -space-x-1">
-          {current.swatches.slice(0, 3).map((color) => (
-            <span
-              key={color}
-              className="h-4 w-4 rounded-full border-2 border-(--surface)"
-              style={{ backgroundColor: color }}
-            />
-          ))}
-        </span>
-        <span className="hidden sm:block">{current.label}</span>
-        <ChevronDown size={14} className={`transition ${open ? 'rotate-180' : ''}`} />
+        <Palette size={15} />
+        <span className="hidden sm:block">{current.emoji}</span>
+        <span className="hidden sm:block font-medium">{current.label}</span>
       </button>
 
-      {open ? (
+      {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
           <div
             role="listbox"
-            className="absolute right-0 z-50 mt-2 w-64 rounded-2xl border border-(--border) bg-(--surface) p-2 shadow-xl"
+            className="absolute right-0 z-50 mt-2 w-72 rounded-2xl border border-(--border) bg-(--surface) p-2 shadow-xl"
           >
-            <p className="px-3 py-2 text-xs font-medium text-(--text-muted)">Appearance</p>
-            {THEMES.map((meta) => (
-              <button
-                key={meta.id}
-                role="option"
-                aria-selected={meta.id === theme}
-                onClick={() => {
-                  setTheme(meta.id)
-                  setOpen(false)
-                }}
-                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition hover:bg-(--surface-2)"
-              >
-                <span className="flex -space-x-1">
-                  {meta.swatches.map((color) => (
-                    <span
-                      key={color}
-                      className="h-5 w-5 rounded-full border-2 border-(--surface)"
-                      style={{ backgroundColor: color }}
-                    />
-                  ))}
-                </span>
-                <span className="flex-1">
-                  <span className="block text-sm font-medium text-(--text)">{meta.label}</span>
-                  <span className="block text-xs text-(--text-muted)">{meta.tagline}</span>
-                </span>
-                {meta.id === theme ? <Check size={16} className="text-(--accent)" /> : null}
-              </button>
-            ))}
+            <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-(--text-muted)">
+              Appearance
+            </p>
+            <div className="grid grid-cols-2 gap-2 px-1 pb-1">
+              {THEMES.map((meta) => (
+                <button
+                  key={meta.id}
+                  role="option"
+                  aria-selected={meta.id === theme}
+                  onClick={() => {
+                    setTheme(meta.id)
+                    setOpen(false)
+                  }}
+                  className={`group relative flex flex-col items-center gap-2.5 rounded-xl border-2 px-3 py-4 text-center transition ${
+                    meta.id === theme
+                      ? 'border-(--accent) bg-(--accent-soft)'
+                      : 'border-transparent hover:border-(--border) hover:bg-(--surface-2)'
+                  }`}
+                >
+                  {meta.id === theme && (
+                    <span className="absolute top-2 right-2">
+                      <Check size={14} className="text-(--accent)" />
+                    </span>
+                  )}
+                  <span className="text-xl">{meta.emoji}</span>
+                  <div>
+                    <span className="block text-sm font-semibold text-(--text)">
+                      {meta.label}
+                    </span>
+                    <span className="block text-[11px] text-(--text-muted)">
+                      {meta.tagline}
+                    </span>
+                  </div>
+                  <span className="flex -space-x-1">
+                    {meta.swatches.map((color) => (
+                      <span
+                        key={color}
+                        className="h-3.5 w-3.5 rounded-full border-2 border-(--surface) transition group-hover:scale-110"
+                        style={{ backgroundColor: color }}
+                      />
+                    ))}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
         </>
-      ) : null}
+      )}
     </div>
   )
 }
 
-export function ThemePreviewSwatches(): ReactNode {
+export function ThemePreviewSwatches() {
   const { theme } = useTheme()
   const meta = THEMES.find((item) => item.id === theme) ?? THEMES[0]
   return (

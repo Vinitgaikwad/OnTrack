@@ -40,7 +40,7 @@ export function Modal({ open, onClose, title, children, width = 'max-w-lg' }: Mo
           <button
             onClick={onClose}
             aria-label="Close"
-            className="grid h-8 w-8 place-items-center rounded-lg text-(--text-muted) transition hover:bg-(--surface-2) hover:text-(--text)"
+            className="grid h-8 w-8 place-items-center rounded-lg text-(--text-muted) transition-all duration-150 hover:bg-(--surface-2) hover:text-(--text) active:scale-95"
           >
             <X size={16} />
           </button>

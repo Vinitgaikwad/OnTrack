@@ -76,15 +76,15 @@ export function SignInPage() {
             />
           </Field>
           <Button type="submit" disabled={pending || !email.trim() || !password}>
-            {pending ? 'Signing in…' : 'Sign in'}
+            {pending ? 'Signing in...' : 'Sign in'}
           </Button>
         </form>
 
         <div className="flex items-center justify-between text-sm">
-          <Link className="text-(--accent) hover:underline" to="/sign-up">
+          <Link className="text-(--accent) hover:underline transition-colors duration-150" to="/sign-up">
             Create an account
           </Link>
-          <Link className="text-(--text-muted) hover:underline" to="/forgot-password">
+          <Link className="text-(--text-muted) hover:underline transition-colors duration-150" to="/forgot-password">
             Forgot password?
           </Link>
         </div>
