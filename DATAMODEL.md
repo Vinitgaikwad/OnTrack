@@ -4,10 +4,12 @@ Source of truth for the data that flows between the frontend and the backend. Fu
 implementing the backend (Prisma ORM + Postgres) or changing frontend entity shapes must keep
 this file in sync (see the rule in `AGENTS.md`).
 
-> **Status: PARTIAL.** Auth, Tasks, Calendar, and Diary are implemented end-to-end: Hono API on
-> Cloudflare Workers → Postgres via Prisma, with transactional email via Resend. The remaining
-> feature stores (Agents, Timer prefs) are still client-side (`zustand` →
-> `localStorage`) and not yet synced. See §1 and §4 for what is live vs. planned.
+> **Status: PARTIAL.** Auth, Tasks, Calendar, Diary, and the **Agent platform** are implemented
+> end-to-end: Hono API on Cloudflare Workers → Postgres via Prisma, transactional email via
+> Resend, LLM execution via BYOK model keys (OpenRouter default). Agent data is server-synced
+> (agents, model keys, inbox messages, run history). Timer prefs and reminders are still
+> client-side (`zustand` → `localStorage`) and not yet synced. Gmail OAuth connection is wired
+> (`/api/auth/gmail/*`) but requires live Google credentials to exercise fully.
 
 ---
 
@@ -26,7 +28,9 @@ this file in sync (see the rule in `AGENTS.md`).
 | `ontrack-notes`                     | `NoteTask`, board      | `Task`         | **Yes (live)**              |
 | `ontrack-calendar`                  | `Appointment`, `CalendarEventKind` | `Appointment` | **Yes (live)**            |
 | `ontrack-diary`                     | `DiaryEntry`           | `DiaryEntry`   | **Yes (live)**              |
-| `ontrack-agents`                    | `Agent`                | `Agent`        | Planned (schema exists)     |
+| `ontrack-agents`                    | `Agent` + templates    | `Agent`,`AgentTemplate` | **Yes (live)**     |
+| `ontrack-model-keys`                | `ModelKey`             | `ModelKey`     | **Yes (live)**              |
+| `ontrack-agent-messages`            | `AgentMessage` (inbox) | `AgentMessage` | **Yes (live)**              |
 | `ontrack-timer`                     | timer settings         | `TimerSettings`| Planned (schema exists; prefs only) |
 | `ontrack-timer`                     | reminders              | `Reminder`     | Planned                    |
 | `ontrack-timer`                     | live session state     | —              | **No** (ephemeral)          |
@@ -149,6 +153,34 @@ month dropdown covers the last 24 months up to the newest entry month. The store
 of loaded months in `entries` (sorted); `entries[0]` is therefore the globally newest entry and
 feeds the Today page + dashboard widget (hidden latest → "Hidden entry" placeholder).
 
+### Agent platform (implemented — v2 scope)
+
+Front sources:
+- `apps/web/src/global/stores/useAgentsStore.ts` — `Agent`, `AgentTool`, `AgentTemplate`
+- `apps/web/src/global/stores/useModelKeysStore.ts` — `ModelKey`
+- `apps/web/src/global/stores/useAgentMessagesStore.ts` — `AgentMessage` (inbox)
+
+**Execution model (v2):** button-triggered only, no cron/streaming. `POST /api/agents/:id/run`
+compiles one full `RunResult` and returns it in a single response. Budget guards: max 50
+runs/day/user (429), in-flight concurrency lock per agent (409), per-run `maxTokens` clamped to
+8000 server-side. All external content is wrapped in `<untrusted_data>` tags before hitting the
+LLM; output JSON is validated by Zod. `draftOnly=true` is the default on every agent.
+
+| Entity        | Source fields (JSON, camelCase)                                                                                              | Notes |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------- | ----- |
+| `Agent`       | `id, name, role, icon, color, description, preferences[], enabled, templateId?, triggerType, sources[], output, prompt?, draftOnly, modelKeyId?, maxTokens, lastRunAt?, runCount, createdAt, updatedAt, tools?[]` | `triggerType`/`schedule`/`timezone` reserved for v3; `output` ∈ `message\|note\|email`; creating from a template copies `defaultRole/prompt` and seeds `AgentTool` rows |
+| `AgentTemplate` | `id, slug, name, description, category, icon, requiresOAuth?, defaultRole, defaultPrompt, defaultSources[], defaultTools[], defaultOutput, configSchema?, sortOrder` | 3 seeded: `email-summarizer`, `job-tracker`, `news-provider` (upserted on first `/api/templates` hit) |
+| `AgentTool`    | `id, agentId, toolName, enabled, config?`                                                                                   | per-agent tool row; `toolName` ∈ registry (14 tools) |
+| `ModelKey`     | `id, provider, label, defaultModel, baseUrl?, createdAt`                                                                    | **`apiKeyEnc` never leaves the server** (AES-256-GCM, `MODEL_KEY_ENCRYPTION_KEY`); POST live-validates against OpenRouter |
+| `AgentMessage` | `id, agentId, title, body (markdown), read, createdAt`                                                                      | inbox; delivery target of every run that outputs `message`/`email` |
+| `AgentRun`     | via `GET /api/agents/:id/runs` → `{ runId, status, message?, sideEffects?, tokensUsed, durationMs, error?, startedAt }`   | audit log; snapshots/`toolCalls` stored on the row but not returned by the list |
+| `IntegrationAccount` | `id, provider ("gmail"), email?, scope[], tokenEnc, tokenExpiry?`                                                       | tokens AES-256-GCM (`INTEGRATION_ENCRYPTION_KEY`), `gmail.readonly` scope |
+
+**Security model:** `email_read` requires a connected Gmail `IntegrationAccount`
+(`requiresOAuth: "gmail"`); OAuth-gated tools show "Connect Gmail" in the editor until
+connected. Model keys: GET returns label/provider/model ONLY. Gmail disconnect revokes tokens
+and deletes the row (`DELETE /api/auth/gmail/disconnect`).
+
 ---
 
 ## 3. Prisma schema (Postgres — applied)
@@ -268,15 +300,121 @@ model DiaryEntry {
 }
 
 model Agent {
-  id           String   @id @default(cuid())
+  id           String          @id @default(cuid())
   userId       String
+  templateId   String?
   name         String
   role         String
   icon         String
   color        String
   description  String
-  preferences  String[] @default([])
-  enabled      Boolean  @default(true)
+  preferences  String[]        @default([])
+  enabled      Boolean         @default(true)
+  triggerType  AgentTriggerType @default(manual) // reserved (v3+)
+  schedule     String?                            // reserved (v3+)
+  timezone     String           @default("UTC")   // reserved (v3+)
+  sources      String[]         @default([])
+  output       AgentOutputType  @default(message)
+  prompt       String?
+  draftOnly    Boolean          @default(true)
+  modelKeyId   String?
+  maxTokens    Int              @default(2000)
+  lastRunAt    DateTime?
+  nextRunAt    DateTime?                          // reserved (v3+)
+  runCount     Int              @default(0)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  runs         AgentRun[]
+  messages     AgentMessage[]
+  tools        AgentTool[]
+  modelKey     ModelKey?         @relation(fields: [modelKeyId], references: [id])
+  template     AgentTemplate?    @relation(fields: [templateId], references: [id])
+}
+
+enum AgentTriggerType { manual schedule }
+enum AgentOutputType  { message note email }
+
+model AgentTemplate {
+  id             String           @id @default(cuid())
+  slug           String           @unique
+  name           String
+  description    String
+  category       String
+  icon           String
+  requiresOAuth  String? // "gmail" | null
+  defaultRole    String
+  defaultPrompt  String
+  defaultSources String[]         @default([])
+  defaultTools   String[]         @default([])
+  defaultOutput  AgentOutputType  @default(message)
+  configSchema   Json?
+  sortOrder      Int              @default(0)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  agents         Agent[]
+}
+
+model ModelKey {
+  id           String   @id @default(cuid())
+  userId       String
+  provider     String   // openrouter | deepseek | groq | openai | anthropic
+  label        String
+  apiKeyEnc    String   // AES-256-GCM
+  baseUrl      String?
+  defaultModel String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  agents       Agent[]
+  @@unique([userId, provider, label])
+}
+
+model AgentTool {
+  id       String  @id @default(cuid())
+  agentId  String
+  toolName String
+  enabled  Boolean @default(false)
+  config   Json?
+  @@unique([agentId, toolName])
+  @@index([agentId])
+}
+
+model AgentRun {
+  id         String   @id @default(cuid())
+  userId     String
+  agentId    String
+  status     String   @default("running") // running | success | failed | skipped
+  inputSnap  String?
+  outputSnap String?
+  toolCalls  String?
+  tokensUsed Int      @default(0)
+  error      String?
+  startedAt  DateTime @default(now())
+  finishedAt DateTime?
+  @@index([userId, agentId, startedAt])
+}
+
+model AgentMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  agentId   String
+  title     String
+  body      String   // markdown
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  @@index([userId, read])
+}
+
+model IntegrationAccount {
+  id          String   @id @default(cuid())
+  userId      String
+  provider    String   // "gmail"
+  email       String?
+  scope       String[] @default([])
+  tokenEnc    String   // AES-256-GCM
+  tokenExpiry DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@unique([userId, provider, email])
 }
 
 model TimerSettings {
@@ -380,6 +518,59 @@ Validation: `date` `YYYY-MM-DD`, `month` `YYYY-MM`, `mood` ∈ `great|good|okay|
 `@@index([userId, date])` serves the month range). All routes auth + scoped to the owner,
 `404 NOT_FOUND` for another user's id.
 
+### Agents (implemented)
+
+| Method | Path                    | Body / Query                 | Returns                                   |
+| ------ | ----------------------- | ---------------------------- | ----------------------------------------- |
+| GET    | `/api/agents`           | —                            | `{ data: Agent[] }` (tools included)      |
+| POST   | `/api/agents`           | `{ name, role, icon, color, description, preferences?, templateId?, prompt?, sources?, output?, draftOnly?, modelKeyId?, maxTokens? }` | `201 { data: Agent }` (template defaults + `AgentTool` rows applied when `templateId` set) |
+| GET    | `/api/agents/:id`       | —                            | `{ data: Agent }`                         |
+| PATCH  | `/api/agents/:id`       | any subset of the above      | `{ data: Agent }` (at least one field)    |
+| DELETE | `/api/agents/:id`       | —                            | `204` (cascades runs/messages/tools)      |
+| POST   | `/api/agents/:id/run`   | —                            | `{ data: RunResult }`; `400 DISABLED`, `404`, `409 CONFLICT` (in-flight), `429 RATE_LIMIT` |
+| GET    | `/api/agents/:id/runs`  | `?limit&offset`              | `{ data: { runs: RunListItem[], hasMore } }` |
+
+```ts
+type RunResult = {
+  runId: string
+  status: 'success' | 'failed'
+  message?: { id: string; title: string; body: string }
+  sideEffects?: Array<{ kind: 'note'|'calendar'|'email'; status: 'created'|'drafted'|'blocked'; title?: string; id?: string }>
+  tokensUsed: number
+  durationMs: number
+  error?: string
+}
+```
+
+### Templates / tools / messages (implemented)
+
+| Method | Path                              | Body / Query                   | Returns                                   |
+| ------ | --------------------------------- | ------------------------------ | ----------------------------------------- |
+| GET    | `/api/templates`                  | —                              | `{ data: AgentTemplate[] }` (seeds upsert on first hit) |
+| GET    | `/api/tools/available`            | —                              | `{ data: ToolDefinition[] }` (14 tools, grouped by category) |
+| GET    | `/api/tools/agents/:id/tools`     | —                              | `{ data: AgentTool[] }`                   |
+| PATCH  | `/api/tools/agents/:id/tools/:toolName` | `{ enabled?, config? }`   | `{ data: AgentTool }` (upsert)            |
+| GET    | `/api/agents/messages`            | `?offset&limit&unread=`        | `{ data: { messages, hasMore } }`         |
+| PATCH  | `/api/agents/messages/:id`        | `{ read: true }`               | `{ data: AgentMessage }`                  |
+| DELETE | `/api/agents/messages/:id`        | —                              | `204`                                     |
+| GET    | `/api/runs/:runId`                | —                              | `{ data: RunListItem }`                   |
+
+### ModelKeys (BYOK, implemented)
+
+| Method | Path                | Body / Query                    | Returns                                       |
+| ------ | ------------------- | ------------------------------- | --------------------------------------------- |
+| GET    | `/api/model-keys`   | —                               | `{ data: ModelKey[] }` — redacted (no key)    |
+| POST   | `/api/model-keys`   | `{ provider, label, apiKey, defaultModel, baseUrl? }` | `201 { data: ModelKey }` — **live-validated** against the provider before storing |
+| DELETE | `/api/model-keys/:id` | —                            | `204`; clears `Agent.modelKeyId` references    |
+
+### Gmail OAuth (implemented, requires live credentials)
+
+| Method   | Path                            | Flow |
+| -------- | ------------------------------- | ---- |
+| GET      | `/api/auth/gmail/start`         | `{ data: { url } }` Google OAuth URL (scope `gmail.readonly openid email profile`) |
+| GET      | `/api/auth/gmail/callback`      | exchange `code` → encrypt tokens → upsert `IntegrationAccount` → redirect `{WEB_URL}/#/agents?gmail=connected` |
+| DELETE   | `/api/auth/gmail/disconnect`    | revoke tokens + delete row (`204`) |
+
 ---
 
 ## 5. Frontend integration notes (implemented for auth + tasks)
@@ -408,17 +599,20 @@ Validation: `date` `YYYY-MM-DD`, `month` `YYYY-MM`, `mood` ∈ `great|good|okay|
 - Migrations: applied via `prisma migrate deploy` (local Docker Postgres `ontrack-pg`).
   `prisma migrate dev` is non-interactive-unfriendly; hand-written migrations + `migrate deploy`
   when needed.
-- Env bindings in `wrangler.jsonc`: `WEB_URL` (var), plus secrets `DATABASE_URL`, `JWT_SECRET`,
-  `RESEND_API_KEY` in `.dev.vars` (local) / Worker secrets (prod).
+- Env bindings in `wrangler.jsonc`: `WEB_URL` (var), plus secrets in `.dev.vars`:
+  `DATABASE_URL`, `JWT_SECRET`, `RESEND_API_KEY`, `OPENROUTER_API_KEY`,
+  `MODEL_KEY_ENCRYPTION_KEY`, `INTEGRATION_ENCRYPTION_KEY`, `GOOGLE_CLIENT_ID`,
+  `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`. Encryption keys (**note**: live-validate
+  against OpenRouter on `POST /api/model-keys`, so OPENROUTER_API_KEY is required).
 - The position-densify invariant must be moved/adjusted in a **transaction** (see tasks service).
 
 ## 7. Open decisions
 
 1. ~~Auth strategy~~ **Resolved:** email + password, custom JWT, email verification + password
    reset via Resend. The `RESEND_API_KEY` was pasted in a session once — **revoke/rotate it**.
-2. Sync strategy for the remaining stores (Diary/Agents/Timer prefs) — same
-   optimistic lazy-load pattern as notes/calendar. Calendar resolved with the appointments API;
-   Diary resolved with the diary API (§4).
+2. Sync strategy for the remaining stores (Timer prefs) — same optimistic lazy-load pattern as
+   notes/calendar. Calendar resolved with the appointments API; Diary resolved with the diary
+   API (§4); Agents resolved with the agents/templates/model-keys/messages APIs (§4, v2-date).
 3. Whether dashboard widgets/theme should ever sync across devices (currently device-local).
 4. Reminder `lastEscalatedAt`/level semantics offline (local-first).
 5. Production Electron: absolute API origin + token rehydration for `file://` builds.

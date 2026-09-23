@@ -218,6 +218,10 @@ export type UserWhereInput = {
   appointments?: Prisma.AppointmentListRelationFilter
   diaryEntries?: Prisma.DiaryEntryListRelationFilter
   agents?: Prisma.AgentListRelationFilter
+  agentRuns?: Prisma.AgentRunListRelationFilter
+  agentMessages?: Prisma.AgentMessageListRelationFilter
+  modelKeys?: Prisma.ModelKeyListRelationFilter
+  integrationAccounts?: Prisma.IntegrationAccountListRelationFilter
   timerSettings?: Prisma.XOR<Prisma.TimerSettingsNullableScalarRelationFilter, Prisma.TimerSettingsWhereInput> | null
   reminders?: Prisma.ReminderListRelationFilter
   verificationToken?: Prisma.XOR<Prisma.EmailVerificationTokenNullableScalarRelationFilter, Prisma.EmailVerificationTokenWhereInput> | null
@@ -238,6 +242,10 @@ export type UserOrderByWithRelationInput = {
   appointments?: Prisma.AppointmentOrderByRelationAggregateInput
   diaryEntries?: Prisma.DiaryEntryOrderByRelationAggregateInput
   agents?: Prisma.AgentOrderByRelationAggregateInput
+  agentRuns?: Prisma.AgentRunOrderByRelationAggregateInput
+  agentMessages?: Prisma.AgentMessageOrderByRelationAggregateInput
+  modelKeys?: Prisma.ModelKeyOrderByRelationAggregateInput
+  integrationAccounts?: Prisma.IntegrationAccountOrderByRelationAggregateInput
   timerSettings?: Prisma.TimerSettingsOrderByWithRelationInput
   reminders?: Prisma.ReminderOrderByRelationAggregateInput
   verificationToken?: Prisma.EmailVerificationTokenOrderByWithRelationInput
@@ -261,6 +269,10 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   appointments?: Prisma.AppointmentListRelationFilter
   diaryEntries?: Prisma.DiaryEntryListRelationFilter
   agents?: Prisma.AgentListRelationFilter
+  agentRuns?: Prisma.AgentRunListRelationFilter
+  agentMessages?: Prisma.AgentMessageListRelationFilter
+  modelKeys?: Prisma.ModelKeyListRelationFilter
+  integrationAccounts?: Prisma.IntegrationAccountListRelationFilter
   timerSettings?: Prisma.XOR<Prisma.TimerSettingsNullableScalarRelationFilter, Prisma.TimerSettingsWhereInput> | null
   reminders?: Prisma.ReminderListRelationFilter
   verificationToken?: Prisma.XOR<Prisma.EmailVerificationTokenNullableScalarRelationFilter, Prisma.EmailVerificationTokenWhereInput> | null
@@ -311,6 +323,10 @@ export type UserCreateInput = {
   appointments?: Prisma.AppointmentCreateNestedManyWithoutUserInput
   diaryEntries?: Prisma.DiaryEntryCreateNestedManyWithoutUserInput
   agents?: Prisma.AgentCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountCreateNestedManyWithoutUserInput
   timerSettings?: Prisma.TimerSettingsCreateNestedOneWithoutUserInput
   reminders?: Prisma.ReminderCreateNestedManyWithoutUserInput
   verificationToken?: Prisma.EmailVerificationTokenCreateNestedOneWithoutUserInput
@@ -331,6 +347,10 @@ export type UserUncheckedCreateInput = {
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutUserInput
   diaryEntries?: Prisma.DiaryEntryUncheckedCreateNestedManyWithoutUserInput
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunUncheckedCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyUncheckedCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedCreateNestedManyWithoutUserInput
   timerSettings?: Prisma.TimerSettingsUncheckedCreateNestedOneWithoutUserInput
   reminders?: Prisma.ReminderUncheckedCreateNestedManyWithoutUserInput
   verificationToken?: Prisma.EmailVerificationTokenUncheckedCreateNestedOneWithoutUserInput
@@ -351,6 +371,10 @@ export type UserUpdateInput = {
   appointments?: Prisma.AppointmentUpdateManyWithoutUserNestedInput
   diaryEntries?: Prisma.DiaryEntryUpdateManyWithoutUserNestedInput
   agents?: Prisma.AgentUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUpdateManyWithoutUserNestedInput
   timerSettings?: Prisma.TimerSettingsUpdateOneWithoutUserNestedInput
   reminders?: Prisma.ReminderUpdateManyWithoutUserNestedInput
   verificationToken?: Prisma.EmailVerificationTokenUpdateOneWithoutUserNestedInput
@@ -371,6 +395,10 @@ export type UserUncheckedUpdateInput = {
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutUserNestedInput
   diaryEntries?: Prisma.DiaryEntryUncheckedUpdateManyWithoutUserNestedInput
   agents?: Prisma.AgentUncheckedUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUncheckedUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUncheckedUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUncheckedUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedUpdateManyWithoutUserNestedInput
   timerSettings?: Prisma.TimerSettingsUncheckedUpdateOneWithoutUserNestedInput
   reminders?: Prisma.ReminderUncheckedUpdateManyWithoutUserNestedInput
   verificationToken?: Prisma.EmailVerificationTokenUncheckedUpdateOneWithoutUserNestedInput
@@ -558,6 +586,62 @@ export type UserUpdateOneRequiredWithoutAgentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAgentsInput, Prisma.UserUpdateWithoutAgentsInput>, Prisma.UserUncheckedUpdateWithoutAgentsInput>
 }
 
+export type UserCreateNestedOneWithoutModelKeysInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutModelKeysInput, Prisma.UserUncheckedCreateWithoutModelKeysInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutModelKeysInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutModelKeysNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutModelKeysInput, Prisma.UserUncheckedCreateWithoutModelKeysInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutModelKeysInput
+  upsert?: Prisma.UserUpsertWithoutModelKeysInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutModelKeysInput, Prisma.UserUpdateWithoutModelKeysInput>, Prisma.UserUncheckedUpdateWithoutModelKeysInput>
+}
+
+export type UserCreateNestedOneWithoutAgentRunsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAgentRunsInput, Prisma.UserUncheckedCreateWithoutAgentRunsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAgentRunsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAgentRunsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAgentRunsInput, Prisma.UserUncheckedCreateWithoutAgentRunsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAgentRunsInput
+  upsert?: Prisma.UserUpsertWithoutAgentRunsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAgentRunsInput, Prisma.UserUpdateWithoutAgentRunsInput>, Prisma.UserUncheckedUpdateWithoutAgentRunsInput>
+}
+
+export type UserCreateNestedOneWithoutAgentMessagesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAgentMessagesInput, Prisma.UserUncheckedCreateWithoutAgentMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAgentMessagesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAgentMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAgentMessagesInput, Prisma.UserUncheckedCreateWithoutAgentMessagesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAgentMessagesInput
+  upsert?: Prisma.UserUpsertWithoutAgentMessagesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAgentMessagesInput, Prisma.UserUpdateWithoutAgentMessagesInput>, Prisma.UserUncheckedUpdateWithoutAgentMessagesInput>
+}
+
+export type UserCreateNestedOneWithoutIntegrationAccountsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutIntegrationAccountsInput, Prisma.UserUncheckedCreateWithoutIntegrationAccountsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutIntegrationAccountsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutIntegrationAccountsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutIntegrationAccountsInput, Prisma.UserUncheckedCreateWithoutIntegrationAccountsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutIntegrationAccountsInput
+  upsert?: Prisma.UserUpsertWithoutIntegrationAccountsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutIntegrationAccountsInput, Prisma.UserUpdateWithoutIntegrationAccountsInput>, Prisma.UserUncheckedUpdateWithoutIntegrationAccountsInput>
+}
+
 export type UserCreateNestedOneWithoutTimerSettingsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutTimerSettingsInput, Prisma.UserUncheckedCreateWithoutTimerSettingsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutTimerSettingsInput
@@ -600,6 +684,10 @@ export type UserCreateWithoutVerificationTokenInput = {
   appointments?: Prisma.AppointmentCreateNestedManyWithoutUserInput
   diaryEntries?: Prisma.DiaryEntryCreateNestedManyWithoutUserInput
   agents?: Prisma.AgentCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountCreateNestedManyWithoutUserInput
   timerSettings?: Prisma.TimerSettingsCreateNestedOneWithoutUserInput
   reminders?: Prisma.ReminderCreateNestedManyWithoutUserInput
   resetToken?: Prisma.PasswordResetTokenCreateNestedOneWithoutUserInput
@@ -619,6 +707,10 @@ export type UserUncheckedCreateWithoutVerificationTokenInput = {
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutUserInput
   diaryEntries?: Prisma.DiaryEntryUncheckedCreateNestedManyWithoutUserInput
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunUncheckedCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyUncheckedCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedCreateNestedManyWithoutUserInput
   timerSettings?: Prisma.TimerSettingsUncheckedCreateNestedOneWithoutUserInput
   reminders?: Prisma.ReminderUncheckedCreateNestedManyWithoutUserInput
   resetToken?: Prisma.PasswordResetTokenUncheckedCreateNestedOneWithoutUserInput
@@ -654,6 +746,10 @@ export type UserUpdateWithoutVerificationTokenInput = {
   appointments?: Prisma.AppointmentUpdateManyWithoutUserNestedInput
   diaryEntries?: Prisma.DiaryEntryUpdateManyWithoutUserNestedInput
   agents?: Prisma.AgentUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUpdateManyWithoutUserNestedInput
   timerSettings?: Prisma.TimerSettingsUpdateOneWithoutUserNestedInput
   reminders?: Prisma.ReminderUpdateManyWithoutUserNestedInput
   resetToken?: Prisma.PasswordResetTokenUpdateOneWithoutUserNestedInput
@@ -673,6 +769,10 @@ export type UserUncheckedUpdateWithoutVerificationTokenInput = {
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutUserNestedInput
   diaryEntries?: Prisma.DiaryEntryUncheckedUpdateManyWithoutUserNestedInput
   agents?: Prisma.AgentUncheckedUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUncheckedUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUncheckedUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUncheckedUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedUpdateManyWithoutUserNestedInput
   timerSettings?: Prisma.TimerSettingsUncheckedUpdateOneWithoutUserNestedInput
   reminders?: Prisma.ReminderUncheckedUpdateManyWithoutUserNestedInput
   resetToken?: Prisma.PasswordResetTokenUncheckedUpdateOneWithoutUserNestedInput
@@ -692,6 +792,10 @@ export type UserCreateWithoutResetTokenInput = {
   appointments?: Prisma.AppointmentCreateNestedManyWithoutUserInput
   diaryEntries?: Prisma.DiaryEntryCreateNestedManyWithoutUserInput
   agents?: Prisma.AgentCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountCreateNestedManyWithoutUserInput
   timerSettings?: Prisma.TimerSettingsCreateNestedOneWithoutUserInput
   reminders?: Prisma.ReminderCreateNestedManyWithoutUserInput
   verificationToken?: Prisma.EmailVerificationTokenCreateNestedOneWithoutUserInput
@@ -711,6 +815,10 @@ export type UserUncheckedCreateWithoutResetTokenInput = {
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutUserInput
   diaryEntries?: Prisma.DiaryEntryUncheckedCreateNestedManyWithoutUserInput
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunUncheckedCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyUncheckedCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedCreateNestedManyWithoutUserInput
   timerSettings?: Prisma.TimerSettingsUncheckedCreateNestedOneWithoutUserInput
   reminders?: Prisma.ReminderUncheckedCreateNestedManyWithoutUserInput
   verificationToken?: Prisma.EmailVerificationTokenUncheckedCreateNestedOneWithoutUserInput
@@ -746,6 +854,10 @@ export type UserUpdateWithoutResetTokenInput = {
   appointments?: Prisma.AppointmentUpdateManyWithoutUserNestedInput
   diaryEntries?: Prisma.DiaryEntryUpdateManyWithoutUserNestedInput
   agents?: Prisma.AgentUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUpdateManyWithoutUserNestedInput
   timerSettings?: Prisma.TimerSettingsUpdateOneWithoutUserNestedInput
   reminders?: Prisma.ReminderUpdateManyWithoutUserNestedInput
   verificationToken?: Prisma.EmailVerificationTokenUpdateOneWithoutUserNestedInput
@@ -765,6 +877,10 @@ export type UserUncheckedUpdateWithoutResetTokenInput = {
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutUserNestedInput
   diaryEntries?: Prisma.DiaryEntryUncheckedUpdateManyWithoutUserNestedInput
   agents?: Prisma.AgentUncheckedUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUncheckedUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUncheckedUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUncheckedUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedUpdateManyWithoutUserNestedInput
   timerSettings?: Prisma.TimerSettingsUncheckedUpdateOneWithoutUserNestedInput
   reminders?: Prisma.ReminderUncheckedUpdateManyWithoutUserNestedInput
   verificationToken?: Prisma.EmailVerificationTokenUncheckedUpdateOneWithoutUserNestedInput
@@ -783,6 +899,10 @@ export type UserCreateWithoutTasksInput = {
   appointments?: Prisma.AppointmentCreateNestedManyWithoutUserInput
   diaryEntries?: Prisma.DiaryEntryCreateNestedManyWithoutUserInput
   agents?: Prisma.AgentCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountCreateNestedManyWithoutUserInput
   timerSettings?: Prisma.TimerSettingsCreateNestedOneWithoutUserInput
   reminders?: Prisma.ReminderCreateNestedManyWithoutUserInput
   verificationToken?: Prisma.EmailVerificationTokenCreateNestedOneWithoutUserInput
@@ -802,6 +922,10 @@ export type UserUncheckedCreateWithoutTasksInput = {
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutUserInput
   diaryEntries?: Prisma.DiaryEntryUncheckedCreateNestedManyWithoutUserInput
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunUncheckedCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyUncheckedCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedCreateNestedManyWithoutUserInput
   timerSettings?: Prisma.TimerSettingsUncheckedCreateNestedOneWithoutUserInput
   reminders?: Prisma.ReminderUncheckedCreateNestedManyWithoutUserInput
   verificationToken?: Prisma.EmailVerificationTokenUncheckedCreateNestedOneWithoutUserInput
@@ -837,6 +961,10 @@ export type UserUpdateWithoutTasksInput = {
   appointments?: Prisma.AppointmentUpdateManyWithoutUserNestedInput
   diaryEntries?: Prisma.DiaryEntryUpdateManyWithoutUserNestedInput
   agents?: Prisma.AgentUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUpdateManyWithoutUserNestedInput
   timerSettings?: Prisma.TimerSettingsUpdateOneWithoutUserNestedInput
   reminders?: Prisma.ReminderUpdateManyWithoutUserNestedInput
   verificationToken?: Prisma.EmailVerificationTokenUpdateOneWithoutUserNestedInput
@@ -856,6 +984,10 @@ export type UserUncheckedUpdateWithoutTasksInput = {
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutUserNestedInput
   diaryEntries?: Prisma.DiaryEntryUncheckedUpdateManyWithoutUserNestedInput
   agents?: Prisma.AgentUncheckedUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUncheckedUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUncheckedUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUncheckedUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedUpdateManyWithoutUserNestedInput
   timerSettings?: Prisma.TimerSettingsUncheckedUpdateOneWithoutUserNestedInput
   reminders?: Prisma.ReminderUncheckedUpdateManyWithoutUserNestedInput
   verificationToken?: Prisma.EmailVerificationTokenUncheckedUpdateOneWithoutUserNestedInput
@@ -875,6 +1007,10 @@ export type UserCreateWithoutAppointmentsInput = {
   tasks?: Prisma.TaskCreateNestedManyWithoutUserInput
   diaryEntries?: Prisma.DiaryEntryCreateNestedManyWithoutUserInput
   agents?: Prisma.AgentCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountCreateNestedManyWithoutUserInput
   timerSettings?: Prisma.TimerSettingsCreateNestedOneWithoutUserInput
   reminders?: Prisma.ReminderCreateNestedManyWithoutUserInput
   verificationToken?: Prisma.EmailVerificationTokenCreateNestedOneWithoutUserInput
@@ -894,6 +1030,10 @@ export type UserUncheckedCreateWithoutAppointmentsInput = {
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutUserInput
   diaryEntries?: Prisma.DiaryEntryUncheckedCreateNestedManyWithoutUserInput
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunUncheckedCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyUncheckedCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedCreateNestedManyWithoutUserInput
   timerSettings?: Prisma.TimerSettingsUncheckedCreateNestedOneWithoutUserInput
   reminders?: Prisma.ReminderUncheckedCreateNestedManyWithoutUserInput
   verificationToken?: Prisma.EmailVerificationTokenUncheckedCreateNestedOneWithoutUserInput
@@ -929,6 +1069,10 @@ export type UserUpdateWithoutAppointmentsInput = {
   tasks?: Prisma.TaskUpdateManyWithoutUserNestedInput
   diaryEntries?: Prisma.DiaryEntryUpdateManyWithoutUserNestedInput
   agents?: Prisma.AgentUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUpdateManyWithoutUserNestedInput
   timerSettings?: Prisma.TimerSettingsUpdateOneWithoutUserNestedInput
   reminders?: Prisma.ReminderUpdateManyWithoutUserNestedInput
   verificationToken?: Prisma.EmailVerificationTokenUpdateOneWithoutUserNestedInput
@@ -948,6 +1092,10 @@ export type UserUncheckedUpdateWithoutAppointmentsInput = {
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutUserNestedInput
   diaryEntries?: Prisma.DiaryEntryUncheckedUpdateManyWithoutUserNestedInput
   agents?: Prisma.AgentUncheckedUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUncheckedUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUncheckedUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUncheckedUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedUpdateManyWithoutUserNestedInput
   timerSettings?: Prisma.TimerSettingsUncheckedUpdateOneWithoutUserNestedInput
   reminders?: Prisma.ReminderUncheckedUpdateManyWithoutUserNestedInput
   verificationToken?: Prisma.EmailVerificationTokenUncheckedUpdateOneWithoutUserNestedInput
@@ -967,6 +1115,10 @@ export type UserCreateWithoutDiaryEntriesInput = {
   tasks?: Prisma.TaskCreateNestedManyWithoutUserInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutUserInput
   agents?: Prisma.AgentCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountCreateNestedManyWithoutUserInput
   timerSettings?: Prisma.TimerSettingsCreateNestedOneWithoutUserInput
   reminders?: Prisma.ReminderCreateNestedManyWithoutUserInput
   verificationToken?: Prisma.EmailVerificationTokenCreateNestedOneWithoutUserInput
@@ -986,6 +1138,10 @@ export type UserUncheckedCreateWithoutDiaryEntriesInput = {
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutUserInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutUserInput
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunUncheckedCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyUncheckedCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedCreateNestedManyWithoutUserInput
   timerSettings?: Prisma.TimerSettingsUncheckedCreateNestedOneWithoutUserInput
   reminders?: Prisma.ReminderUncheckedCreateNestedManyWithoutUserInput
   verificationToken?: Prisma.EmailVerificationTokenUncheckedCreateNestedOneWithoutUserInput
@@ -1021,6 +1177,10 @@ export type UserUpdateWithoutDiaryEntriesInput = {
   tasks?: Prisma.TaskUpdateManyWithoutUserNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutUserNestedInput
   agents?: Prisma.AgentUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUpdateManyWithoutUserNestedInput
   timerSettings?: Prisma.TimerSettingsUpdateOneWithoutUserNestedInput
   reminders?: Prisma.ReminderUpdateManyWithoutUserNestedInput
   verificationToken?: Prisma.EmailVerificationTokenUpdateOneWithoutUserNestedInput
@@ -1040,6 +1200,10 @@ export type UserUncheckedUpdateWithoutDiaryEntriesInput = {
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutUserNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutUserNestedInput
   agents?: Prisma.AgentUncheckedUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUncheckedUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUncheckedUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUncheckedUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedUpdateManyWithoutUserNestedInput
   timerSettings?: Prisma.TimerSettingsUncheckedUpdateOneWithoutUserNestedInput
   reminders?: Prisma.ReminderUncheckedUpdateManyWithoutUserNestedInput
   verificationToken?: Prisma.EmailVerificationTokenUncheckedUpdateOneWithoutUserNestedInput
@@ -1059,6 +1223,10 @@ export type UserCreateWithoutAgentsInput = {
   tasks?: Prisma.TaskCreateNestedManyWithoutUserInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutUserInput
   diaryEntries?: Prisma.DiaryEntryCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountCreateNestedManyWithoutUserInput
   timerSettings?: Prisma.TimerSettingsCreateNestedOneWithoutUserInput
   reminders?: Prisma.ReminderCreateNestedManyWithoutUserInput
   verificationToken?: Prisma.EmailVerificationTokenCreateNestedOneWithoutUserInput
@@ -1078,6 +1246,10 @@ export type UserUncheckedCreateWithoutAgentsInput = {
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutUserInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutUserInput
   diaryEntries?: Prisma.DiaryEntryUncheckedCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunUncheckedCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyUncheckedCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedCreateNestedManyWithoutUserInput
   timerSettings?: Prisma.TimerSettingsUncheckedCreateNestedOneWithoutUserInput
   reminders?: Prisma.ReminderUncheckedCreateNestedManyWithoutUserInput
   verificationToken?: Prisma.EmailVerificationTokenUncheckedCreateNestedOneWithoutUserInput
@@ -1113,6 +1285,10 @@ export type UserUpdateWithoutAgentsInput = {
   tasks?: Prisma.TaskUpdateManyWithoutUserNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutUserNestedInput
   diaryEntries?: Prisma.DiaryEntryUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUpdateManyWithoutUserNestedInput
   timerSettings?: Prisma.TimerSettingsUpdateOneWithoutUserNestedInput
   reminders?: Prisma.ReminderUpdateManyWithoutUserNestedInput
   verificationToken?: Prisma.EmailVerificationTokenUpdateOneWithoutUserNestedInput
@@ -1132,6 +1308,442 @@ export type UserUncheckedUpdateWithoutAgentsInput = {
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutUserNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutUserNestedInput
   diaryEntries?: Prisma.DiaryEntryUncheckedUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUncheckedUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUncheckedUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUncheckedUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedUpdateManyWithoutUserNestedInput
+  timerSettings?: Prisma.TimerSettingsUncheckedUpdateOneWithoutUserNestedInput
+  reminders?: Prisma.ReminderUncheckedUpdateManyWithoutUserNestedInput
+  verificationToken?: Prisma.EmailVerificationTokenUncheckedUpdateOneWithoutUserNestedInput
+  resetToken?: Prisma.PasswordResetTokenUncheckedUpdateOneWithoutUserNestedInput
+}
+
+export type UserCreateWithoutModelKeysInput = {
+  id?: string
+  email: string
+  name: string
+  passwordHash: string
+  emailVerified?: boolean
+  refreshTokenDigest?: string | null
+  refreshTokenExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tasks?: Prisma.TaskCreateNestedManyWithoutUserInput
+  appointments?: Prisma.AppointmentCreateNestedManyWithoutUserInput
+  diaryEntries?: Prisma.DiaryEntryCreateNestedManyWithoutUserInput
+  agents?: Prisma.AgentCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountCreateNestedManyWithoutUserInput
+  timerSettings?: Prisma.TimerSettingsCreateNestedOneWithoutUserInput
+  reminders?: Prisma.ReminderCreateNestedManyWithoutUserInput
+  verificationToken?: Prisma.EmailVerificationTokenCreateNestedOneWithoutUserInput
+  resetToken?: Prisma.PasswordResetTokenCreateNestedOneWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutModelKeysInput = {
+  id?: string
+  email: string
+  name: string
+  passwordHash: string
+  emailVerified?: boolean
+  refreshTokenDigest?: string | null
+  refreshTokenExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutUserInput
+  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutUserInput
+  diaryEntries?: Prisma.DiaryEntryUncheckedCreateNestedManyWithoutUserInput
+  agents?: Prisma.AgentUncheckedCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunUncheckedCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedCreateNestedManyWithoutUserInput
+  timerSettings?: Prisma.TimerSettingsUncheckedCreateNestedOneWithoutUserInput
+  reminders?: Prisma.ReminderUncheckedCreateNestedManyWithoutUserInput
+  verificationToken?: Prisma.EmailVerificationTokenUncheckedCreateNestedOneWithoutUserInput
+  resetToken?: Prisma.PasswordResetTokenUncheckedCreateNestedOneWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutModelKeysInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutModelKeysInput, Prisma.UserUncheckedCreateWithoutModelKeysInput>
+}
+
+export type UserUpsertWithoutModelKeysInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutModelKeysInput, Prisma.UserUncheckedUpdateWithoutModelKeysInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutModelKeysInput, Prisma.UserUncheckedCreateWithoutModelKeysInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutModelKeysInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutModelKeysInput, Prisma.UserUncheckedUpdateWithoutModelKeysInput>
+}
+
+export type UserUpdateWithoutModelKeysInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  refreshTokenDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tasks?: Prisma.TaskUpdateManyWithoutUserNestedInput
+  appointments?: Prisma.AppointmentUpdateManyWithoutUserNestedInput
+  diaryEntries?: Prisma.DiaryEntryUpdateManyWithoutUserNestedInput
+  agents?: Prisma.AgentUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUpdateManyWithoutUserNestedInput
+  timerSettings?: Prisma.TimerSettingsUpdateOneWithoutUserNestedInput
+  reminders?: Prisma.ReminderUpdateManyWithoutUserNestedInput
+  verificationToken?: Prisma.EmailVerificationTokenUpdateOneWithoutUserNestedInput
+  resetToken?: Prisma.PasswordResetTokenUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutModelKeysInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  refreshTokenDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutUserNestedInput
+  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutUserNestedInput
+  diaryEntries?: Prisma.DiaryEntryUncheckedUpdateManyWithoutUserNestedInput
+  agents?: Prisma.AgentUncheckedUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUncheckedUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUncheckedUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedUpdateManyWithoutUserNestedInput
+  timerSettings?: Prisma.TimerSettingsUncheckedUpdateOneWithoutUserNestedInput
+  reminders?: Prisma.ReminderUncheckedUpdateManyWithoutUserNestedInput
+  verificationToken?: Prisma.EmailVerificationTokenUncheckedUpdateOneWithoutUserNestedInput
+  resetToken?: Prisma.PasswordResetTokenUncheckedUpdateOneWithoutUserNestedInput
+}
+
+export type UserCreateWithoutAgentRunsInput = {
+  id?: string
+  email: string
+  name: string
+  passwordHash: string
+  emailVerified?: boolean
+  refreshTokenDigest?: string | null
+  refreshTokenExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tasks?: Prisma.TaskCreateNestedManyWithoutUserInput
+  appointments?: Prisma.AppointmentCreateNestedManyWithoutUserInput
+  diaryEntries?: Prisma.DiaryEntryCreateNestedManyWithoutUserInput
+  agents?: Prisma.AgentCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountCreateNestedManyWithoutUserInput
+  timerSettings?: Prisma.TimerSettingsCreateNestedOneWithoutUserInput
+  reminders?: Prisma.ReminderCreateNestedManyWithoutUserInput
+  verificationToken?: Prisma.EmailVerificationTokenCreateNestedOneWithoutUserInput
+  resetToken?: Prisma.PasswordResetTokenCreateNestedOneWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAgentRunsInput = {
+  id?: string
+  email: string
+  name: string
+  passwordHash: string
+  emailVerified?: boolean
+  refreshTokenDigest?: string | null
+  refreshTokenExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutUserInput
+  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutUserInput
+  diaryEntries?: Prisma.DiaryEntryUncheckedCreateNestedManyWithoutUserInput
+  agents?: Prisma.AgentUncheckedCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyUncheckedCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedCreateNestedManyWithoutUserInput
+  timerSettings?: Prisma.TimerSettingsUncheckedCreateNestedOneWithoutUserInput
+  reminders?: Prisma.ReminderUncheckedCreateNestedManyWithoutUserInput
+  verificationToken?: Prisma.EmailVerificationTokenUncheckedCreateNestedOneWithoutUserInput
+  resetToken?: Prisma.PasswordResetTokenUncheckedCreateNestedOneWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAgentRunsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAgentRunsInput, Prisma.UserUncheckedCreateWithoutAgentRunsInput>
+}
+
+export type UserUpsertWithoutAgentRunsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAgentRunsInput, Prisma.UserUncheckedUpdateWithoutAgentRunsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAgentRunsInput, Prisma.UserUncheckedCreateWithoutAgentRunsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAgentRunsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAgentRunsInput, Prisma.UserUncheckedUpdateWithoutAgentRunsInput>
+}
+
+export type UserUpdateWithoutAgentRunsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  refreshTokenDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tasks?: Prisma.TaskUpdateManyWithoutUserNestedInput
+  appointments?: Prisma.AppointmentUpdateManyWithoutUserNestedInput
+  diaryEntries?: Prisma.DiaryEntryUpdateManyWithoutUserNestedInput
+  agents?: Prisma.AgentUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUpdateManyWithoutUserNestedInput
+  timerSettings?: Prisma.TimerSettingsUpdateOneWithoutUserNestedInput
+  reminders?: Prisma.ReminderUpdateManyWithoutUserNestedInput
+  verificationToken?: Prisma.EmailVerificationTokenUpdateOneWithoutUserNestedInput
+  resetToken?: Prisma.PasswordResetTokenUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAgentRunsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  refreshTokenDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutUserNestedInput
+  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutUserNestedInput
+  diaryEntries?: Prisma.DiaryEntryUncheckedUpdateManyWithoutUserNestedInput
+  agents?: Prisma.AgentUncheckedUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUncheckedUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUncheckedUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedUpdateManyWithoutUserNestedInput
+  timerSettings?: Prisma.TimerSettingsUncheckedUpdateOneWithoutUserNestedInput
+  reminders?: Prisma.ReminderUncheckedUpdateManyWithoutUserNestedInput
+  verificationToken?: Prisma.EmailVerificationTokenUncheckedUpdateOneWithoutUserNestedInput
+  resetToken?: Prisma.PasswordResetTokenUncheckedUpdateOneWithoutUserNestedInput
+}
+
+export type UserCreateWithoutAgentMessagesInput = {
+  id?: string
+  email: string
+  name: string
+  passwordHash: string
+  emailVerified?: boolean
+  refreshTokenDigest?: string | null
+  refreshTokenExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tasks?: Prisma.TaskCreateNestedManyWithoutUserInput
+  appointments?: Prisma.AppointmentCreateNestedManyWithoutUserInput
+  diaryEntries?: Prisma.DiaryEntryCreateNestedManyWithoutUserInput
+  agents?: Prisma.AgentCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountCreateNestedManyWithoutUserInput
+  timerSettings?: Prisma.TimerSettingsCreateNestedOneWithoutUserInput
+  reminders?: Prisma.ReminderCreateNestedManyWithoutUserInput
+  verificationToken?: Prisma.EmailVerificationTokenCreateNestedOneWithoutUserInput
+  resetToken?: Prisma.PasswordResetTokenCreateNestedOneWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAgentMessagesInput = {
+  id?: string
+  email: string
+  name: string
+  passwordHash: string
+  emailVerified?: boolean
+  refreshTokenDigest?: string | null
+  refreshTokenExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutUserInput
+  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutUserInput
+  diaryEntries?: Prisma.DiaryEntryUncheckedCreateNestedManyWithoutUserInput
+  agents?: Prisma.AgentUncheckedCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunUncheckedCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyUncheckedCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedCreateNestedManyWithoutUserInput
+  timerSettings?: Prisma.TimerSettingsUncheckedCreateNestedOneWithoutUserInput
+  reminders?: Prisma.ReminderUncheckedCreateNestedManyWithoutUserInput
+  verificationToken?: Prisma.EmailVerificationTokenUncheckedCreateNestedOneWithoutUserInput
+  resetToken?: Prisma.PasswordResetTokenUncheckedCreateNestedOneWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAgentMessagesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAgentMessagesInput, Prisma.UserUncheckedCreateWithoutAgentMessagesInput>
+}
+
+export type UserUpsertWithoutAgentMessagesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAgentMessagesInput, Prisma.UserUncheckedUpdateWithoutAgentMessagesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAgentMessagesInput, Prisma.UserUncheckedCreateWithoutAgentMessagesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAgentMessagesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAgentMessagesInput, Prisma.UserUncheckedUpdateWithoutAgentMessagesInput>
+}
+
+export type UserUpdateWithoutAgentMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  refreshTokenDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tasks?: Prisma.TaskUpdateManyWithoutUserNestedInput
+  appointments?: Prisma.AppointmentUpdateManyWithoutUserNestedInput
+  diaryEntries?: Prisma.DiaryEntryUpdateManyWithoutUserNestedInput
+  agents?: Prisma.AgentUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUpdateManyWithoutUserNestedInput
+  timerSettings?: Prisma.TimerSettingsUpdateOneWithoutUserNestedInput
+  reminders?: Prisma.ReminderUpdateManyWithoutUserNestedInput
+  verificationToken?: Prisma.EmailVerificationTokenUpdateOneWithoutUserNestedInput
+  resetToken?: Prisma.PasswordResetTokenUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAgentMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  refreshTokenDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutUserNestedInput
+  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutUserNestedInput
+  diaryEntries?: Prisma.DiaryEntryUncheckedUpdateManyWithoutUserNestedInput
+  agents?: Prisma.AgentUncheckedUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUncheckedUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUncheckedUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedUpdateManyWithoutUserNestedInput
+  timerSettings?: Prisma.TimerSettingsUncheckedUpdateOneWithoutUserNestedInput
+  reminders?: Prisma.ReminderUncheckedUpdateManyWithoutUserNestedInput
+  verificationToken?: Prisma.EmailVerificationTokenUncheckedUpdateOneWithoutUserNestedInput
+  resetToken?: Prisma.PasswordResetTokenUncheckedUpdateOneWithoutUserNestedInput
+}
+
+export type UserCreateWithoutIntegrationAccountsInput = {
+  id?: string
+  email: string
+  name: string
+  passwordHash: string
+  emailVerified?: boolean
+  refreshTokenDigest?: string | null
+  refreshTokenExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tasks?: Prisma.TaskCreateNestedManyWithoutUserInput
+  appointments?: Prisma.AppointmentCreateNestedManyWithoutUserInput
+  diaryEntries?: Prisma.DiaryEntryCreateNestedManyWithoutUserInput
+  agents?: Prisma.AgentCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyCreateNestedManyWithoutUserInput
+  timerSettings?: Prisma.TimerSettingsCreateNestedOneWithoutUserInput
+  reminders?: Prisma.ReminderCreateNestedManyWithoutUserInput
+  verificationToken?: Prisma.EmailVerificationTokenCreateNestedOneWithoutUserInput
+  resetToken?: Prisma.PasswordResetTokenCreateNestedOneWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutIntegrationAccountsInput = {
+  id?: string
+  email: string
+  name: string
+  passwordHash: string
+  emailVerified?: boolean
+  refreshTokenDigest?: string | null
+  refreshTokenExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutUserInput
+  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutUserInput
+  diaryEntries?: Prisma.DiaryEntryUncheckedCreateNestedManyWithoutUserInput
+  agents?: Prisma.AgentUncheckedCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunUncheckedCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyUncheckedCreateNestedManyWithoutUserInput
+  timerSettings?: Prisma.TimerSettingsUncheckedCreateNestedOneWithoutUserInput
+  reminders?: Prisma.ReminderUncheckedCreateNestedManyWithoutUserInput
+  verificationToken?: Prisma.EmailVerificationTokenUncheckedCreateNestedOneWithoutUserInput
+  resetToken?: Prisma.PasswordResetTokenUncheckedCreateNestedOneWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutIntegrationAccountsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutIntegrationAccountsInput, Prisma.UserUncheckedCreateWithoutIntegrationAccountsInput>
+}
+
+export type UserUpsertWithoutIntegrationAccountsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutIntegrationAccountsInput, Prisma.UserUncheckedUpdateWithoutIntegrationAccountsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutIntegrationAccountsInput, Prisma.UserUncheckedCreateWithoutIntegrationAccountsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutIntegrationAccountsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutIntegrationAccountsInput, Prisma.UserUncheckedUpdateWithoutIntegrationAccountsInput>
+}
+
+export type UserUpdateWithoutIntegrationAccountsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  refreshTokenDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tasks?: Prisma.TaskUpdateManyWithoutUserNestedInput
+  appointments?: Prisma.AppointmentUpdateManyWithoutUserNestedInput
+  diaryEntries?: Prisma.DiaryEntryUpdateManyWithoutUserNestedInput
+  agents?: Prisma.AgentUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUpdateManyWithoutUserNestedInput
+  timerSettings?: Prisma.TimerSettingsUpdateOneWithoutUserNestedInput
+  reminders?: Prisma.ReminderUpdateManyWithoutUserNestedInput
+  verificationToken?: Prisma.EmailVerificationTokenUpdateOneWithoutUserNestedInput
+  resetToken?: Prisma.PasswordResetTokenUpdateOneWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutIntegrationAccountsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  refreshTokenDigest?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  refreshTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutUserNestedInput
+  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutUserNestedInput
+  diaryEntries?: Prisma.DiaryEntryUncheckedUpdateManyWithoutUserNestedInput
+  agents?: Prisma.AgentUncheckedUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUncheckedUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUncheckedUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUncheckedUpdateManyWithoutUserNestedInput
   timerSettings?: Prisma.TimerSettingsUncheckedUpdateOneWithoutUserNestedInput
   reminders?: Prisma.ReminderUncheckedUpdateManyWithoutUserNestedInput
   verificationToken?: Prisma.EmailVerificationTokenUncheckedUpdateOneWithoutUserNestedInput
@@ -1152,6 +1764,10 @@ export type UserCreateWithoutTimerSettingsInput = {
   appointments?: Prisma.AppointmentCreateNestedManyWithoutUserInput
   diaryEntries?: Prisma.DiaryEntryCreateNestedManyWithoutUserInput
   agents?: Prisma.AgentCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountCreateNestedManyWithoutUserInput
   reminders?: Prisma.ReminderCreateNestedManyWithoutUserInput
   verificationToken?: Prisma.EmailVerificationTokenCreateNestedOneWithoutUserInput
   resetToken?: Prisma.PasswordResetTokenCreateNestedOneWithoutUserInput
@@ -1171,6 +1787,10 @@ export type UserUncheckedCreateWithoutTimerSettingsInput = {
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutUserInput
   diaryEntries?: Prisma.DiaryEntryUncheckedCreateNestedManyWithoutUserInput
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunUncheckedCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyUncheckedCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedCreateNestedManyWithoutUserInput
   reminders?: Prisma.ReminderUncheckedCreateNestedManyWithoutUserInput
   verificationToken?: Prisma.EmailVerificationTokenUncheckedCreateNestedOneWithoutUserInput
   resetToken?: Prisma.PasswordResetTokenUncheckedCreateNestedOneWithoutUserInput
@@ -1206,6 +1826,10 @@ export type UserUpdateWithoutTimerSettingsInput = {
   appointments?: Prisma.AppointmentUpdateManyWithoutUserNestedInput
   diaryEntries?: Prisma.DiaryEntryUpdateManyWithoutUserNestedInput
   agents?: Prisma.AgentUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUpdateManyWithoutUserNestedInput
   reminders?: Prisma.ReminderUpdateManyWithoutUserNestedInput
   verificationToken?: Prisma.EmailVerificationTokenUpdateOneWithoutUserNestedInput
   resetToken?: Prisma.PasswordResetTokenUpdateOneWithoutUserNestedInput
@@ -1225,6 +1849,10 @@ export type UserUncheckedUpdateWithoutTimerSettingsInput = {
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutUserNestedInput
   diaryEntries?: Prisma.DiaryEntryUncheckedUpdateManyWithoutUserNestedInput
   agents?: Prisma.AgentUncheckedUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUncheckedUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUncheckedUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUncheckedUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedUpdateManyWithoutUserNestedInput
   reminders?: Prisma.ReminderUncheckedUpdateManyWithoutUserNestedInput
   verificationToken?: Prisma.EmailVerificationTokenUncheckedUpdateOneWithoutUserNestedInput
   resetToken?: Prisma.PasswordResetTokenUncheckedUpdateOneWithoutUserNestedInput
@@ -1244,6 +1872,10 @@ export type UserCreateWithoutRemindersInput = {
   appointments?: Prisma.AppointmentCreateNestedManyWithoutUserInput
   diaryEntries?: Prisma.DiaryEntryCreateNestedManyWithoutUserInput
   agents?: Prisma.AgentCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountCreateNestedManyWithoutUserInput
   timerSettings?: Prisma.TimerSettingsCreateNestedOneWithoutUserInput
   verificationToken?: Prisma.EmailVerificationTokenCreateNestedOneWithoutUserInput
   resetToken?: Prisma.PasswordResetTokenCreateNestedOneWithoutUserInput
@@ -1263,6 +1895,10 @@ export type UserUncheckedCreateWithoutRemindersInput = {
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutUserInput
   diaryEntries?: Prisma.DiaryEntryUncheckedCreateNestedManyWithoutUserInput
   agents?: Prisma.AgentUncheckedCreateNestedManyWithoutUserInput
+  agentRuns?: Prisma.AgentRunUncheckedCreateNestedManyWithoutUserInput
+  agentMessages?: Prisma.AgentMessageUncheckedCreateNestedManyWithoutUserInput
+  modelKeys?: Prisma.ModelKeyUncheckedCreateNestedManyWithoutUserInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedCreateNestedManyWithoutUserInput
   timerSettings?: Prisma.TimerSettingsUncheckedCreateNestedOneWithoutUserInput
   verificationToken?: Prisma.EmailVerificationTokenUncheckedCreateNestedOneWithoutUserInput
   resetToken?: Prisma.PasswordResetTokenUncheckedCreateNestedOneWithoutUserInput
@@ -1298,6 +1934,10 @@ export type UserUpdateWithoutRemindersInput = {
   appointments?: Prisma.AppointmentUpdateManyWithoutUserNestedInput
   diaryEntries?: Prisma.DiaryEntryUpdateManyWithoutUserNestedInput
   agents?: Prisma.AgentUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUpdateManyWithoutUserNestedInput
   timerSettings?: Prisma.TimerSettingsUpdateOneWithoutUserNestedInput
   verificationToken?: Prisma.EmailVerificationTokenUpdateOneWithoutUserNestedInput
   resetToken?: Prisma.PasswordResetTokenUpdateOneWithoutUserNestedInput
@@ -1317,6 +1957,10 @@ export type UserUncheckedUpdateWithoutRemindersInput = {
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutUserNestedInput
   diaryEntries?: Prisma.DiaryEntryUncheckedUpdateManyWithoutUserNestedInput
   agents?: Prisma.AgentUncheckedUpdateManyWithoutUserNestedInput
+  agentRuns?: Prisma.AgentRunUncheckedUpdateManyWithoutUserNestedInput
+  agentMessages?: Prisma.AgentMessageUncheckedUpdateManyWithoutUserNestedInput
+  modelKeys?: Prisma.ModelKeyUncheckedUpdateManyWithoutUserNestedInput
+  integrationAccounts?: Prisma.IntegrationAccountUncheckedUpdateManyWithoutUserNestedInput
   timerSettings?: Prisma.TimerSettingsUncheckedUpdateOneWithoutUserNestedInput
   verificationToken?: Prisma.EmailVerificationTokenUncheckedUpdateOneWithoutUserNestedInput
   resetToken?: Prisma.PasswordResetTokenUncheckedUpdateOneWithoutUserNestedInput
@@ -1332,6 +1976,10 @@ export type UserCountOutputType = {
   appointments: number
   diaryEntries: number
   agents: number
+  agentRuns: number
+  agentMessages: number
+  modelKeys: number
+  integrationAccounts: number
   reminders: number
 }
 
@@ -1340,6 +1988,10 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   appointments?: boolean | UserCountOutputTypeCountAppointmentsArgs
   diaryEntries?: boolean | UserCountOutputTypeCountDiaryEntriesArgs
   agents?: boolean | UserCountOutputTypeCountAgentsArgs
+  agentRuns?: boolean | UserCountOutputTypeCountAgentRunsArgs
+  agentMessages?: boolean | UserCountOutputTypeCountAgentMessagesArgs
+  modelKeys?: boolean | UserCountOutputTypeCountModelKeysArgs
+  integrationAccounts?: boolean | UserCountOutputTypeCountIntegrationAccountsArgs
   reminders?: boolean | UserCountOutputTypeCountRemindersArgs
 }
 
@@ -1384,6 +2036,34 @@ export type UserCountOutputTypeCountAgentsArgs<ExtArgs extends runtime.Types.Ext
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountAgentRunsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AgentRunWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAgentMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AgentMessageWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountModelKeysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ModelKeyWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountIntegrationAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.IntegrationAccountWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountRemindersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.ReminderWhereInput
 }
@@ -1403,6 +2083,10 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   appointments?: boolean | Prisma.User$appointmentsArgs<ExtArgs>
   diaryEntries?: boolean | Prisma.User$diaryEntriesArgs<ExtArgs>
   agents?: boolean | Prisma.User$agentsArgs<ExtArgs>
+  agentRuns?: boolean | Prisma.User$agentRunsArgs<ExtArgs>
+  agentMessages?: boolean | Prisma.User$agentMessagesArgs<ExtArgs>
+  modelKeys?: boolean | Prisma.User$modelKeysArgs<ExtArgs>
+  integrationAccounts?: boolean | Prisma.User$integrationAccountsArgs<ExtArgs>
   timerSettings?: boolean | Prisma.User$timerSettingsArgs<ExtArgs>
   reminders?: boolean | Prisma.User$remindersArgs<ExtArgs>
   verificationToken?: boolean | Prisma.User$verificationTokenArgs<ExtArgs>
@@ -1452,6 +2136,10 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   appointments?: boolean | Prisma.User$appointmentsArgs<ExtArgs>
   diaryEntries?: boolean | Prisma.User$diaryEntriesArgs<ExtArgs>
   agents?: boolean | Prisma.User$agentsArgs<ExtArgs>
+  agentRuns?: boolean | Prisma.User$agentRunsArgs<ExtArgs>
+  agentMessages?: boolean | Prisma.User$agentMessagesArgs<ExtArgs>
+  modelKeys?: boolean | Prisma.User$modelKeysArgs<ExtArgs>
+  integrationAccounts?: boolean | Prisma.User$integrationAccountsArgs<ExtArgs>
   timerSettings?: boolean | Prisma.User$timerSettingsArgs<ExtArgs>
   reminders?: boolean | Prisma.User$remindersArgs<ExtArgs>
   verificationToken?: boolean | Prisma.User$verificationTokenArgs<ExtArgs>
@@ -1468,6 +2156,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     appointments: Prisma.$AppointmentPayload<ExtArgs>[]
     diaryEntries: Prisma.$DiaryEntryPayload<ExtArgs>[]
     agents: Prisma.$AgentPayload<ExtArgs>[]
+    agentRuns: Prisma.$AgentRunPayload<ExtArgs>[]
+    agentMessages: Prisma.$AgentMessagePayload<ExtArgs>[]
+    modelKeys: Prisma.$ModelKeyPayload<ExtArgs>[]
+    integrationAccounts: Prisma.$IntegrationAccountPayload<ExtArgs>[]
     timerSettings: Prisma.$TimerSettingsPayload<ExtArgs> | null
     reminders: Prisma.$ReminderPayload<ExtArgs>[]
     verificationToken: Prisma.$EmailVerificationTokenPayload<ExtArgs> | null
@@ -1881,6 +2573,10 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   appointments<T extends Prisma.User$appointmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$appointmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   diaryEntries<T extends Prisma.User$diaryEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$diaryEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DiaryEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   agents<T extends Prisma.User$agentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$agentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  agentRuns<T extends Prisma.User$agentRunsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$agentRunsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentRunPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  agentMessages<T extends Prisma.User$agentMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$agentMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  modelKeys<T extends Prisma.User$modelKeysArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$modelKeysArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ModelKeyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  integrationAccounts<T extends Prisma.User$integrationAccountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$integrationAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$IntegrationAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   timerSettings<T extends Prisma.User$timerSettingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$timerSettingsArgs<ExtArgs>>): Prisma.Prisma__TimerSettingsClient<runtime.Types.Result.GetResult<Prisma.$TimerSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   reminders<T extends Prisma.User$remindersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$remindersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReminderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   verificationToken<T extends Prisma.User$verificationTokenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$verificationTokenArgs<ExtArgs>>): Prisma.Prisma__EmailVerificationTokenClient<runtime.Types.Result.GetResult<Prisma.$EmailVerificationTokenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -2409,6 +3105,102 @@ export type User$agentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   distinct?: Prisma.AgentScalarFieldEnum | Prisma.AgentScalarFieldEnum[]
+}
+
+/**
+ * User.agentRuns
+ */
+export type User$agentRunsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgentRun
+   */
+  select?: Prisma.AgentRunSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgentRun
+   */
+  omit?: Prisma.AgentRunOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgentRunInclude<ExtArgs> | null
+  where?: Prisma.AgentRunWhereInput
+  orderBy?: Prisma.AgentRunOrderByWithRelationInput | Prisma.AgentRunOrderByWithRelationInput[]
+  cursor?: Prisma.AgentRunWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AgentRunScalarFieldEnum | Prisma.AgentRunScalarFieldEnum[]
+}
+
+/**
+ * User.agentMessages
+ */
+export type User$agentMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgentMessage
+   */
+  select?: Prisma.AgentMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgentMessage
+   */
+  omit?: Prisma.AgentMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgentMessageInclude<ExtArgs> | null
+  where?: Prisma.AgentMessageWhereInput
+  orderBy?: Prisma.AgentMessageOrderByWithRelationInput | Prisma.AgentMessageOrderByWithRelationInput[]
+  cursor?: Prisma.AgentMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AgentMessageScalarFieldEnum | Prisma.AgentMessageScalarFieldEnum[]
+}
+
+/**
+ * User.modelKeys
+ */
+export type User$modelKeysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ModelKey
+   */
+  select?: Prisma.ModelKeySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ModelKey
+   */
+  omit?: Prisma.ModelKeyOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ModelKeyInclude<ExtArgs> | null
+  where?: Prisma.ModelKeyWhereInput
+  orderBy?: Prisma.ModelKeyOrderByWithRelationInput | Prisma.ModelKeyOrderByWithRelationInput[]
+  cursor?: Prisma.ModelKeyWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ModelKeyScalarFieldEnum | Prisma.ModelKeyScalarFieldEnum[]
+}
+
+/**
+ * User.integrationAccounts
+ */
+export type User$integrationAccountsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the IntegrationAccount
+   */
+  select?: Prisma.IntegrationAccountSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the IntegrationAccount
+   */
+  omit?: Prisma.IntegrationAccountOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.IntegrationAccountInclude<ExtArgs> | null
+  where?: Prisma.IntegrationAccountWhereInput
+  orderBy?: Prisma.IntegrationAccountOrderByWithRelationInput | Prisma.IntegrationAccountOrderByWithRelationInput[]
+  cursor?: Prisma.IntegrationAccountWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.IntegrationAccountScalarFieldEnum | Prisma.IntegrationAccountScalarFieldEnum[]
 }
 
 /**

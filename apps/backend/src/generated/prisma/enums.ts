@@ -46,3 +46,20 @@ export const Mood = {
 } as const
 
 export type Mood = (typeof Mood)[keyof typeof Mood]
+
+
+export const AgentTriggerType = {
+  manual: 'manual',
+  schedule: 'schedule'
+} as const
+
+export type AgentTriggerType = (typeof AgentTriggerType)[keyof typeof AgentTriggerType]
+
+
+export const AgentOutputType = {
+  message: 'message',
+  note: 'note',
+  email: 'email'
+} as const
+
+export type AgentOutputType = (typeof AgentOutputType)[keyof typeof AgentOutputType]

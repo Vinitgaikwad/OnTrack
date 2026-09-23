@@ -7,12 +7,17 @@
     "cf-typegen": "wrangler types --env-interface CloudflareBindings"
   },
   "dependencies": {
+    "@ai-sdk/openai-compatible": "^3.0.47",
+    "@mozilla/readability": "^0.6.0",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
+    "ai": "^7.0.97",
     "bcryptjs": "^3.0.3",
     "hono": "^4.13.5",
     "jose": "^6.2.12",
+    "linkedom": "^0.18.13",
     "pg": "^8.23.0",
+    "rss-parser": "^3.13.0",
     "zod": "^4.5.4"
   },
   "devDependencies": {

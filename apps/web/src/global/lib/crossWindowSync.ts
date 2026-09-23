@@ -6,6 +6,8 @@ import { useNotesStore } from '../stores/useNotesStore'
 import { useThemeStore } from '../stores/useThemeStore'
 import { useTimerStore } from '../stores/useTimerStore'
 import { useUserStore } from '../stores/useUserStore'
+import { useModelKeysStore } from '../stores/useModelKeysStore'
+import { useAgentMessagesStore } from '../stores/useAgentMessagesStore'
 
 type SyncableStore = {
   persist: {
@@ -19,6 +21,8 @@ const STORES: Array<{ key: string; store: SyncableStore }> = [
   { key: 'ontrack-timer', store: useTimerStore as unknown as SyncableStore },
   { key: 'ontrack-diary', store: useDiaryStore as unknown as SyncableStore },
   { key: 'ontrack-agents', store: useAgentsStore as unknown as SyncableStore },
+  { key: 'ontrack-model-keys', store: useModelKeysStore as unknown as SyncableStore },
+  { key: 'ontrack-agent-messages', store: useAgentMessagesStore as unknown as SyncableStore },
   { key: 'ontrack-theme', store: useThemeStore as unknown as SyncableStore },
   { key: 'ontrack-dashboard', store: useDashboardStore as unknown as SyncableStore },
   { key: 'ontrack-user', store: useUserStore as unknown as SyncableStore },

@@ -58,6 +58,12 @@ export const ModelName = {
   Appointment: 'Appointment',
   DiaryEntry: 'DiaryEntry',
   Agent: 'Agent',
+  AgentTemplate: 'AgentTemplate',
+  ModelKey: 'ModelKey',
+  AgentTool: 'AgentTool',
+  AgentRun: 'AgentRun',
+  AgentMessage: 'AgentMessage',
+  IntegrationAccount: 'IntegrationAccount',
   TimerSettings: 'TimerSettings',
   Reminder: 'Reminder'
 } as const
@@ -165,16 +171,124 @@ export type DiaryEntryScalarFieldEnum = (typeof DiaryEntryScalarFieldEnum)[keyof
 export const AgentScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  templateId: 'templateId',
   name: 'name',
   role: 'role',
   icon: 'icon',
   color: 'color',
   description: 'description',
   preferences: 'preferences',
-  enabled: 'enabled'
+  enabled: 'enabled',
+  triggerType: 'triggerType',
+  schedule: 'schedule',
+  timezone: 'timezone',
+  sources: 'sources',
+  output: 'output',
+  prompt: 'prompt',
+  draftOnly: 'draftOnly',
+  modelKeyId: 'modelKeyId',
+  maxTokens: 'maxTokens',
+  lastRunAt: 'lastRunAt',
+  nextRunAt: 'nextRunAt',
+  runCount: 'runCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type AgentScalarFieldEnum = (typeof AgentScalarFieldEnum)[keyof typeof AgentScalarFieldEnum]
+
+
+export const AgentTemplateScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  name: 'name',
+  description: 'description',
+  category: 'category',
+  icon: 'icon',
+  requiresOAuth: 'requiresOAuth',
+  defaultRole: 'defaultRole',
+  defaultPrompt: 'defaultPrompt',
+  defaultSources: 'defaultSources',
+  defaultTools: 'defaultTools',
+  defaultOutput: 'defaultOutput',
+  configSchema: 'configSchema',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgentTemplateScalarFieldEnum = (typeof AgentTemplateScalarFieldEnum)[keyof typeof AgentTemplateScalarFieldEnum]
+
+
+export const ModelKeyScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  label: 'label',
+  apiKeyEnc: 'apiKeyEnc',
+  baseUrl: 'baseUrl',
+  defaultModel: 'defaultModel',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ModelKeyScalarFieldEnum = (typeof ModelKeyScalarFieldEnum)[keyof typeof ModelKeyScalarFieldEnum]
+
+
+export const AgentToolScalarFieldEnum = {
+  id: 'id',
+  agentId: 'agentId',
+  toolName: 'toolName',
+  enabled: 'enabled',
+  config: 'config'
+} as const
+
+export type AgentToolScalarFieldEnum = (typeof AgentToolScalarFieldEnum)[keyof typeof AgentToolScalarFieldEnum]
+
+
+export const AgentRunScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  agentId: 'agentId',
+  status: 'status',
+  inputSnap: 'inputSnap',
+  outputSnap: 'outputSnap',
+  toolCalls: 'toolCalls',
+  tokensUsed: 'tokensUsed',
+  error: 'error',
+  startedAt: 'startedAt',
+  finishedAt: 'finishedAt'
+} as const
+
+export type AgentRunScalarFieldEnum = (typeof AgentRunScalarFieldEnum)[keyof typeof AgentRunScalarFieldEnum]
+
+
+export const AgentMessageScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  agentId: 'agentId',
+  title: 'title',
+  body: 'body',
+  read: 'read',
+  createdAt: 'createdAt'
+} as const
+
+export type AgentMessageScalarFieldEnum = (typeof AgentMessageScalarFieldEnum)[keyof typeof AgentMessageScalarFieldEnum]
+
+
+export const IntegrationAccountScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  email: 'email',
+  scope: 'scope',
+  tokenEnc: 'tokenEnc',
+  tokenExpiry: 'tokenExpiry',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type IntegrationAccountScalarFieldEnum = (typeof IntegrationAccountScalarFieldEnum)[keyof typeof IntegrationAccountScalarFieldEnum]
 
 
 export const TimerSettingsScalarFieldEnum = {
@@ -209,6 +323,14 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
 export const QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
@@ -223,4 +345,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

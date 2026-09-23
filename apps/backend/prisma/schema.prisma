@@ -23,6 +23,10 @@ model User {
   appointments      Appointment[]
   diaryEntries      DiaryEntry[]
   agents            Agent[]
+  agentRuns         AgentRun[]
+  agentMessages     AgentMessage[]
+  modelKeys         ModelKey[]
+  integrationAccounts IntegrationAccount[]
   timerSettings     TimerSettings?
   reminders         Reminder[]
   verificationToken EmailVerificationToken?
@@ -74,6 +78,17 @@ enum Mood {
   rough
 }
 
+enum AgentTriggerType {
+  manual
+  schedule
+}
+
+enum AgentOutputType {
+  message
+  note
+  email
+}
+
 model Task {
   id       String       @id @default(cuid())
   user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -83,7 +98,7 @@ model Task {
   priority TaskPriority @default(medium)
   status   TaskStatus   @default(todo)
   position Int          @default(0)
-  dueDate  String? // "YYYY-MM-DD"
+  dueDate  String?
   createdAt DateTime    @default(now())
   doneAt   DateTime?
 
@@ -97,8 +112,8 @@ model Appointment {
   userId    String
   kind      CalendarEventKind  @default(appointment)
   title     String
-  date      String // "YYYY-MM-DD"
-  startTime String // "HH:mm"
+  date      String
+  startTime String
   endTime   String?
   color     String
   notes     String             @default("")
@@ -110,7 +125,7 @@ model DiaryEntry {
   id        String   @id @default(cuid())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  date      String // "YYYY-MM-DD"
+  date      String
   title     String
   content   String
   mood      Mood     @default(okay)
@@ -123,16 +138,136 @@ model DiaryEntry {
 }
 
 model Agent {
+  id          String          @id @default(cuid())
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  templateId  String?
+  name        String
+  role        String
+  icon        String
+  color       String
+  description String
+  preferences String[]        @default([])
+  enabled     Boolean         @default(true)
+
+  triggerType AgentTriggerType @default(manual)
+  schedule    String?
+  timezone    String           @default("UTC")
+
+  sources     String[]         @default([])
+  output      AgentOutputType  @default(message)
+  prompt      String?
+  draftOnly   Boolean          @default(true)
+
+  modelKeyId  String?
+  maxTokens   Int              @default(2000)
+  lastRunAt   DateTime?
+  nextRunAt   DateTime?
+  runCount    Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  runs         AgentRun[]
+  messages     AgentMessage[]
+  tools        AgentTool[]
+  modelKey     ModelKey?       @relation(fields: [modelKeyId], references: [id])
+  template     AgentTemplate?  @relation(fields: [templateId], references: [id])
+}
+
+model AgentTemplate {
+  id             String           @id @default(cuid())
+  slug           String           @unique
+  name           String
+  description    String
+  category       String
+  icon           String
+  requiresOAuth  String?
+  defaultRole    String
+  defaultPrompt  String
+  defaultSources String[]         @default([])
+  defaultTools   String[]         @default([])
+  defaultOutput  AgentOutputType  @default(message)
+  configSchema   Json?
+  sortOrder      Int              @default(0)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  agents         Agent[]
+}
+
+model ModelKey {
   id           String   @id @default(cuid())
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String
-  name         String
-  role         String
-  icon         String
-  color        String
-  description  String
-  preferences  String[] @default([])
-  enabled      Boolean  @default(true)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider     String
+  label        String
+  apiKeyEnc    String
+  baseUrl      String?
+  defaultModel String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  agents Agent[]
+
+  @@unique([userId, provider, label])
+}
+
+model AgentTool {
+  id       String  @id @default(cuid())
+  agentId  String
+  agent    Agent   @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  toolName String
+  enabled  Boolean @default(false)
+  config   Json?
+
+  @@unique([agentId, toolName])
+  @@index([agentId])
+}
+
+model AgentRun {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  agentId    String
+  agent      Agent     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  status     String    @default("running")
+  inputSnap  String?
+  outputSnap String?
+  toolCalls  String?
+  tokensUsed Int       @default(0)
+  error      String?
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime?
+
+  @@index([userId, agentId, startedAt])
+}
+
+model AgentMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  agentId   String
+  agent     Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+}
+
+model IntegrationAccount {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider    String
+  email       String?
+  scope       String[] @default([])
+  tokenEnc    String
+  tokenExpiry DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, provider, email])
 }
 
 model TimerSettings {
@@ -148,9 +283,9 @@ model Reminder {
   id              String   @id @default(cuid())
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId          String
-  kind            String   @default("focus") // 'focus' | 'break'
+  kind            String   @default("focus")
   message         String
-  level           Int      @default(1) // 1 | 2 | 3
+  level           Int      @default(1)
   createdAt       DateTime @default(now())
   lastEscalatedAt DateTime @default(now())
 

@@ -33,6 +33,7 @@ yarn-error.log*
 !.env.example
 .node.env
 .dev.vars
+client_secret*.json
 
 # turbo
 .turbo

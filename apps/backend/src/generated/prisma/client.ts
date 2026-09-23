@@ -74,6 +74,36 @@ export type DiaryEntry = Prisma.DiaryEntryModel
  */
 export type Agent = Prisma.AgentModel
 /**
+ * Model AgentTemplate
+ * 
+ */
+export type AgentTemplate = Prisma.AgentTemplateModel
+/**
+ * Model ModelKey
+ * 
+ */
+export type ModelKey = Prisma.ModelKeyModel
+/**
+ * Model AgentTool
+ * 
+ */
+export type AgentTool = Prisma.AgentToolModel
+/**
+ * Model AgentRun
+ * 
+ */
+export type AgentRun = Prisma.AgentRunModel
+/**
+ * Model AgentMessage
+ * 
+ */
+export type AgentMessage = Prisma.AgentMessageModel
+/**
+ * Model IntegrationAccount
+ * 
+ */
+export type IntegrationAccount = Prisma.IntegrationAccountModel
+/**
  * Model TimerSettings
  * 
  */

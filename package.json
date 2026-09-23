@@ -13,6 +13,7 @@
     "predev": "node scripts/dev-cleanup.mjs",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
+    "test": "node --experimental-strip-types --test \"Test/*.test.ts\"",
     "format": "prettier --write \"**/*.{ts,tsx,md,js,jsx}\""
   },
   "devDependencies": {
