@@ -168,6 +168,15 @@ LLM; output JSON is validated by Zod. `draftOnly=true` is the default on every a
 composes the system prompt from the agent's Markdown `description` (the `prompt` column is no
 longer used).
 
+**Default agents (v2.1):** 3 pre-built agents are seeded per user — adherent **Email Summarizer**
+(`email_read`/`classify`/`calendar_write`/`note_write`/`task_move`), **Job Finder**
+(`job_search`/`web_fetch`/`note_write`, 10–25 verified listings), and **Daily News Provider**
+(`news_read`/`web_fetch`/`summarize`, sources `['hn']`). Each ships with an editable Markdown
+system prompt in `description` (sections to customize). Seeded on signup (`auth.service.signup`)
+and lazily backfilled in `agentsService.listAgents` the first time a user is in a zero-agent state
+(idempotent by exact name — deleting one does not bring it back; deleting all does, on the next
+fetch). Definitions live in `seed.service.ts` (`DEFAULT_AGENTS`, `seedDefaultAgents`).
+
 | Entity        | Source fields (JSON, camelCase)                                                                                              | Notes |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------- | ----- |
 | `Agent`       | `id, name, role, icon, color, description, preferences[], enabled, templateId?, triggerType, sources[], output, prompt?, draftOnly, modelKeyId?, maxTokens, lastRunAt?, runCount, createdAt, updatedAt, tools?[]` | `triggerType`/`schedule`/`timezone` reserved for v3; `output` ∈ `message\|note\|email`; **`description` is a Markdown doc and is what the runner sends to the LLM as system instructions** (replaces `prompt`, retained for legacy only); creating from a template copies `defaultRole` and seeds `defaultPrompt` into the editable `description` + `AgentTool` rows |

@@ -44,16 +44,20 @@ type ToolDef = {
 }
 
 const AVAILABLE_TOOLS: ToolDef[] = [
-  { id: 'gmail', name: 'Gmail', description: 'Read, search, and summarize emails', category: 'communication', requiresOAuth: true, oauthProvider: 'Gmail' },
-  { id: 'calendar', name: 'Calendar', description: 'View and manage events', category: 'productivity', requiresOAuth: true, oauthProvider: 'Google Calendar' },
-  { id: 'notes', name: 'Notes', description: 'Create and update notes', category: 'productivity' },
-  { id: 'tasks', name: 'Tasks', description: 'Manage task lists and priorities', category: 'productivity' },
-  { id: 'diary', name: 'Diary', description: 'Read and write diary entries', category: 'data' },
-  { id: 'search', name: 'Web Search', description: 'Search the web for information', category: 'data' },
-  { id: 'model', name: 'AI Model', description: 'Use an LLM for reasoning and generation', category: 'ai' },
-  { id: 'spreadsheet', name: 'Spreadsheets', description: 'Read and write structured data', category: 'data' },
-  { id: 'email-send', name: 'Send Email', description: 'Compose and send emails', category: 'communication' },
-  { id: 'notifications', name: 'Notifications', description: 'Push notifications and reminders', category: 'communication' },
+  { id: 'email_read', name: 'Read Emails', description: 'Read emails from your inbox', category: 'data', requiresOAuth: true, oauthProvider: 'Gmail' },
+  { id: 'email_send', name: 'Send Emails', description: 'Send emails on your behalf', category: 'communication', requiresOAuth: true, oauthProvider: 'Gmail' },
+  { id: 'web_fetch', name: 'Web Fetch', description: 'Fetch and read web page content', category: 'data' },
+  { id: 'news_read', name: 'Read News', description: 'Read latest news articles', category: 'data' },
+  { id: 'job_search', name: 'Job Search', description: 'Search for job listings', category: 'data' },
+  { id: 'notes_read', name: 'Read Notes', description: 'Read your notes', category: 'data' },
+  { id: 'calendar_read', name: 'Read Calendar', description: 'Read calendar events', category: 'productivity' },
+  { id: 'diary_read', name: 'Read Diary', description: 'Read diary entries', category: 'data' },
+  { id: 'note_write', name: 'Write Note', description: 'Create or update notes', category: 'productivity' },
+  { id: 'calendar_write', name: 'Write Calendar', description: 'Create or update calendar events', category: 'productivity' },
+  { id: 'task_move', name: 'Move Task', description: 'Move tasks between columns', category: 'productivity' },
+  { id: 'message_inbox', name: 'Message Inbox', description: 'Check agent message inbox', category: 'communication' },
+  { id: 'summarize', name: 'Summarize', description: 'Summarize content using AI', category: 'ai' },
+  { id: 'classify', name: 'Classify', description: 'Classify content using AI', category: 'ai' },
 ]
 
 const CATEGORY_LABELS: Record<ToolCategory, string> = {

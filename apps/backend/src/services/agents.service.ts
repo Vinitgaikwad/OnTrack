@@ -1,5 +1,6 @@
 import type { Prisma, PrismaClient } from '../generated/prisma/client'
 import { AppError } from '../lib/http'
+import { seedDefaultAgents } from './seed.service'
 
 type Db = PrismaClient | Prisma.TransactionClient
 
@@ -10,6 +11,8 @@ async function findOwnedAgent(db: Db, userId: string, agentId: string) {
 }
 
 export async function listAgents(db: Db, userId: string) {
+  const count = await db.agent.count({ where: { userId } })
+  if (count === 0) await seedDefaultAgents(db, userId)
   return db.agent.findMany({
     where: { userId },
     orderBy: { createdAt: 'desc' },

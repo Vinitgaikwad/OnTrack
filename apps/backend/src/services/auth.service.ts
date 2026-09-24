@@ -4,6 +4,7 @@ import { AppError } from '../lib/http'
 import { signAccessToken } from '../lib/jwt'
 import { digestToken, randomToken } from '../lib/tokens'
 import { createEmailSender, createEmailLinkBuilder, passwordResetEmailHtml, verificationEmailHtml } from './email.service'
+import { seedDefaultAgents } from './seed.service'
 
 export const ACCESS_TOKEN_TTL_MS = 15 * 60 * 1000
 export const REFRESH_TOKEN_TTL_MS = 30 * 24 * 60 * 60 * 1000
@@ -111,6 +112,12 @@ export async function signup(
   const user = await db.user.create({
     data: { email, name: input.name.trim(), passwordHash },
   })
+
+  try {
+    await seedDefaultAgents(db, user.id)
+  } catch (err) {
+    console.error('[ontrack] default agent seeding failed', err)
+  }
 
   const token = randomToken()
   const expiresAt = new Date(Date.now() + VERIFY_TOKEN_TTL_MS)
