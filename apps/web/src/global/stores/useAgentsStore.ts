@@ -32,7 +32,6 @@ export type Agent = {
   triggerType: 'manual' | 'schedule'
   sources: string[]
   output: 'message' | 'note' | 'email'
-  prompt?: string | null
   draftOnly: boolean
   modelKeyId?: string | null
   maxTokens: number
@@ -109,7 +108,6 @@ const toAgent = (dto: AgentDto): Agent => ({
   triggerType: dto.triggerType,
   sources: dto.sources,
   output: dto.output,
-  prompt: dto.prompt,
   draftOnly: dto.draftOnly,
   modelKeyId: dto.modelKeyId,
   maxTokens: dto.maxTokens,
@@ -211,7 +209,6 @@ export const useAgentsStore = create<AgentsStore>()(
           triggerType: 'manual',
           sources: input.sources ?? [],
           output: input.output ?? 'message',
-          prompt: input.prompt ?? null,
           draftOnly: input.draftOnly ?? false,
           modelKeyId: input.modelKeyId ?? null,
           maxTokens: input.maxTokens ?? 4096,

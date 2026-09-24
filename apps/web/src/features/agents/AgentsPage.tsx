@@ -3,6 +3,7 @@ import { Bot, Brain, Bell, CalendarClock, Coffee, Feather, Inbox, Mail, Newspape
 import type { Agent, AgentTemplate } from '../../global/stores/useAgentsStore'
 import { useAgentsStore } from '../../global/stores/useAgentsStore'
 import { useAgentMessagesStore } from '../../global/stores/useAgentMessagesStore'
+import Markdown from 'react-markdown'
 import { AgentEditor } from './AgentEditor'
 import { TemplateGallery } from './TemplateGallery'
 import { AgentInbox } from './AgentInbox'
@@ -218,7 +219,13 @@ export function AgentsPage() {
                       </div>
                     </div>
 
-                    <p className="mt-3 line-clamp-2 flex-1 text-sm text-(--text-muted)">{agent.description}</p>
+                    {agent.description.trim() ? (
+                      <div className="markdown mt-3 min-w-0 flex-1 line-clamp-2">
+                        <Markdown>{agent.description}</Markdown>
+                      </div>
+                    ) : (
+                      <p className="mt-3 flex-1 text-sm text-(--text-muted)">No system prompt yet.</p>
+                    )}
 
                     {agent.tools && agent.tools.length > 0 ? (
                       <div className="mt-3 flex flex-wrap gap-1.5">

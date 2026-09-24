@@ -164,11 +164,13 @@ Front sources:
 compiles one full `RunResult` and returns it in a single response. Budget guards: max 50
 runs/day/user (429), in-flight concurrency lock per agent (409), per-run `maxTokens` clamped to
 8000 server-side. All external content is wrapped in `<untrusted_data>` tags before hitting the
-LLM; output JSON is validated by Zod. `draftOnly=true` is the default on every agent.
+LLM; output JSON is validated by Zod. `draftOnly=true` is the default on every agent. The runner
+composes the system prompt from the agent's Markdown `description` (the `prompt` column is no
+longer used).
 
 | Entity        | Source fields (JSON, camelCase)                                                                                              | Notes |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------- | ----- |
-| `Agent`       | `id, name, role, icon, color, description, preferences[], enabled, templateId?, triggerType, sources[], output, prompt?, draftOnly, modelKeyId?, maxTokens, lastRunAt?, runCount, createdAt, updatedAt, tools?[]` | `triggerType`/`schedule`/`timezone` reserved for v3; `output` ∈ `message\|note\|email`; creating from a template copies `defaultRole/prompt` and seeds `AgentTool` rows |
+| `Agent`       | `id, name, role, icon, color, description, preferences[], enabled, templateId?, triggerType, sources[], output, prompt?, draftOnly, modelKeyId?, maxTokens, lastRunAt?, runCount, createdAt, updatedAt, tools?[]` | `triggerType`/`schedule`/`timezone` reserved for v3; `output` ∈ `message\|note\|email`; **`description` is a Markdown doc and is what the runner sends to the LLM as system instructions** (replaces `prompt`, retained for legacy only); creating from a template copies `defaultRole` and seeds `defaultPrompt` into the editable `description` + `AgentTool` rows |
 | `AgentTemplate` | `id, slug, name, description, category, icon, requiresOAuth?, defaultRole, defaultPrompt, defaultSources[], defaultTools[], defaultOutput, configSchema?, sortOrder` | 3 seeded: `email-summarizer`, `job-tracker`, `news-provider` (upserted on first `/api/templates` hit) |
 | `AgentTool`    | `id, agentId, toolName, enabled, config?`                                                                                   | per-agent tool row; `toolName` ∈ registry (14 tools) |
 | `ModelKey`     | `id, provider, label, defaultModel, baseUrl?, createdAt`                                                                    | **`apiKeyEnc` never leaves the server** (AES-256-GCM, `MODEL_KEY_ENCRYPTION_KEY`); POST live-validates against OpenRouter |

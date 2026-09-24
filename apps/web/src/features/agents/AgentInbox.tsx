@@ -122,7 +122,7 @@ export function AgentInbox() {
 
                   {isExpanded ? (
                     <div className="border-t border-(--border) px-5 py-4">
-                      <div className="prose prose-sm prose-invert max-w-none text-sm leading-relaxed text-(--text-muted) [&_p]:mb-2 [&_ul]:mb-2 [&_ol]:mb-2 [&_li]:mb-0.5">
+                      <div className="markdown max-w-none">
                         <Markdown>{msg.body}</Markdown>
                       </div>
                     </div>

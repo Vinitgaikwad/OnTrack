@@ -14,14 +14,15 @@ const runningAgents = new Set<string>()
 function buildSystemPrompt(agent: {
   name: string
   role: string
-  prompt: string | null
+  description: string
   sources: string[]
   output: string
   preferences: string[]
 }): string {
   const parts: string[] = []
   parts.push(`You are "${agent.name}", an AI agent specializing in ${agent.role}.`)
-  if (agent.prompt) parts.push(`\nCustom instructions: ${agent.prompt}`)
+  const instructions = agent.description.trim()
+  if (instructions) parts.push(`\nInstructions:\n${instructions}`)
   if (agent.sources.length > 0) parts.push(`\nData sources: ${agent.sources.join(', ')}`)
   if (agent.preferences.length > 0) parts.push(`\nPreferences: ${agent.preferences.join(', ')}`)
   parts.push(`\nOutput format: ${agent.output}.`)
@@ -32,12 +33,9 @@ function buildSystemPrompt(agent: {
 function buildUserPrompt(agent: {
   name: string
   role: string
-  prompt: string | null
-  sources: string[]
 }, contextData: { news?: unknown[]; emails?: unknown[] }): string {
   const parts: string[] = []
   parts.push(`Run the agent "${agent.name}" (${agent.role}).`)
-  if (agent.prompt) parts.push(`Task: ${agent.prompt}`)
 
   if (contextData.news && contextData.news.length > 0) {
     parts.push(`\n--- News data ---`)
@@ -250,14 +248,14 @@ export async function runAgent(
     const systemPrompt = buildSystemPrompt({
       name: agent.name,
       role: agent.role,
-      prompt: agent.prompt,
+      description: agent.description,
       sources: agent.sources,
       output: agent.output,
       preferences: agent.preferences,
     })
 
     const userPrompt = buildUserPrompt(
-      { name: agent.name, role: agent.role, prompt: agent.prompt, sources: agent.sources },
+      { name: agent.name, role: agent.role },
       contextData
     )
 

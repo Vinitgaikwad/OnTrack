@@ -40,7 +40,6 @@ export type CreateAgentInput = {
   description: string
   preferences?: string[]
   templateId?: string
-  prompt?: string
   sources?: string[]
   output?: 'message' | 'note' | 'email'
   draftOnly?: boolean

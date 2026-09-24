@@ -8,7 +8,8 @@ import { AGENT_COLORS, AGENT_ICONS, type AgentIconKey } from './AgentsPage'
 import { ModelKeyModal } from './ModelKeyModal'
 import { Modal } from '../../global/ui/Modal'
 import { Button } from '../../global/ui/Button'
-import { Field, Input, Textarea } from '../../global/ui/Field'
+import { Field, Input } from '../../global/ui/Field'
+import { MarkdownEditor } from '../../global/ui/MarkdownEditor'
 
 type AgentEditorProps = {
   open: boolean
@@ -76,7 +77,9 @@ export function AgentEditor({ open, initial, template, onClose, onSave }: AgentE
   const [role, setRole] = useState(initial?.role ?? template?.defaultRole ?? 'Coach')
   const [icon, setIcon] = useState<AgentIconKey>((initial?.icon as AgentIconKey) ?? (template?.icon as AgentIconKey) ?? 'brain')
   const [color, setColor] = useState(initial?.color ?? AGENT_COLORS[0])
-  const [description, setDescription] = useState(initial?.description ?? template?.description ?? '')
+  const [description, setDescription] = useState(
+    initial?.description ?? template?.defaultPrompt ?? template?.description ?? ''
+  )
   const [preferences, setPreferences] = useState<string[]>(initial?.preferences ?? [])
 
   const [enabledTools, setEnabledTools] = useState<string[]>(initial?.tools?.map((t) => t.toolName) ?? template?.defaultTools ?? [])
@@ -134,7 +137,6 @@ export function AgentEditor({ open, initial, template, onClose, onSave }: AgentE
         preferences,
         sources: template?.defaultSources ?? [],
         output: output as 'message' | 'note' | 'email',
-        prompt: template?.defaultPrompt ?? undefined,
         draftOnly,
         modelKeyId: modelKeyId || undefined,
         maxTokens,
@@ -155,28 +157,26 @@ export function AgentEditor({ open, initial, template, onClose, onSave }: AgentE
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Focus Coach" autoFocus />
           </Field>
 
-          <div className="grid grid-cols-[1fr_1.2fr] gap-3">
-            <Field label="Role" hint="What they're best at">
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full rounded-xl border border-(--border) bg-(--surface) px-3 py-2.5 text-sm outline-none transition focus:border-(--accent)"
-              >
-                {ROLES.map((r) => (
-                  <option key={r} value={r}>{r}</option>
-                ))}
-              </select>
-            </Field>
-            <Field label="Description" hint="What are they here for?">
-              <Textarea
-                rows={3}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Keeps sessions short, celebrates every finished block."
-              />
-            </Field>
-          </div>
+          <Field label="Role" hint="What they're best at">
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full rounded-xl border border-(--border) bg-(--surface) px-3 py-2.5 text-sm outline-none transition focus:border-(--accent)"
+            >
+              {ROLES.map((r) => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </select>
+          </Field>
         </div>
+
+        <Field label="System prompt" hint="Markdown supported — use ## for subtitles, bullets, and bold. This document is sent to the model as instructions.">
+          <MarkdownEditor
+            value={description}
+            onChange={setDescription}
+            placeholder={'Keeps sessions short, celebrates every finished block.\n\n## Rules\n- Always summarize with bullets\n- Cheer at the end of every block\n\n## Tone\nEncouraging but direct.'}
+          />
+        </Field>
 
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Icon" hint="Face for your helper">
