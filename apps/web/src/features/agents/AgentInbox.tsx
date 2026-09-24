@@ -8,6 +8,12 @@ import { Card } from '../../global/ui/Card'
 import { Button } from '../../global/ui/Button'
 import { IconButton } from '../../global/ui/IconButton'
 
+const markdownComponents = {
+  a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+    <a {...props} target="_blank" rel="noopener noreferrer" />
+  ),
+}
+
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime()
   const mins = Math.floor(diff / 60000)
@@ -123,7 +129,7 @@ export function AgentInbox() {
                   {isExpanded ? (
                     <div className="border-t border-(--border) px-5 py-4">
                       <div className="markdown max-w-none">
-                        <Markdown>{msg.body}</Markdown>
+                        <Markdown components={markdownComponents}>{msg.body}</Markdown>
                       </div>
                     </div>
                   ) : null}

@@ -10,6 +10,7 @@ import {
   updateAgent as updateAgentReq,
   type AgentDto,
   type AgentToolDto,
+  type AgentActionItem,
   type CreateAgentInput,
   type RunResultDto,
 } from '../repositories/agents.repository'
@@ -71,6 +72,7 @@ export type RunResult = {
   runId: string
   status: string
   message?: string
+  pendingActions?: AgentActionItem[]
   sideEffects?: string[]
   tokensUsed: number
   durationMs: number
@@ -278,6 +280,7 @@ export const useAgentsStore = create<AgentsStore>()(
             runId: result.runId,
             status: result.status,
             message: result.message,
+            pendingActions: result.pendingActions,
             sideEffects: result.sideEffects,
             tokensUsed: result.tokensUsed,
             durationMs: result.durationMs,

@@ -123,7 +123,13 @@ Turn the latest emails into a short, prioritized digest and capture anything tha
 ## Rules
 - Propose a task or event ONLY when the email's details are explicit and verifiable. Never invent one from vague wording.
 - If you are not sure, mark it \`[INFO]\` and summarize instead.
-- Label every suggested item as \`[TASK]\`, \`[EVENT]\`, or \`[INFO]\`.
+
+## Machine format (critical)
+For every item you (or the user) should act on, append ONE line in this exact format at the end of your reply — nothing else on that line:
+- \`[TASK] <short title> | <YYYY-MM-DD>\`
+- \`[EVENT] <short title> | <YYYY-MM-DD> | <HH:MM>\` (end time optional: \`<HH:MM>-<HH:MM>\`)
+- \`[NOTE] <title> | <one-line content>\`
+These lines are hidden from your digest and shown to the user as proposed additions to approve before they are added. Do not put the same item both in the digest and as a machine line — the machine line is the single source of truth.
 - Keep the digest under 10 bullets; lead with what matters most.
 
 ## Customize me
@@ -208,11 +214,82 @@ A titled bullet list: **Story** — one-line summary — why it matters — link
   },
 ]
 
+// TEMPORARY demo seeds — only to preview how inbox content renders.
+// Remove together with seedExampleMessages() once the UX is confirmed.
+const EXAMPLE_INBOX_MESSAGES: Array<{ agentName: string; title: string; body: string }> = [
+  {
+    agentName: 'Daily News Provider',
+    title: 'Example — Daily News Provider output',
+    body: `## 💻 Dev & AI — what matters today
+
+Welcome to your agent inbox. This is a demo message showing how a real digest is displayed.
+
+### Top stories
+
+- **[Meta ships Llama 5 with native tool-use](https://example.com/story/llama5)** — agentic coding loops now run with far fewer failed tool calls. _Why it matters: reliable multi-step agents without hand-holding._
+- **[Deno adds SQLite-backed KV to the stdlib](https://example.com/story/deno-kv)** — zero-config local persistence. _Why it matters: local-first apps get durable storage for free._
+- **[React Compiler reaches 1.0](https://example.com/story/react-compiler)** — automatic memoization is now stable. _Why it matters: less manual tuning, faster stacks._
+- **[Prisma ORM previews driver adapters](https://example.com/story/prisma-drivers)** — one schema over Postgres or SQLite. _Why it matters: simpler local-to-prod parity._
+
+> Picked for your interests: **software engineering, AI, developer tools**.
+
+> [Demo message] Delete me after you've confirmed the layout.`,
+  },
+  {
+    agentName: 'Email Summarizer',
+    title: 'Example — Email Summarizer output',
+    body: `## Inbox digest — 3 actionable emails
+
+1. **[Project sync moved to Friday](https://example.com/mail/project-sync)** — ask about the new API contract; meeting rescheduled.
+2. **[Internship applications closing soon](https://example.com/mail/internship)** — last date to apply is **Nov 12, 2026**.
+3. **[Python course test schedule](https://example.com/mail/python-test)** — test on **Nov 12, 2026, 14:00–15:00**.
+
+### Proposed additions (from this run)
+
+- [TASK] Internship last date to apply — **Nov 12, 2026**
+- [EVENT] Python Test — **Nov 12, 2026 · 14:00**
+
+> [Demo message] Delete me after you've confirmed the layout.`,
+  },
+]
+
+export async function seedExampleMessages(db: Db, userId: string): Promise<void> {
+  const count = await db.agentMessage.count({ where: { userId } })
+  if (count > 0) return
+
+  const agents = await db.agent.findMany({ where: { userId } })
+  const byName = new Map(agents.map((agent) => [agent.name, agent]))
+
+  const rows: Array<{ userId: string; agentId: string; title: string; body: string }> = []
+  for (const seed of EXAMPLE_INBOX_MESSAGES) {
+    const agent = byName.get(seed.agentName)
+    if (!agent) continue
+    rows.push({ userId, agentId: agent.id, title: seed.title, body: seed.body })
+  }
+
+  if (rows.length === 0) return
+  await db.agentMessage.createMany({ data: rows })
+}
+
 export async function seedDefaultAgents(db: Db, userId: string): Promise<void> {
   await db.$transaction(async (tx) => {
     for (const def of DEFAULT_AGENTS) {
       const exists = await tx.agent.findFirst({ where: { userId, name: def.name } })
-      if (exists) continue
+      if (exists) {
+        // Refresh seeded defaults (draftOnly: true) with the latest prompt/mode;
+        // never touch agents the user has customized (draftOnly: false).
+        if (exists.draftOnly) {
+          await tx.agent.update({
+            where: { id: exists.id },
+            data: {
+              description: def.description,
+              output: def.output,
+              maxTokens: def.maxTokens ?? exists.maxTokens,
+            },
+          })
+        }
+        continue
+      }
 
       const agent = await tx.agent.create({
         data: {

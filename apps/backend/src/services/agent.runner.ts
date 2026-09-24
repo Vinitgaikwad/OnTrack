@@ -6,6 +6,7 @@ import { generateWithLLM } from './ai.service'
 import { fetchNewsForAgent } from './news.service'
 import { fetchRecentEmails } from './gmail.service'
 import { createMessage } from './messages.service'
+import { parseActionItems, stripActionLines, type PendingAction } from './agent.actions'
 
 const DAILY_RUN_LIMIT = 50
 
@@ -146,6 +147,7 @@ export type RunResult = {
   runId: string
   status: 'success' | 'failed'
   message?: { id: string; title: string; body: string }
+  pendingActions?: PendingAction[]
   sideEffects?: Array<{
     kind: 'note' | 'calendar' | 'email'
     status: 'created' | 'drafted' | 'blocked'
@@ -271,7 +273,10 @@ export async function runAgent(
     const aiText = result.text || JSON.stringify(result.object || '')
     const tokensUsed = ((result.usage.inputTokens ?? 0) + (result.usage.outputTokens ?? 0))
 
-    const messageId = await formatOutput(db, userId, agentId, agent.output, aiText, agent.name)
+    const pendingActions = parseActionItems(aiText)
+    const cleanedText = stripActionLines(aiText)
+
+    const messageId = await formatOutput(db, userId, agentId, agent.output, cleanedText, agent.name)
 
     await db.agentRun.update({
       where: { id: run.id },
@@ -297,6 +302,7 @@ export async function runAgent(
       ...(messageId
         ? { message: { id: messageId.id, title: messageId.title, body: messageId.body } }
         : {}),
+      ...(pendingActions.length > 0 ? { pendingActions } : {}),
       tokensUsed,
       durationMs: Date.now() - started,
     }

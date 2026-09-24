@@ -1,5 +1,6 @@
 import type { Prisma, PrismaClient } from '../generated/prisma/client'
 import { AppError } from '../lib/http'
+import { seedExampleMessages } from './seed.service'
 
 type Db = PrismaClient | Prisma.TransactionClient
 
@@ -14,6 +15,8 @@ export async function listMessages(
   userId: string,
   opts: { offset?: number; limit?: number; unread?: boolean }
 ) {
+  await seedExampleMessages(db, userId)
+
   const offset = opts.offset ?? 0
   const limit = opts.limit ?? 20
 

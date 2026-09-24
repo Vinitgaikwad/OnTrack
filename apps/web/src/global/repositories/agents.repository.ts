@@ -47,10 +47,20 @@ export type CreateAgentInput = {
   maxTokens?: number
 }
 
+export type AgentActionItem = {
+  kind: 'task' | 'event' | 'note'
+  title: string
+  date?: string
+  startTime?: string
+  endTime?: string | null
+  note?: string
+}
+
 export type RunResultDto = {
   runId: string
   status: string
   message?: string
+  pendingActions?: AgentActionItem[]
   sideEffects?: string[]
   tokensUsed: number
   durationMs: number
@@ -89,6 +99,17 @@ export async function deleteAgent(id: string): Promise<void> {
 export async function runAgent(id: string): Promise<RunResultDto> {
   return api<RunResultDto>(`/api/agents/${encodeURIComponent(id)}/run`, {
     method: 'POST',
+  })
+}
+
+export type ConfirmActionResponse = {
+  created: Array<{ kind: AgentActionItem['kind']; id: string }>
+}
+
+export async function confirmActionItems(items: AgentActionItem[]): Promise<ConfirmActionResponse> {
+  return api<ConfirmActionResponse>('/api/agents/actions', {
+    method: 'POST',
+    body: JSON.stringify({ items }),
   })
 }
 

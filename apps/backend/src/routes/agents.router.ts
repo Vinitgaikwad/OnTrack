@@ -13,4 +13,6 @@ agentsRouter.get('/:id', ctrl.handleGetAgent)
 agentsRouter.patch('/:id', ctrl.handleUpdateAgent)
 agentsRouter.delete('/:id', ctrl.handleDeleteAgent)
 
+agentsRouter.post('/actions', ctrl.handleConfirmActions)
+
 export default agentsRouter

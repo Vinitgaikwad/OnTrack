@@ -540,12 +540,25 @@ Validation: `date` `YYYY-MM-DD`, `month` `YYYY-MM`, `mood` ∈ `great|good|okay|
 | DELETE | `/api/agents/:id`       | —                            | `204` (cascades runs/messages/tools)      |
 | POST   | `/api/agents/:id/run`   | —                            | `{ data: RunResult }`; `400 DISABLED`, `404`, `409 CONFLICT` (in-flight), `429 RATE_LIMIT` |
 | GET    | `/api/agents/:id/runs`  | `?limit&offset`              | `{ data: { runs: RunListItem[], hasMore } }` |
+| POST   | `/api/agents/actions`   | `{ items: ActionItem[] }`    | `{ data: { created: { kind, id }[] } }` — creates `Appointment` (`task` → `kind:'task'`, `event` → `kind:'appointment'`) and `DiaryEntry` (`note`, tagged `agent-output`); triggered only after the user approves proposed items in the UI |
+
+```ts
+type ActionItem = {
+  kind: 'task' | 'event' | 'note'
+  title: string
+  date?: string // "YYYY-MM-DD", required for task/event
+  startTime?: string // "HH:mm"
+  endTime?: string | null
+  note?: string
+}
+```
 
 ```ts
 type RunResult = {
   runId: string
   status: 'success' | 'failed'
   message?: { id: string; title: string; body: string }
+  pendingActions?: ActionItem[] // parsed from [TASK]/[EVENT]/[NOTE] lines in the LLM output; user approves before /api/agents/actions creates them
   sideEffects?: Array<{ kind: 'note'|'calendar'|'email'; status: 'created'|'drafted'|'blocked'; title?: string; id?: string }>
   tokensUsed: number
   durationMs: number

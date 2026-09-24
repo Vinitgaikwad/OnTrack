@@ -5,6 +5,7 @@ import { fail, ok } from '../lib/http'
 import { handle, validateBody, validateQuery } from '../lib/validate'
 import * as agentsService from '../services/agents.service'
 import * as agentRunner from '../services/agent.runner'
+import { createActionItems } from '../services/agent.actions'
 
 const idSchema = z.string().min(1).max(100)
 
@@ -94,6 +95,28 @@ export const handleRunAgent = (c: Context) =>
     const db = prismaClient(c.env.DATABASE_URL)
     const result = await agentRunner.runAgent(db, c.get('userId'), agentId, c.env)
     return ok(c, result)
+  })
+
+const actionItemSchema = z.object({
+  kind: z.enum(['task', 'event', 'note']),
+  title: z.string().min(1).max(200),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  startTime: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+  endTime: z.string().regex(/^\d{2}:\d{2}$/).nullable().optional(),
+  note: z.string().max(2000).optional(),
+})
+
+const confirmActionsSchema = z.object({
+  items: z.array(actionItemSchema).min(1).max(25),
+})
+
+export const handleConfirmActions = (c: Context) =>
+  handle(c, async () => {
+    const body = await validateBody(c, confirmActionsSchema)
+    if (!body.ok) return body.response
+    const db = prismaClient(c.env.DATABASE_URL)
+    const created = await createActionItems(db, c.get('userId'), body.data.items)
+    return ok(c, { created })
   })
 
 const listRunsSchema = z.object({

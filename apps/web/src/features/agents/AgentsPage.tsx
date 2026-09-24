@@ -7,6 +7,8 @@ import Markdown from 'react-markdown'
 import { AgentEditor } from './AgentEditor'
 import { TemplateGallery } from './TemplateGallery'
 import { AgentInbox } from './AgentInbox'
+import { RunConfirmModal } from './RunConfirmModal'
+import type { AgentActionItem } from '../../global/repositories/agents.repository'
 import { Card } from '../../global/ui/Card'
 import { Button } from '../../global/ui/Button'
 import { IconButton } from '../../global/ui/IconButton'
@@ -60,6 +62,7 @@ export function AgentsPage() {
   const [templateForEditor, setTemplateForEditor] = useState<AgentTemplate | null>(null)
   const [creating, setCreating] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [pendingRun, setPendingRun] = useState<{ agentName: string; items: AgentActionItem[] } | null>(null)
 
   useEffect(() => {
     void ensureLoaded()
@@ -96,6 +99,17 @@ export function AgentsPage() {
     } else {
       setDeletingId(agent.id)
       setTimeout(() => setDeletingId(null), 3000)
+    }
+  }
+
+  const handleRun = async (agent: Agent) => {
+    try {
+      const result = await runAgent(agent.id)
+      if (result.pendingActions && result.pendingActions.length > 0) {
+        setPendingRun({ agentName: agent.name, items: result.pendingActions })
+      }
+    } catch {
+      // store already surfaced the error via toast
     }
   }
 
@@ -285,7 +299,7 @@ export function AgentsPage() {
                       <Button
                         size="sm"
                         disabled={isAnotherRunning}
-                        onClick={() => runAgent(agent.id)}
+                        onClick={() => void handleRun(agent)}
                       >
                         {isRunning ? (
                           <><Loader2 size={14} className="animate-spin" /> Running</>
@@ -315,6 +329,14 @@ export function AgentsPage() {
             template={templateForEditor}
             onClose={closeEditor}
             onSave={closeEditor}
+          />
+
+          <RunConfirmModal
+            open={pendingRun !== null}
+            agentName={pendingRun?.agentName ?? ''}
+            items={pendingRun?.items ?? []}
+            onCancel={() => setPendingRun(null)}
+            onDone={() => setPendingRun(null)}
           />
         </>
       )}
