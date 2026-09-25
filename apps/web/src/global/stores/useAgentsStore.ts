@@ -19,6 +19,8 @@ import {
   type AgentTemplateDto,
 } from '../repositories/templates.repository'
 import { useToastStore } from './useToastStore'
+import { useAgentMessagesStore } from './useAgentMessagesStore'
+import { useDiaryStore } from './useDiaryStore'
 
 export type Agent = {
   id: string
@@ -276,6 +278,15 @@ export const useAgentsStore = create<AgentsStore>()(
                 : a
             ),
           }))
+
+          // The run wrote to the server but these stores short-circuit on
+          // loadStatus === 'loaded', so the inbox/diary kept showing stale
+          // data and the run looked like it produced nothing.
+          if (result.status === 'success') {
+            void useAgentMessagesStore.getState().refresh()
+            void useDiaryStore.getState().refresh()
+          }
+
           return {
             runId: result.runId,
             status: result.status,

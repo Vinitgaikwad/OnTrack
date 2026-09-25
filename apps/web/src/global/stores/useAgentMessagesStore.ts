@@ -26,6 +26,8 @@ type AgentMessagesStore = {
   offset: number
   epoch: number
   ensureLoaded: () => Promise<void>
+  /** Force-reloads regardless of loadStatus. Use after a server-side mutation (e.g. an agent run). */
+  refresh: () => Promise<void>
   loadMore: () => Promise<void>
   markRead: (id: string) => Promise<void>
   deleteMessage: (id: string) => Promise<void>
@@ -106,6 +108,11 @@ export const useAgentMessagesStore = create<AgentMessagesStore>()(
           if (get().loadStatus === 'loading') set({ loadStatus: 'error' })
           pushSyncError(error)
         }
+      },
+
+      refresh: async () => {
+        set((state) => ({ epoch: state.epoch + 1 }))
+        await refreshMessages(set, get)
       },
 
       loadMore: async () => {

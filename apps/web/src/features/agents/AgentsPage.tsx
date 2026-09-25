@@ -3,6 +3,7 @@ import { Bot, Brain, Bell, CalendarClock, Coffee, Feather, Inbox, Mail, Newspape
 import type { Agent, AgentTemplate } from '../../global/stores/useAgentsStore'
 import { useAgentsStore } from '../../global/stores/useAgentsStore'
 import { useAgentMessagesStore } from '../../global/stores/useAgentMessagesStore'
+import { useToastStore } from '../../global/stores/useToastStore'
 import Markdown from 'react-markdown'
 import { AgentEditor } from './AgentEditor'
 import { TemplateGallery } from './TemplateGallery'
@@ -56,6 +57,7 @@ export function AgentsPage() {
   const runningAgentId = useAgentsStore((state) => state.runningAgentId)
 
   const unreadCount = useAgentMessagesStore((state) => state.unreadCount)
+  const pushToast = useToastStore((state) => state.push)
 
   const [tab, setTab] = useState<'agents' | 'inbox'>('agents')
   const [editing, setEditing] = useState<Agent | null>(null)
@@ -107,7 +109,31 @@ export function AgentsPage() {
       const result = await runAgent(agent.id)
       if (result.pendingActions && result.pendingActions.length > 0) {
         setPendingRun({ agentName: agent.name, items: result.pendingActions })
+        return
       }
+      // Never fail silently: say where the output went, or that there was none.
+      if (result.status === 'failed') {
+        pushToast({
+          title: `${agent.name} failed`,
+          message: result.error ?? 'The run did not complete.',
+          level: 'error',
+        })
+        return
+      }
+      if (result.message) {
+        pushToast({
+          title: `${agent.name} finished`,
+          message: 'Output added to your inbox.',
+          level: 'info',
+        })
+        setTab('inbox')
+        return
+      }
+      pushToast({
+        title: `${agent.name} finished`,
+        message: 'No inbox message and nothing to approve — this agent sends output to the diary, or had no data to work with.',
+        level: 'info',
+      })
     } catch {
       // store already surfaced the error via toast
     }

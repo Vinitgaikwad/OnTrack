@@ -70,6 +70,8 @@ type DiaryStore = {
   /** Bumped on month switches and local mutations; stale responses never overwrite newer state. */
   epoch: number
   ensureLoaded: () => Promise<void>
+  /** Force-reloads the active month. Use after a server-side mutation (e.g. an agent run). */
+  refresh: () => Promise<void>
   ensureMonth: (month: string) => Promise<void>
   loadMore: () => Promise<void>
   setActiveMonth: (month: string | null) => void
@@ -107,6 +109,10 @@ export const useDiaryStore = create<DiaryStore>()(
         loadStatus: 'idle',
         activeMonth: null,
         epoch: 0,
+
+        refresh: async () => {
+          await refreshCurrentMonth()
+        },
 
         ensureLoaded: async () => {
           if (get().loadStatus === 'loading' || get().loadStatus === 'loaded') return
