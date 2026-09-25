@@ -1,65 +1,15 @@
 import type { PrismaClient } from '../generated/prisma/client'
 import { AppError } from '../lib/http'
+import {
+  parseActionItems,
+  stripActionLines,
+  type PendingAction,
+  type PendingActionKind,
+} from '../lib/agent-prompts'
 
-export type PendingActionKind = 'task' | 'event' | 'note'
-
-export type PendingAction = {
-  kind: PendingActionKind
-  title: string
-  date?: string
-  startTime?: string
-  endTime?: string | null
-  note?: string
-}
-
-const MARKER_PREFIX = /^\[(?:TASK|EVENT|NOTE|INFO)\]/
-
-const DATE_RE = /^\[TASK\]\s*(.+?)\s*\|\s*(\d{4}-\d{2}-\d{2})\s*$/
-const EVENT_RE = /^\[EVENT\]\s*(.+?)\s*\|\s*(\d{4}-\d{2}-\d{2})\s*\|\s*(\d{2}:\d{2})(?:\s*-\s*(\d{2}:\d{2}))?\s*$/
-const NOTE_RE = /^\[NOTE\]\s*(.+?)\s*\|\s*(.+)$/
-
-export function parseActionItems(text: string): PendingAction[] {
-  const items: PendingAction[] = []
-
-  for (const rawLine of text.split('\n')) {
-    const line = rawLine.trim()
-
-    const task = DATE_RE.exec(line)
-    if (task) {
-      items.push({ kind: 'task', title: task[1].trim(), date: task[2] })
-      continue
-    }
-
-    const event = EVENT_RE.exec(line)
-    if (event) {
-      items.push({
-        kind: 'event',
-        title: event[1].trim(),
-        date: event[2],
-        startTime: event[3],
-        endTime: event[4] ?? null,
-      })
-      continue
-    }
-
-    const note = NOTE_RE.exec(line)
-    if (note) {
-      items.push({ kind: 'note', title: note[1].trim(), note: note[2].trim() })
-      continue
-    }
-  }
-
-  return items
-}
-
-export function stripActionLines(text: string): string {
-  return text
-    .split('\n')
-    .map((rawLine) => rawLine.trimEnd())
-    .filter((line) => (line.trim().length > 0 ? !MARKER_PREFIX.test(line.trim()) : true))
-    .join('\n')
-    .trim()
-}
+// Re-exported so existing imports keep working.
+export { parseActionItems, stripActionLines }
+export type { PendingAction, PendingActionKind }
 
 export async function createActionItems(
   db: PrismaClient,
