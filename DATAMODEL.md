@@ -182,7 +182,7 @@ fetch). Definitions live in `seed.service.ts` (`DEFAULT_AGENTS`, `seedDefaultAge
 | `Agent`       | `id, name, role, icon, color, description, preferences[], enabled, templateId?, triggerType, sources[], output, prompt?, draftOnly, modelKeyId?, maxTokens, lastRunAt?, runCount, createdAt, updatedAt, tools?[]` | `triggerType`/`schedule`/`timezone` reserved for v3; `output` ∈ `message\|note\|email`; **`description` is a Markdown doc and is what the runner sends to the LLM as system instructions** (replaces `prompt`, retained for legacy only); creating from a template copies `defaultRole` and seeds `defaultPrompt` into the editable `description` + `AgentTool` rows |
 | `AgentTemplate` | `id, slug, name, description, category, icon, requiresOAuth?, defaultRole, defaultPrompt, defaultSources[], defaultTools[], defaultOutput, configSchema?, sortOrder` | 3 seeded: `email-summarizer`, `job-tracker`, `news-provider` (upserted on first `/api/templates` hit) |
 | `AgentTool`    | `id, agentId, toolName, enabled, config?`                                                                                   | per-agent tool row; `toolName` ∈ registry (14 tools) |
-| `ModelKey`     | `id, provider, label, defaultModel, baseUrl?, createdAt`                                                                    | **`apiKeyEnc` never leaves the server** (AES-256-GCM, `MODEL_KEY_ENCRYPTION_KEY`); POST live-validates against OpenRouter |
+| `ModelKey`     | `id, provider, label, defaultModel, baseUrl?, createdAt`                                                                    | **`apiKeyEnc` never leaves the server** (AES-256-GCM, `MODEL_KEY_ENCRYPTION_KEY`); POST live-validates against **that key's own provider** (free endpoint) and stores the resolved `baseUrl` |
 | `AgentMessage` | `id, agentId, title, body (markdown), read, createdAt`                                                                      | inbox; delivery target of every run that outputs `message`/`email` |
 | `AgentRun`     | via `GET /api/agents/:id/runs` → `{ runId, status, message?, sideEffects?, tokensUsed, durationMs, error?, startedAt }`   | audit log; snapshots/`toolCalls` stored on the row but not returned by the list |
 | `IntegrationAccount` | `id, provider ("gmail"), email?, scope[], tokenEnc, tokenExpiry?`                                                       | tokens AES-256-GCM (`INTEGRATION_ENCRYPTION_KEY`), `gmail.readonly` scope |
@@ -368,10 +368,10 @@ model AgentTemplate {
 model ModelKey {
   id           String   @id @default(cuid())
   userId       String
-  provider     String   // openrouter | deepseek | groq | openai | anthropic
+  provider     String   // normalized to: openrouter | deepseek | groq | openai | anthropic
   label        String
   apiKeyEnc    String   // AES-256-GCM
-  baseUrl      String?
+  baseUrl      String?  // resolved on create; the agent run uses this, never a hardcoded default
   defaultModel String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -589,11 +589,32 @@ type RunResult = {
 
 ### Gmail OAuth (implemented, requires live credentials)
 
-| Method   | Path                            | Flow |
-| -------- | ------------------------------- | ---- |
-| GET      | `/api/auth/gmail/start`         | `{ data: { url } }` Google OAuth URL (scope `gmail.readonly openid email profile`) |
-| GET      | `/api/auth/gmail/callback`      | exchange `code` → encrypt tokens → upsert `IntegrationAccount` → redirect `{WEB_URL}/#/agents?gmail=connected` |
-| DELETE   | `/api/auth/gmail/disconnect`    | revoke tokens + delete row (`204`) |
+| Method   | Path                            | Auth   | Flow |
+| -------- | ------------------------------- | ------ | ---- |
+| GET      | `/api/auth/gmail/connect`       | bearer | `{ data: { authUrl } }` Google OAuth URL (scope `gmail.readonly openid email profile`); sets the `gmail_oauth_nonce` HttpOnly `SameSite=Lax` cookie and returns a `state` JWT |
+| GET      | `/api/auth/gmail/callback`      | public | verifies `state` + nonce cookie, exchanges `code`, resolves the account email, upserts `IntegrationAccount`, then redirects `{WEB_URL}/#/agents?gmail=connected` (or `?gmail=denied\|csrf_failed\|invalid_request\|failed`) |
+| GET      | `/api/auth/gmail/status`        | bearer | `{ data: { isConnected, email } }` |
+| DELETE   | `/api/auth/gmail`               | bearer | revokes at Google (best effort), then deletes the row → `{ data: { isConnected: false, wasConnected } }` |
+
+**Token handling.** `IntegrationAccount.tokenEnc` holds ONLY the AES-GCM encrypted
+*refresh* token (`INTEGRATION_ENCRYPTION_KEY`). Access tokens live in a module-level
+`Map` in `integrations.service.ts`, scoped to the Worker isolate and never persisted;
+only `tokenExpiry` is written back on refresh. A Cloudflare Worker has no durable
+memory, so a cold isolate simply refreshes on first use.
+
+**CSRF.** The app is Bearer-only (no session cookie), so the callback cannot identify
+the user from a header. `state` is a short-lived (600 s) JWT carrying `userId` +
+`nonce`, signed with a **domain-separated HMAC key** derived from `JWT_SECRET`
+(`gmail-oauth-state.ts`). Domain separation matters: `verifyAccessToken` accepts any
+HS256 token with a `sub`, so without it a `state` value would double as a valid
+access token. The mirrored nonce cookie is what proves the callback returned to the
+same browser that started the flow.
+
+**Agent runs.** `agent.runner.ts` calls `getGmailAccessToken` rather than decrypting
+`tokenEnc` directly. If Gmail is enabled but unconnected (or the grant is dead), the
+run **short-circuits before the LLM call**, writes an explanation through
+`formatOutput`, and returns `tokensUsed: 0` — it does not silently produce a summary
+with no mail in it.
 
 ---
 
@@ -626,8 +647,13 @@ type RunResult = {
 - Env bindings in `wrangler.jsonc`: `WEB_URL` (var), plus secrets in `.dev.vars`:
   `DATABASE_URL`, `JWT_SECRET`, `RESEND_API_KEY`, `OPENROUTER_API_KEY`,
   `MODEL_KEY_ENCRYPTION_KEY`, `INTEGRATION_ENCRYPTION_KEY`, `GOOGLE_CLIENT_ID`,
-  `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`. Encryption keys (**note**: live-validate
-  against OpenRouter on `POST /api/model-keys`, so OPENROUTER_API_KEY is required).
+  `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`. `OPENROUTER_API_KEY` is only the
+  fallback for agents with **no** `ModelKey`; BYOK keys carry their own `baseUrl`.
+- Provider routing lives in `apps/backend/src/lib/llm-providers.ts` (single source of
+  truth, shared by key validation and the agent run). Never hardcode a vendor base
+  URL in a service — that silently sends a key to the wrong API.
+- BYOK live validation uses token-free endpoints only (`/models`, DeepSeek
+  `/user/balance`), so adding a key costs nothing.
 - The position-densify invariant must be moved/adjusted in a **transaction** (see tasks service).
 
 ## 7. Open decisions

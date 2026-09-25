@@ -370,13 +370,17 @@ type RunResult = {
 | POST | `/api/model-keys` | `{ provider, label, apiKey, defaultModel, baseUrl? }` | `201 { data: ModelKey }` — live key validation first |
 | DELETE | `/api/model-keys/:id` | — | `204` (clears `Agent.modelKeyId` deps) |
 
-### Gmail OAuth (new)
+### Gmail OAuth (shipped — see DATAMODEL.md §4 for the current contract)
+
+Paths were renamed during implementation: `start` → `connect`, `disconnect` →
+`DELETE /api/auth/gmail`, and `GET /api/auth/gmail/status` was added.
 
 | Method | Path | Flow |
 |---|---|---|
-| GET | `/api/auth/gmail/start` | build Google auth URL (scope `gmail.readonly openid email profile`, redirect to `GOOGLE_REDIRECT_URI`), return `{ url }` |
-| GET | `/api/auth/gmail/callback` | exchange `code` → tokens → encrypt → upsert `IntegrationAccount` → redirect `{WEB_URL}/#/agents?gmail=connected` |
-| DELETE | `/api/auth/gmail/disconnect` | delete `IntegrationAccount` row + revoke tokens |
+| GET | `/api/auth/gmail/connect` | build Google auth URL (scope `gmail.readonly openid email profile`, redirect to `GOOGLE_REDIRECT_URI`), set the `gmail_oauth_nonce` cookie, return `{ authUrl }` |
+| GET | `/api/auth/gmail/callback` | verify `state` JWT + nonce cookie → exchange `code` → encrypt **refresh token only** → upsert `IntegrationAccount` → redirect `{WEB_URL}/#/agents?gmail=connected` |
+| GET | `/api/auth/gmail/status` | `{ isConnected, email }` |
+| DELETE | `/api/auth/gmail` | revoke at Google (best effort) + delete the `IntegrationAccount` row |
 
 ---
 

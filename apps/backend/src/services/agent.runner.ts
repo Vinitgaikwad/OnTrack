@@ -2,66 +2,28 @@ import type { PrismaClient } from '../generated/prisma/client'
 import type { Env } from '../types'
 import { AppError } from '../lib/http'
 import { decrypt } from '../lib/crypto'
+import { DEFAULT_BASE_URL, FALLBACK_MODEL, resolveBaseUrl } from '../lib/llm-providers'
+import {
+  buildSystemPrompt,
+  buildUserPrompt,
+  parseActionItems,
+  stripActionLines,
+  type PendingAction,
+} from '../lib/agent-prompts'
 import { generateWithLLM } from './ai.service'
 import { fetchNewsForAgent } from './news.service'
 import { fetchRecentEmails } from './gmail.service'
+import { getGmailAccessToken } from './integrations.service'
 import { createMessage } from './messages.service'
-import { parseActionItems, stripActionLines, type PendingAction } from './agent.actions'
 
 const DAILY_RUN_LIMIT = 50
 
 const runningAgents = new Set<string>()
 
-function buildSystemPrompt(agent: {
-  name: string
-  role: string
-  description: string
-  sources: string[]
-  output: string
-  preferences: string[]
-}): string {
-  const parts: string[] = []
-  parts.push(`You are "${agent.name}", an AI agent specializing in ${agent.role}.`)
-  const instructions = agent.description.trim()
-  if (instructions) parts.push(`\nInstructions:\n${instructions}`)
-  if (agent.sources.length > 0) parts.push(`\nData sources: ${agent.sources.join(', ')}`)
-  if (agent.preferences.length > 0) parts.push(`\nPreferences: ${agent.preferences.join(', ')}`)
-  parts.push(`\nOutput format: ${agent.output}.`)
-  parts.push(`\nBe concise, actionable, and structured. When listing items, use bullet points.`)
-  return parts.join('')
-}
-
-function buildUserPrompt(agent: {
-  name: string
-  role: string
-}, contextData: { news?: unknown[]; emails?: unknown[] }): string {
-  const parts: string[] = []
-  parts.push(`Run the agent "${agent.name}" (${agent.role}).`)
-
-  if (contextData.news && contextData.news.length > 0) {
-    parts.push(`\n--- News data ---`)
-    const sliced = contextData.news.slice(0, 20)
-    for (const item of sliced) {
-      const asRecord = item as Record<string, unknown>
-      const title = String(asRecord.title || '')
-      const source = String(asRecord.source || '')
-      parts.push(`- [${source}] ${title}`)
-    }
-  }
-
-  if (contextData.emails && contextData.emails.length > 0) {
-    parts.push(`\n--- Recent emails ---`)
-    const sliced = contextData.emails.slice(0, 15)
-    for (const item of sliced) {
-      const asRecord = item as Record<string, unknown>
-      const subject = String(asRecord.subject || '')
-      const from = String(asRecord.from || '')
-      const snippet = String(asRecord.snippet || '')
-      parts.push(`- From: ${from} | Subject: ${subject} | ${snippet}`)
-    }
-  }
-
-  return parts.join('')
+type ContextData = {
+  news?: unknown[]
+  emails?: unknown[]
+  emailConnectionMissing?: boolean
 }
 
 async function gatherContext(
@@ -70,8 +32,8 @@ async function gatherContext(
   agentId: string,
   sources: string[],
   env: Env
-): Promise<{ news?: unknown[]; emails?: unknown[] }> {
-  const result: { news?: unknown[]; emails?: unknown[] } = {}
+): Promise<ContextData> {
+  const result: ContextData = {}
 
   const toolNames = sources
   const agentTools = await db.agentTool.findMany({
@@ -91,12 +53,11 @@ async function gatherContext(
 
   const hasEmail = enabledToolNames.has('email_read')
   if (hasEmail) {
-    const integration = await db.integrationAccount.findFirst({
-      where: { userId, provider: 'gmail' },
-    })
-    if (integration && integration.tokenEnc) {
+    const accessToken = await getGmailAccessToken(db, userId, env)
+    if (!accessToken) {
+      result.emailConnectionMissing = true
+    } else {
       try {
-        const accessToken = await decrypt(integration.tokenEnc, env.INTEGRATION_ENCRYPTION_KEY)
         result.emails = await fetchRecentEmails(accessToken, 24)
       } catch {
         console.error('[runner] gmail fetch failed')
@@ -222,14 +183,26 @@ export async function runAgent(
   if (!agent.enabled) throw new AppError('BAD_REQUEST', 'Agent is disabled.', 400)
 
   let apiKey = env.OPENROUTER_API_KEY
-  let baseUrl = 'https://openrouter.ai/api/v1'
-  let model = 'anthropic/claude-3.5-sonnet'
+  let baseUrl = DEFAULT_BASE_URL
+  let model = FALLBACK_MODEL
+  let provider: string | undefined
 
   if (agent.modelKey) {
-    const decryptedKey = await decrypt(agent.modelKey.apiKeyEnc, env.MODEL_KEY_ENCRYPTION_KEY)
-    apiKey = decryptedKey
-    if (agent.modelKey.baseUrl) baseUrl = agent.modelKey.baseUrl
+    provider = agent.modelKey.provider
+    apiKey = await decrypt(agent.modelKey.apiKeyEnc, env.MODEL_KEY_ENCRYPTION_KEY)
+    // Resolve from the key's own provider. Falling back to OpenRouter here sent
+    // every non-OpenRouter key to openrouter.ai, which is why DeepSeek never
+    // showed a request on its dashboard.
+    baseUrl = resolveBaseUrl(provider, agent.modelKey.baseUrl)
     if (agent.modelKey.defaultModel) model = agent.modelKey.defaultModel
+  }
+
+  if (!apiKey) {
+    throw new AppError(
+      'NO_API_KEY',
+      'No API key available. Add a model key or set OPENROUTER_API_KEY.',
+      400
+    )
   }
 
   runningAgents.add(agentId)
@@ -247,10 +220,40 @@ export async function runAgent(
   try {
     const contextData = await gatherContext(db, userId, agentId, agent.sources, env)
 
+    if (contextData.emailConnectionMissing) {
+      const explanation =
+        'This agent needs Gmail, but no Google account is connected. ' +
+        'Open the agent, choose Connect Gmail, then run it again.'
+      const noticeId = await formatOutput(
+        db,
+        userId,
+        agentId,
+        agent.output,
+        explanation,
+        agent.name
+      )
+      await db.agentRun.update({
+        where: { id: run.id },
+        data: { status: 'success', outputSnap: explanation, finishedAt: new Date() },
+      })
+      await db.agent.update({
+        where: { id: agentId },
+        data: { lastRunAt: new Date(), runCount: { increment: 1 } },
+      })
+      return {
+        runId: run.id,
+        status: 'success',
+        ...(noticeId ? { message: noticeId } : {}),
+        tokensUsed: 0,
+        durationMs: Date.now() - started,
+      }
+    }
+
     const systemPrompt = buildSystemPrompt({
       name: agent.name,
       role: agent.role,
       description: agent.description,
+      prompt: agent.prompt,
       sources: agent.sources,
       output: agent.output,
       preferences: agent.preferences,
@@ -262,12 +265,13 @@ export async function runAgent(
     )
 
     const result = await generateWithLLM({
-      apiKey: apiKey || '',
+      apiKey,
+      provider,
       baseUrl,
       model,
       systemPrompt,
       userPrompt,
-      maxTokens: agent.maxTokens,
+      maxOutputTokens: agent.maxTokens,
     })
 
     const aiText = result.text || JSON.stringify(result.object || '')
