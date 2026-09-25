@@ -47,4 +47,8 @@ dist-electron
 # wrangler (cloudflare worker) local dev
 .wrangler
 
+# agent scratch and session plans
+.superpowers
+docs/superpowers
+
 # prisma client generated into the repo is committed on purpose
