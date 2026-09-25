@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Check, ChevronDown } from 'lucide-react'
 import type { Agent, AgentTemplate } from '../../global/stores/useAgentsStore'
 import { useAgentsStore } from '../../global/stores/useAgentsStore'
 import { useModelKeysStore } from '../../global/stores/useModelKeysStore'
 import { useToastStore } from '../../global/stores/useToastStore'
+import { useIntegrationsStore } from '../../global/stores/useIntegrationsStore'
 import { AGENT_COLORS, AGENT_ICONS, type AgentIconKey } from './AgentsPage'
 import { ModelKeyModal } from './ModelKeyModal'
 import { Modal } from '../../global/ui/Modal'
@@ -94,6 +95,47 @@ export function AgentEditor({ open, initial, template, onClose, onSave }: AgentE
 
   const [showModelKeyModal, setShowModelKeyModal] = useState(false)
   const [advancedOpen, setAdvancedOpen] = useState(false)
+
+  const isGmailConnected = useIntegrationsStore((s) => s.isGmailConnected)
+  const gmailEmail = useIntegrationsStore((s) => s.gmailEmail)
+  const isGmailLoading = useIntegrationsStore((s) => s.isGmailLoading)
+  const isGmailConnecting = useIntegrationsStore((s) => s.isGmailConnecting)
+  const refreshGmail = useIntegrationsStore((s) => s.refreshGmail)
+  const connectGmail = useIntegrationsStore((s) => s.connectGmail)
+  const disconnectGmail = useIntegrationsStore((s) => s.disconnectGmail)
+
+  useEffect(() => {
+    if (open) void refreshGmail()
+  }, [open, refreshGmail])
+
+  const handleGmailCallbackResult = useCallback(async () => {
+    // HashRouter: the callback redirects to `#/agents?gmail=...`, so the query
+    // lives inside the hash, not in window.location.search.
+    const hashQuery = window.location.hash.split('?')[1]
+    if (!hashQuery) return
+    const outcome = new URLSearchParams(hashQuery).get('gmail')
+    if (!outcome) return
+    await refreshGmail()
+    const title =
+      outcome === 'connected'
+        ? 'Gmail connected'
+        : outcome === 'denied'
+          ? 'Gmail connection cancelled'
+          : 'Gmail connection failed'
+    useToastStore.getState().push({
+      title,
+      level: outcome === 'connected' ? 'info' : 'error',
+    })
+  }, [refreshGmail])
+
+  useEffect(() => {
+    void handleGmailCallbackResult()
+  }, [handleGmailCallbackResult])
+
+  const handleDisconnectGmail = async () => {
+    await disconnectGmail()
+    useToastStore.getState().push({ title: 'Gmail disconnected', level: 'info' })
+  }
 
   const togglePreference = (pref: string) => {
     setPreferences((current) =>
@@ -270,8 +312,30 @@ export function AgentEditor({ open, initial, template, onClose, onSave }: AgentE
                             <p className="text-[11px] text-(--text-muted)">{tool.description}</p>
                           </div>
                           {tool.requiresOAuth ? (
-                            <Button variant="ghost" size="sm" onClick={() => toggleTool(tool.id)}>
-                              {enabled ? 'Connected' : `Connect ${tool.oauthProvider}`}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              disabled={
+                                isGmailLoading || isGmailConnecting || tool.oauthProvider !== 'gmail'
+                              }
+                              onClick={() => {
+                                if (tool.oauthProvider !== 'gmail') return
+                                if (isGmailConnected) {
+                                  if (enabled) toggleTool(tool.id)
+                                  void handleDisconnectGmail()
+                                } else {
+                                  if (!enabled) toggleTool(tool.id)
+                                  void connectGmail()
+                                }
+                              }}
+                            >
+                              {tool.oauthProvider !== 'gmail'
+                                ? `Connect ${tool.oauthProvider}`
+                                : isGmailConnected
+                                  ? `Connected: ${gmailEmail ?? 'Gmail'}`
+                                  : isGmailConnecting
+                                    ? 'Connecting...'
+                                    : 'Connect Gmail'}
                             </Button>
                           ) : (
                             <button

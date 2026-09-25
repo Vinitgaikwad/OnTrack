@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import authRouter from './routes/auth.router'
+import integrationsRouter from './routes/integrations.router'
 import taskRouter from './routes/task.router'
 import appointmentRouter from './routes/appointment.router'
 import diaryRouter from './routes/diary.router'
@@ -26,6 +27,7 @@ app.use(
 app.get('/', (c) => c.text('Hello Hono!'))
 
 app.route('/api/auth', authRouter)
+app.route('/api/auth/gmail', integrationsRouter)
 app.route('/api/tasks', taskRouter)
 app.route('/api/appointments', appointmentRouter)
 app.route('/api/diary', diaryRouter)
