@@ -30,7 +30,7 @@ type ModelKeysStore = {
     apiKey: string
     defaultModel: string
     baseUrl?: string
-  }) => Promise<void>
+  }) => Promise<boolean>
   deleteKey: (id: string) => Promise<void>
 }
 
@@ -43,10 +43,10 @@ const toModelKey = (dto: ModelKeyDto): ModelKey => ({
   createdAt: dto.createdAt,
 })
 
-function pushSyncError(error: unknown): void {
+function pushSyncError(error: unknown, title = "Couldn't sync model keys"): void {
   if (isAuthError(error)) return
   useToastStore.getState().push({
-    title: "Couldn't sync model keys",
+    title,
     message: toErrorMessage(error),
     level: 'error',
   })
@@ -106,12 +106,14 @@ export const useModelKeysStore = create<ModelKeysStore>()(
           set((state) => ({
             keys: state.keys.map((k) => (k.id === optimistic.id ? toModelKey(dto) : k)),
           }))
+          return true
         } catch (error) {
-          pushSyncError(error)
+          pushSyncError(error, 'Could not add model key')
           set((state) => ({
             keys: state.keys.filter((k) => k.id !== optimistic.id),
           }))
           void refreshKeys(set, get)
+          return false
         }
       },
 

@@ -4,12 +4,20 @@ import type { ZodSchema } from 'zod'
 
 export type LLMOptions = {
   apiKey: string
+  /** Only used for error messages; routing is the caller's job. */
+  provider?: string
+  /**
+   * Fully-resolved OpenAI-compatible base URL. Required — inferring a default
+   * here is what previously sent every non-OpenRouter key to openrouter.ai.
+   */
   baseUrl: string
   model: string
   systemPrompt: string
   userPrompt: string
   schema?: ZodSchema
-  maxTokens?: number
+  maxOutputTokens?: number
+  /** Injectable for tests. Defaults to global fetch. */
+  fetch?: typeof fetch
 }
 
 export type LLMResult = {
@@ -19,24 +27,37 @@ export type LLMResult = {
 }
 
 export async function generateWithLLM(opts: LLMOptions): Promise<LLMResult> {
+  const baseUrl = opts.baseUrl?.replace(/\/+$/, '')
+  if (!baseUrl) {
+    throw new Error(`No base URL resolved for provider "${opts.provider ?? 'unknown'}".`)
+  }
+  if (!opts.apiKey) {
+    throw new Error(`No API key resolved for provider "${opts.provider ?? 'unknown'}" (baseUrl ${baseUrl}).`)
+  }
+
   const provider = createOpenAICompatible({
     name: 'agent-provider',
-    baseURL: opts.baseUrl || 'https://openrouter.ai/api/v1',
+    baseURL: baseUrl,
     apiKey: opts.apiKey,
+    ...(opts.fetch ? { fetch: opts.fetch } : {}),
   })
 
   const model = provider.chatModel(opts.model)
+  const maxOutputTokens = opts.maxOutputTokens
+    ? { maxOutputTokens: opts.maxOutputTokens }
+    : {}
 
+  // The system prompt must go through `system`, not a { role: 'system' } message.
+  // AI SDK v5+ rejects system-role messages unless allowSystemInMessages is set,
+  // which threw before any HTTP request was ever made.
   if (opts.schema) {
     const result = await generateObject({
       model,
       schema: opts.schema,
-      messages: [
-        { role: 'system', content: opts.systemPrompt },
-        { role: 'user', content: opts.userPrompt },
-      ],
+      system: opts.systemPrompt,
+      messages: [{ role: 'user', content: opts.userPrompt }],
       temperature: 0.2,
-      ...(opts.maxTokens ? { maxTokens: opts.maxTokens } : {}),
+      ...maxOutputTokens,
     })
     return {
       object: result.object,
@@ -49,12 +70,10 @@ export async function generateWithLLM(opts: LLMOptions): Promise<LLMResult> {
 
   const result = await generateText({
     model,
-    messages: [
-      { role: 'system', content: opts.systemPrompt },
-      { role: 'user', content: opts.userPrompt },
-    ],
+    system: opts.systemPrompt,
+    messages: [{ role: 'user', content: opts.userPrompt }],
     temperature: 0.2,
-    ...(opts.maxTokens ? { maxTokens: opts.maxTokens } : {}),
+    ...maxOutputTokens,
   })
   return {
     text: result.text,

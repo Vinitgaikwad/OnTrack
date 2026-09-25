@@ -22,6 +22,19 @@ const MODEL_OPTIONS: Record<ModelProvider, string[]> = {
   OpenRouter: ['openai/gpt-4o', 'anthropic/claude-sonnet-4.5', 'google/gemini-2.5-flash', 'meta-llama/llama-3.3-70b-instruct', 'deepseek/deepseek-chat'],
 }
 
+/**
+ * Must stay in sync with PROVIDERS in apps/backend/src/lib/llm-providers.ts.
+ * Without this the key validates against the wrong vendor and runs route to
+ * the wrong API.
+ */
+const PROVIDER_BASE_URL: Record<ModelProvider, string> = {
+  OpenRouter: 'https://openrouter.ai/api/v1',
+  DeepSeek: 'https://api.deepseek.com/v1',
+  Groq: 'https://api.groq.com/openai/v1',
+  OpenAI: 'https://api.openai.com/v1',
+  Anthropic: '',
+}
+
 const CUSTOM_MODEL = '__custom__'
 
 export function ModelKeyModal({ open, onClose }: ModelKeyModalProps) {
@@ -33,7 +46,8 @@ export function ModelKeyModal({ open, onClose }: ModelKeyModalProps) {
   const [apiKey, setApiKey] = useState('')
   const [modelChoice, setModelChoice] = useState<string>(MODEL_OPTIONS[PROVIDERS[0]][0])
   const [customModel, setCustomModel] = useState('')
-  const [baseUrl, setBaseUrl] = useState('')
+  const [baseUrl, setBaseUrl] = useState(PROVIDER_BASE_URL[PROVIDERS[0]])
+  const [saving, setSaving] = useState(false)
 
   const model = modelChoice === CUSTOM_MODEL ? customModel : modelChoice
 
@@ -41,19 +55,27 @@ export function ModelKeyModal({ open, onClose }: ModelKeyModalProps) {
     setProvider(next)
     setModelChoice(MODEL_OPTIONS[next][0])
     setCustomModel('')
+    setBaseUrl(PROVIDER_BASE_URL[next])
   }
 
-  const handleSave = () => {
-    if (!label.trim() || !apiKey.trim() || !model.trim()) return
-    createKey({
-      provider,
-      label: label.trim(),
-      apiKey: apiKey.trim(),
-      defaultModel: model.trim(),
-      baseUrl: baseUrl.trim() || undefined,
-    })
-    pushToast({ title: `${label.trim()} key added`, level: 'info' })
-    onClose()
+  const handleSave = async () => {
+    if (!label.trim() || !apiKey.trim() || !model.trim() || saving) return
+    setSaving(true)
+    try {
+      const added = await createKey({
+        provider,
+        label: label.trim(),
+        apiKey: apiKey.trim(),
+        defaultModel: model.trim(),
+        baseUrl: baseUrl.trim() || undefined,
+      })
+      // Only claim success once the backend has actually stored the key.
+      if (!added) return
+      pushToast({ title: `${label.trim()} key added`, level: 'info' })
+      onClose()
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -103,14 +125,20 @@ export function ModelKeyModal({ open, onClose }: ModelKeyModalProps) {
           </Field>
         ) : null}
 
-        <Field label="Base URL" hint="Optional — pre-filled for known providers">
+        <Field
+          label="Base URL"
+          hint={provider === 'Anthropic' ? 'Required for Anthropic — this app speaks the OpenAI API format' : 'Pre-filled for known providers'}
+        >
           <Input value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)} placeholder="https://api.example.com/v1" />
         </Field>
 
         <div className="flex justify-end gap-2 pt-1">
           <Button variant="ghost" onClick={onClose}>Cancel</Button>
-          <Button disabled={!label.trim() || !apiKey.trim() || !model.trim()} onClick={handleSave}>
-            Add key
+          <Button
+            disabled={saving || !label.trim() || !apiKey.trim() || !model.trim() || (provider === 'Anthropic' && !baseUrl.trim())}
+            onClick={handleSave}
+          >
+            {saving ? 'Validating…' : 'Add key'}
           </Button>
         </div>
       </div>
