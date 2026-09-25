@@ -8,14 +8,15 @@ type GmailMessage = {
   body: string
 }
 
-type TokenData = {
+export type TokenData = {
   access_token: string
   refresh_token?: string
   expires_in: number
   token_type: string
+  scope?: string
 }
 
-const SCOPES = 'https://www.googleapis.com/auth/gmail.readonly openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile'
+export const SCOPES = 'https://www.googleapis.com/auth/gmail.readonly openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile'
 
 export function buildAuthUrl(clientId: string, redirectUri: string): string {
   const params = new URLSearchParams({
@@ -102,7 +103,7 @@ export async function revokeTokens(
   clientId: string,
   _clientSecret: string
 ): Promise<void> {
-  await fetch('https://oauth2.googleapis.com/revoke', {
+  const res = await fetch('https://oauth2.googleapis.com/revoke', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
@@ -110,6 +111,9 @@ export async function revokeTokens(
       client_id: clientId,
     }),
   })
+  if (!res.ok) {
+    throw new Error(`Token revoke failed: ${res.status}`)
+  }
 }
 
 export async function encryptToken(
@@ -124,4 +128,41 @@ export async function decryptToken(
   secretHex: string
 ): Promise<string> {
   return decrypt(ciphertext, secretHex)
+}
+
+export async function fetchGoogleEmail(accessToken: string): Promise<string> {
+  const res = await fetch('https://openidconnect.googleapis.com/v1/userinfo', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+  if (!res.ok) {
+    throw new Error(`Google userinfo failed: ${res.status}`)
+  }
+  const data = (await res.json()) as { email?: string; email_verified?: boolean }
+  if (!data.email) throw new Error('Google account has no email address')
+  if (data.email_verified === false) {
+    throw new Error('Google account email is not verified')
+  }
+  return data.email
+}
+
+export async function refreshAccessToken(
+  refreshToken: string,
+  clientId: string,
+  clientSecret: string
+): Promise<TokenData> {
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      refresh_token: refreshToken,
+      client_id: clientId,
+      client_secret: clientSecret,
+      grant_type: 'refresh_token',
+    }),
+  })
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`Token refresh failed: ${res.status} ${err}`)
+  }
+  return res.json() as Promise<TokenData>
 }
