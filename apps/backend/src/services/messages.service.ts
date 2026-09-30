@@ -1,6 +1,5 @@
 import type { Prisma, PrismaClient } from '../generated/prisma/client'
 import { AppError } from '../lib/http'
-import { seedExampleMessages } from './seed.service'
 
 type Db = PrismaClient | Prisma.TransactionClient
 
@@ -10,13 +9,19 @@ async function findOwnedMessage(db: Db, userId: string, messageId: string) {
   return message
 }
 
+/**
+ * List one page of a user's agent inbox.
+ *
+ * @param db - Prisma client or transaction client
+ * @param userId - Owner of the inbox
+ * @param opts - Offset, page size, and unread-only filter
+ * @returns The page of messages plus whether more remain
+ */
 export async function listMessages(
   db: Db,
   userId: string,
   opts: { offset?: number; limit?: number; unread?: boolean }
 ) {
-  await seedExampleMessages(db, userId)
-
   const offset = opts.offset ?? 0
   const limit = opts.limit ?? 20
 
