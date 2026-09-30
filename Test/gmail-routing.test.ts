@@ -134,6 +134,10 @@ const repoSource = await readFile(
   'utf8'
 )
 const editorSource = await readFile('apps/web/src/features/agents/AgentEditor.tsx', 'utf8')
+const toolRegistrySource = await readFile(
+  'apps/web/src/features/agents/available-tools.ts',
+  'utf8'
+)
 
 test('store reads real server state instead of a local toggle', () => {
   assert.match(storeSource, /getGmailStatus/)
@@ -150,8 +154,20 @@ test('connecting leaves the app for Google, it does not fake a connection', () =
 
 test('editor reflects real connection state and still enables the tool', () => {
   assert.match(editorSource, /useIntegrationsStore/)
-  assert.match(editorSource, /Connected: \$\{gmailEmail \?\? 'Gmail'\}/)
+  assert.match(toolRegistrySource, /Connected: \$\{connectedEmail \?\? GMAIL_PROVIDER_LABEL\}/)
   assert.match(editorSource, /if \(!enabled\) toggleTool\(tool\.id\)/)
+})
+
+test('editor never hardcodes a provider string when gating the connect button', () => {
+  assert.match(editorSource, /!isGmailOAuthTool\(tool\)/)
+  assert.ok(
+    !/oauthProvider !==\s*'gmail'/.test(editorSource),
+    "a raw 'gmail' comparison is what silently disabled the Connect Gmail button"
+  )
+  assert.ok(
+    !/oauthProvider !==\s*'gmail'/.test(toolRegistrySource),
+    'the gate must compare against the exported constant, not a literal'
+  )
 })
 
 test('callback result is read from the hash, not location.search (HashRouter)', () => {

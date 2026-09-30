@@ -11,6 +11,13 @@ import { Modal } from '../../global/ui/Modal'
 import { Button } from '../../global/ui/Button'
 import { Field, Input } from '../../global/ui/Field'
 import { MarkdownEditor } from '../../global/ui/MarkdownEditor'
+import {
+  AVAILABLE_TOOLS,
+  CATEGORY_LABELS,
+  CATEGORY_ORDER,
+  getGmailButtonLabel,
+  isGmailOAuthTool,
+} from './available-tools'
 
 type AgentEditorProps = {
   open: boolean
@@ -32,43 +39,6 @@ const PREFERENCE_SUGGESTIONS = [
 ]
 
 const ROLES = ['Coach', 'Reminder', 'Tracker', 'Listener', 'Nagger', 'Summarizer', 'Curator', 'Planner']
-
-type ToolCategory = 'data' | 'communication' | 'productivity' | 'ai'
-
-type ToolDef = {
-  id: string
-  name: string
-  description: string
-  category: ToolCategory
-  requiresOAuth?: boolean
-  oauthProvider?: string
-}
-
-const AVAILABLE_TOOLS: ToolDef[] = [
-  { id: 'email_read', name: 'Read Emails', description: 'Read emails from your inbox', category: 'data', requiresOAuth: true, oauthProvider: 'Gmail' },
-  { id: 'email_send', name: 'Send Emails', description: 'Send emails on your behalf', category: 'communication', requiresOAuth: true, oauthProvider: 'Gmail' },
-  { id: 'web_fetch', name: 'Web Fetch', description: 'Fetch and read web page content', category: 'data' },
-  { id: 'news_read', name: 'Read News', description: 'Read latest news articles', category: 'data' },
-  { id: 'job_search', name: 'Job Search', description: 'Search for job listings', category: 'data' },
-  { id: 'notes_read', name: 'Read Notes', description: 'Read your notes', category: 'data' },
-  { id: 'calendar_read', name: 'Read Calendar', description: 'Read calendar events', category: 'productivity' },
-  { id: 'diary_read', name: 'Read Diary', description: 'Read diary entries', category: 'data' },
-  { id: 'note_write', name: 'Write Note', description: 'Create or update notes', category: 'productivity' },
-  { id: 'calendar_write', name: 'Write Calendar', description: 'Create or update calendar events', category: 'productivity' },
-  { id: 'task_move', name: 'Move Task', description: 'Move tasks between columns', category: 'productivity' },
-  { id: 'message_inbox', name: 'Message Inbox', description: 'Check agent message inbox', category: 'communication' },
-  { id: 'summarize', name: 'Summarize', description: 'Summarize content using AI', category: 'ai' },
-  { id: 'classify', name: 'Classify', description: 'Classify content using AI', category: 'ai' },
-]
-
-const CATEGORY_LABELS: Record<ToolCategory, string> = {
-  data: 'Data',
-  communication: 'Communication',
-  productivity: 'Productivity',
-  ai: 'AI & Generation',
-}
-
-const CATEGORY_ORDER: ToolCategory[] = ['data', 'communication', 'productivity', 'ai']
 
 const OUTPUT_OPTIONS = ['message', 'note', 'email'] as const
 
@@ -316,10 +286,10 @@ export function AgentEditor({ open, initial, template, onClose, onSave }: AgentE
                               variant="ghost"
                               size="sm"
                               disabled={
-                                isGmailLoading || isGmailConnecting || tool.oauthProvider !== 'gmail'
+                                isGmailLoading || isGmailConnecting || !isGmailOAuthTool(tool)
                               }
                               onClick={() => {
-                                if (tool.oauthProvider !== 'gmail') return
+                                if (!isGmailOAuthTool(tool)) return
                                 if (isGmailConnected) {
                                   if (enabled) toggleTool(tool.id)
                                   void handleDisconnectGmail()
@@ -329,13 +299,12 @@ export function AgentEditor({ open, initial, template, onClose, onSave }: AgentE
                                 }
                               }}
                             >
-                              {tool.oauthProvider !== 'gmail'
-                                ? `Connect ${tool.oauthProvider}`
-                                : isGmailConnected
-                                  ? `Connected: ${gmailEmail ?? 'Gmail'}`
-                                  : isGmailConnecting
-                                    ? 'Connecting...'
-                                    : 'Connect Gmail'}
+                              {getGmailButtonLabel(
+                                tool,
+                                isGmailConnected,
+                                gmailEmail,
+                                isGmailConnecting
+                              )}
                             </Button>
                           ) : (
                             <button
