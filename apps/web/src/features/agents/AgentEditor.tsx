@@ -85,6 +85,14 @@ export function AgentEditor({ open, initial, template, onClose, onSave }: AgentE
     if (!hashQuery) return
     const outcome = new URLSearchParams(hashQuery).get('gmail')
     if (!outcome) return
+    // Drop the param before awaiting anything: this component is remounted every
+    // time an agent is opened or saved, and a leftover ?gmail= would re-toast on
+    // each remount and on every Inbox -> Agents navigation.
+    window.history.replaceState(
+      null,
+      '',
+      `${window.location.pathname}${window.location.search}#${window.location.hash.split('?')[0]}`
+    )
     await refreshGmail()
     const title =
       outcome === 'connected'
