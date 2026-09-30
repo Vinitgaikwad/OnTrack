@@ -15,6 +15,7 @@ import { fetchNewsForAgent } from './news.service'
 import { fetchRecentEmails } from './gmail.service'
 import { getGmailAccessToken } from './integrations.service'
 import { createMessage } from './messages.service'
+import { resolveOutputDestination, type OutputDestination } from '../lib/output-destination'
 
 const DAILY_RUN_LIMIT = 50
 
@@ -68,6 +69,20 @@ async function gatherContext(
   return result
 }
 
+/**
+ * Persist a run's output on the surface the agent's `output` column names.
+ *
+ * The returned `destination` is derived from the same value that picked the
+ * write, so the caller can never be told "inbox" for a diary entry.
+ *
+ * @param db - Prisma client used for the write
+ * @param userId - Owner of the output
+ * @param agentId - Agent the output belongs to
+ * @param outputType - The agent's `output` column
+ * @param aiText - Output text to store
+ * @param agentName - Agent name, used in the note title
+ * @returns The stored record and its destination, or null for an unknown output type
+ */
 async function formatOutput(
   db: PrismaClient,
   userId: string,
@@ -75,13 +90,15 @@ async function formatOutput(
   outputType: string,
   aiText: string,
   agentName: string
-): Promise<{ id: string; title: string; body: string } | null> {
-  if (outputType === 'message' || outputType === 'email') {
+): Promise<{ destination: OutputDestination; id: string; title: string; body: string } | null> {
+  const destination = resolveOutputDestination(outputType)
+
+  if (destination === 'inbox') {
     const message = await createMessage(db, userId, agentId, `${agentName} output`, aiText)
-    return { id: message.id, title: message.title, body: message.body }
+    return { destination, id: message.id, title: message.title, body: message.body }
   }
 
-  if (outputType === 'note') {
+  if (destination === 'diary') {
     const today = new Date().toISOString().slice(0, 10)
     const entry = await db.diaryEntry.create({
       data: {
@@ -95,6 +112,7 @@ async function formatOutput(
       },
     })
     return {
+      destination,
       id: entry.id,
       title: `${agentName} — ${today}`,
       body: aiText,
@@ -107,6 +125,8 @@ async function formatOutput(
 export type RunResult = {
   runId: string
   status: 'success' | 'failed'
+  /** Where the output was written. Never inferred from `message` being present. */
+  destination: OutputDestination
   message?: { id: string; title: string; body: string }
   pendingActions?: PendingAction[]
   sideEffects?: Array<{
@@ -243,6 +263,7 @@ export async function runAgent(
       return {
         runId: run.id,
         status: 'success',
+        destination: resolveOutputDestination(agent.output),
         ...(noticeId ? { message: noticeId } : {}),
         tokensUsed: 0,
         durationMs: Date.now() - started,
@@ -303,6 +324,7 @@ export async function runAgent(
     return {
       runId: run.id,
       status: 'success',
+      destination: resolveOutputDestination(agent.output),
       ...(messageId
         ? { message: { id: messageId.id, title: messageId.title, body: messageId.body } }
         : {}),
@@ -325,6 +347,7 @@ export async function runAgent(
     return {
       runId: run.id,
       status: 'failed',
+      destination: 'none',
       tokensUsed: 0,
       durationMs: Date.now() - started,
       error: errorMsg,
