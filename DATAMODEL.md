@@ -184,7 +184,7 @@ fetch). Definitions live in `seed.service.ts` (`DEFAULT_AGENTS`, `seedDefaultAge
 | `AgentTool`    | `id, agentId, toolName, enabled, config?`                                                                                   | per-agent tool row; `toolName` ∈ registry (14 tools) |
 | `ModelKey`     | `id, provider, label, defaultModel, baseUrl?, createdAt`                                                                    | **`apiKeyEnc` never leaves the server** (AES-256-GCM, `MODEL_KEY_ENCRYPTION_KEY`); POST live-validates against **that key's own provider** (free endpoint) and stores the resolved `baseUrl` |
 | `AgentMessage` | `id, agentId, title, body (markdown), read, createdAt`                                                                      | inbox; delivery target of every run that outputs `message`/`email` |
-| `AgentRun`     | via `GET /api/agents/:id/runs` → `{ runId, status, message?, sideEffects?, tokensUsed, durationMs, error?, startedAt }`   | audit log; snapshots/`toolCalls` stored on the row but not returned by the list |
+| `AgentRun`     | via `GET /api/agents/:id/runs` → `AgentRunDto { runId, status, message?, sideEffects?, tokensUsed, durationMs, error?, startedAt }` | audit log; `message` is the flat `outputSnap` string here, **not** the output record — snapshots/`toolCalls` stored on the row but not returned by the list |
 | `IntegrationAccount` | `id, provider ("gmail"), email?, scope[], tokenEnc, tokenExpiry?`                                                       | tokens AES-256-GCM (`INTEGRATION_ENCRYPTION_KEY`), `gmail.readonly` scope |
 
 **Security model:** `email_read` requires a connected Gmail `IntegrationAccount`
@@ -557,6 +557,7 @@ type ActionItem = {
 type RunResult = {
   runId: string
   status: 'success' | 'failed'
+  destination: 'inbox' | 'diary' | 'none' // where output was written; derived from Agent.output, never inferred from message
   message?: { id: string; title: string; body: string }
   pendingActions?: ActionItem[] // parsed from [TASK]/[EVENT]/[NOTE] lines in the LLM output; user approves before /api/agents/actions creates them
   sideEffects?: Array<{ kind: 'note'|'calendar'|'email'; status: 'created'|'drafted'|'blocked'; title?: string; id?: string }>
@@ -564,6 +565,11 @@ type RunResult = {
   durationMs: number
   error?: string
 }
+```
+
+`destination` exists because `message` is populated for **both** inbox writes and diary
+writes, so its presence cannot identify the surface. The run toast reads `destination`
+to decide between the inbox and diary surfaces.
 ```
 
 ### Templates / tools / messages (implemented)

@@ -120,7 +120,15 @@ export function AgentsPage() {
         })
         return
       }
-      if (result.message) {
+      if (result.destination === 'diary') {
+        pushToast({
+          title: `${agent.name} finished`,
+          message: 'Saved to your diary, not the inbox.',
+          level: 'info',
+        })
+        return
+      }
+      if (result.destination === 'inbox' && result.message) {
         pushToast({
           title: `${agent.name} finished`,
           message: 'Output added to your inbox.',
@@ -131,7 +139,7 @@ export function AgentsPage() {
       }
       pushToast({
         title: `${agent.name} finished`,
-        message: 'No inbox message and nothing to approve — this agent sends output to the diary, or had no data to work with.',
+        message: 'Ran successfully but produced nothing to save, and there is nothing to approve.',
         level: 'info',
       })
     } catch {

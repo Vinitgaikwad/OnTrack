@@ -13,6 +13,7 @@ import {
   type AgentActionItem,
   type CreateAgentInput,
   type RunResultDto,
+  type OutputDestination,
 } from '../repositories/agents.repository'
 import {
   listTemplates as listTemplatesReq,
@@ -73,7 +74,8 @@ export type AgentTemplate = {
 export type RunResult = {
   runId: string
   status: string
-  message?: string
+  destination: OutputDestination
+  message?: { id: string; title: string; body: string }
   pendingActions?: AgentActionItem[]
   sideEffects?: string[]
   tokensUsed: number
@@ -290,6 +292,7 @@ export const useAgentsStore = create<AgentsStore>()(
           return {
             runId: result.runId,
             status: result.status,
+            destination: result.destination ?? 'none',
             message: result.message,
             pendingActions: result.pendingActions,
             sideEffects: result.sideEffects,

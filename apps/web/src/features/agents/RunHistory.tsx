@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ChevronDown, ChevronUp, CheckCircle2, XCircle, Loader2 } from 'lucide-react'
-import { listRuns, type RunResultDto } from '../../global/repositories/agents.repository'
+import { listRuns, type AgentRunDto } from '../../global/repositories/agents.repository'
 
 type RunHistoryProps = {
   agentId: string
@@ -28,7 +28,7 @@ function formatDuration(ms: number): string {
 }
 
 export function RunHistory({ agentId }: RunHistoryProps) {
-  const [runs, setRuns] = useState<RunResultDto[]>([])
+  const [runs, setRuns] = useState<AgentRunDto[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)

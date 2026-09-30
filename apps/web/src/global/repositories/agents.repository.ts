@@ -56,10 +56,38 @@ export type AgentActionItem = {
   note?: string
 }
 
+/**
+ * One row of an agent's run history.
+ *
+ * Distinct from {@link RunResultDto}: the list endpoint flattens the output
+ * snapshot to a `message` string and adds `startedAt`, so the two shapes cannot
+ * share one type.
+ */
+export type AgentRunDto = {
+  runId: string
+  status: string
+  /** The `outputSnap` text, not an output record. */
+  message?: string
+  sideEffects?: string[]
+  tokensUsed: number
+  durationMs: number
+  error?: string
+  startedAt: string
+}
+
+/**
+ * Where a run's output was written.
+ *
+ * Mirrors the backend `OutputDestination`. Never infer this from `message` being
+ * present — a diary entry also produces a message object.
+ */
+export type OutputDestination = 'inbox' | 'diary' | 'none'
+
 export type RunResultDto = {
   runId: string
   status: string
-  message?: string
+  destination?: OutputDestination
+  message?: { id: string; title: string; body: string }
   pendingActions?: AgentActionItem[]
   sideEffects?: string[]
   tokensUsed: number
@@ -113,11 +141,11 @@ export async function confirmActionItems(items: AgentActionItem[]): Promise<Conf
   })
 }
 
-export async function listRuns(agentId: string, limit?: number): Promise<RunResultDto[]> {
+export async function listRuns(agentId: string, limit?: number): Promise<AgentRunDto[]> {
   const params = new URLSearchParams()
   if (limit !== undefined) params.set('limit', String(limit))
   const qs = params.toString() ? `?${params.toString()}` : ''
-  return api<RunResultDto[]>(`/api/agents/${encodeURIComponent(agentId)}/runs${qs}`)
+  return api<AgentRunDto[]>(`/api/agents/${encodeURIComponent(agentId)}/runs${qs}`)
 }
 
 export async function listAgentTools(agentId: string): Promise<AgentToolDto[]> {
