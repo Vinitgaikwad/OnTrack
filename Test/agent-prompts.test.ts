@@ -14,7 +14,7 @@ const agent = {
   description: '## Mission\nSummarize emails.',
   prompt: null as string | null,
   sources: [] as string[],
-  output: 'message',
+  output: ['message'] as string[],
   preferences: ['Keeps it short'] as string[],
 }
 
@@ -196,7 +196,25 @@ test('buildSystemPrompt includes description, role, preferences and output', () 
   assert.match(out, /Email assistant/)
   assert.match(out, /Summarize emails\./)
   assert.match(out, /Keeps it short/)
-  assert.match(out, /Output format: message/)
+  assert.match(out, /delivered to: message/)
+})
+
+test('buildSystemPrompt names every selected destination', () => {
+  const out = buildSystemPrompt({ ...agent, output: ['message', 'calendar', 'note'] })
+  assert.match(out, /delivered to: message, calendar, note/)
+})
+
+test('a calendar destination tells the model the date is what creates the entry', () => {
+  // The calendar write only happens for an [EVENT] line carrying a date, so the
+  // model has to know that or the destination silently produces nothing.
+  const out = buildSystemPrompt({ ...agent, output: ['calendar'] })
+  assert.match(out, /\[EVENT\] line carrying that date/)
+  assert.match(out, /never write it as prose/)
+})
+
+test('a non-calendar destination does not ask for dated event lines', () => {
+  const out = buildSystemPrompt({ ...agent, output: ['message'] })
+  assert.doesNotMatch(out, /\[EVENT\] line carrying that date/)
 })
 
 test('buildSystemPrompt does not duplicate the description when it is also the prompt', () => {

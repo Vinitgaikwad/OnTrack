@@ -1,4 +1,4 @@
-import type { Prisma, PrismaClient } from '../generated/prisma/client'
+import type { AgentOutputType, Prisma, PrismaClient } from '../generated/prisma/client'
 import { AppError } from '../lib/http'
 import { seedDefaultAgents } from './seed.service'
 
@@ -42,7 +42,7 @@ export async function createAgent(
     templateId?: string
     prompt?: string
     sources?: string[]
-    output?: 'message' | 'note' | 'email'
+    output?: AgentOutputType[]
     draftOnly?: boolean
     modelKeyId?: string | null
     maxTokens?: number
@@ -51,7 +51,7 @@ export async function createAgent(
   let role = input.role
   let prompt = input.prompt ?? null
   let sources = input.sources ?? []
-  let output = input.output ?? 'message'
+  let output = input.output ?? []
   let defaultTools: string[] = []
 
   if (input.templateId) {
@@ -60,9 +60,13 @@ export async function createAgent(
     role = role || template.defaultRole
     prompt = prompt || template.defaultPrompt
     sources = sources.length > 0 ? sources : template.defaultSources
-    output = output || template.defaultOutput
+    if (output.length === 0) output = template.defaultOutput
     defaultTools = template.defaultTools
   }
+
+  // An agent with no destination would silently drop every run's output, so the
+  // inbox is the floor rather than "write nowhere".
+  if (output.length === 0) output = ['message']
 
   return db.$transaction(async (tx) => {
     const agent = await tx.agent.create({
@@ -112,13 +116,17 @@ export async function updateAgent(
     preferences?: string[]
     prompt?: string
     sources?: string[]
-    output?: 'message' | 'note' | 'email'
+    output?: AgentOutputType[]
     draftOnly?: boolean
     modelKeyId?: string | null
     maxTokens?: number
   }
 ) {
   await findOwnedAgent(db, userId, agentId)
+  // Reject an empty set explicitly: it would make every future run a silent no-op.
+  if (patch.output !== undefined && patch.output.length === 0) {
+    throw new AppError('VALIDATION', 'Pick at least one place to deliver output.', 400)
+  }
   return db.agent.update({
     where: { id: agentId },
     data: patch,

@@ -179,11 +179,11 @@ fetch). Definitions live in `seed.service.ts` (`DEFAULT_AGENTS`, `seedDefaultAge
 
 | Entity        | Source fields (JSON, camelCase)                                                                                              | Notes |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------- | ----- |
-| `Agent`       | `id, name, role, icon, color, description, preferences[], enabled, templateId?, triggerType, sources[], output, prompt?, draftOnly, modelKeyId?, maxTokens, lastRunAt?, runCount, createdAt, updatedAt, tools?[]` | `triggerType`/`schedule`/`timezone` reserved for v3; `output` ∈ `message\|note\|email`; **`description` is a Markdown doc and is what the runner sends to the LLM as system instructions** (replaces `prompt`, retained for legacy only); creating from a template copies `defaultRole` and seeds `defaultPrompt` into the editable `description` + `AgentTool` rows |
+| `Agent`       | `id, name, role, icon, color, description, preferences[], enabled, templateId?, triggerType, sources[], output[], prompt?, draftOnly, modelKeyId?, maxTokens, lastRunAt?, runCount, createdAt, updatedAt, tools?[]` | `triggerType`/`schedule`/`timezone` reserved for v3; **`output` is a SET of destinations** (`message\|note\|calendar`, non-empty), so one run writes to every selected surface — see "Output destinations" below; **`description` is a Markdown doc and is what the runner sends to the LLM as system instructions** (replaces `prompt`, retained for legacy only); creating from a template copies `defaultRole` and seeds `defaultPrompt` into the editable `description` + `AgentTool` rows |
 | `AgentTemplate` | `id, slug, name, description, category, icon, requiresOAuth?, defaultRole, defaultPrompt, defaultSources[], defaultTools[], defaultOutput, configSchema?, sortOrder` | 3 seeded: `email-summarizer`, `job-tracker`, `news-provider` (upserted on first `/api/templates` hit) |
 | `AgentTool`    | `id, agentId, toolName, enabled, config?`                                                                                   | per-agent tool row; `toolName` ∈ registry (14 tools) |
 | `ModelKey`     | `id, provider, label, defaultModel, baseUrl?, createdAt`                                                                    | **`apiKeyEnc` never leaves the server** (AES-256-GCM, `MODEL_KEY_ENCRYPTION_KEY`); POST live-validates against **that key's own provider** (free endpoint) and stores the resolved `baseUrl` |
-| `AgentMessage` | `id, agentId, title, body (markdown), read, createdAt`                                                                      | inbox; delivery target of every run that outputs `message`/`email` |
+| `AgentMessage` | `id, agentId, title, body (markdown), read, createdAt`                                                                      | inbox; delivery target of every run whose `output` includes `message` |
 | `AgentRun`     | via `GET /api/agents/:id/runs` → `AgentRunDto { runId, status, message?, sideEffects?, tokensUsed, durationMs, error?, startedAt }` | audit log; `message` is the flat `outputSnap` string here, **not** the output record — snapshots/`toolCalls` stored on the row but not returned by the list |
 | `IntegrationAccount` | `id, provider ("gmail"), email?, scope[], tokenEnc, tokenExpiry?`                                                       | tokens AES-256-GCM (`INTEGRATION_ENCRYPTION_KEY`), `gmail.readonly` scope |
 
@@ -325,7 +325,7 @@ model Agent {
   schedule     String?                            // reserved (v3+)
   timezone     String           @default("UTC")   // reserved (v3+)
   sources      String[]         @default([])
-  output       AgentOutputType  @default(message)
+  output       AgentOutputType[] @default([message])  // set of destinations; see "Output destinations"
   prompt       String?
   draftOnly    Boolean          @default(true)
   modelKeyId   String?
@@ -343,7 +343,7 @@ model Agent {
 }
 
 enum AgentTriggerType { manual schedule }
-enum AgentOutputType  { message note email }
+enum AgentOutputType  { message note calendar }  // `email` retired — it resolved to the inbox anyway
 
 model AgentTemplate {
   id             String           @id @default(cuid())
@@ -357,7 +357,7 @@ model AgentTemplate {
   defaultPrompt  String
   defaultSources String[]         @default([])
   defaultTools   String[]         @default([])
-  defaultOutput  AgentOutputType  @default(message)
+  defaultOutput  AgentOutputType[] @default([message])
   configSchema   Json?
   sortOrder      Int              @default(0)
   createdAt      DateTime         @default(now())
@@ -534,7 +534,7 @@ Validation: `date` `YYYY-MM-DD`, `month` `YYYY-MM`, `mood` ∈ `great|good|okay|
 | Method | Path                    | Body / Query                 | Returns                                   |
 | ------ | ----------------------- | ---------------------------- | ----------------------------------------- |
 | GET    | `/api/agents`           | —                            | `{ data: Agent[] }` (tools included)      |
-| POST   | `/api/agents`           | `{ name, role, icon, color, description, preferences?, templateId?, prompt?, sources?, output?, draftOnly?, modelKeyId?, maxTokens? }` | `201 { data: Agent }` (template defaults + `AgentTool` rows applied when `templateId` set) |
+| POST   | `/api/agents`           | `{ name, role, icon, color, description, preferences?, templateId?, prompt?, sources?, output?, draftOnly?, modelKeyId?, maxTokens? }` | `201 { data: Agent }` (template defaults + `AgentTool` rows applied when `templateId` set; `output` is a non-empty `OutputType[]`, defaulting to `['message']`) |
 | GET    | `/api/agents/:id`       | —                            | `{ data: Agent }`                         |
 | PATCH  | `/api/agents/:id`       | any subset of the above      | `{ data: Agent }` (at least one field)    |
 | DELETE | `/api/agents/:id`       | —                            | `204` (cascades runs/messages/tools)      |
@@ -557,9 +557,14 @@ type ActionItem = {
 type RunResult = {
   runId: string
   status: 'success' | 'failed'
-  destination: 'inbox' | 'diary' | 'none' // where output was written; derived from Agent.output, never inferred from message
-  message?: { id: string; title: string; body: string }
-  pendingActions?: ActionItem[] // parsed from [TASK]/[EVENT]/[NOTE] lines in the LLM output; user approves before /api/agents/actions creates them
+  destinations: Array<'inbox' | 'notes' | 'calendar'> // configured on the agent, in write order
+  output: Array<{                          // one entry per row written, across all destinations
+    destination: 'inbox' | 'notes' | 'calendar' // the surface it ACTUALLY landed on
+    id: string
+    title: string
+    fallbackFrom?: 'inbox' | 'notes' | 'calendar' // set when it stands in for another destination
+  }>
+  pendingActions?: ActionItem[] // [TASK]/[EVENT]/[NOTE] lines NOT already written by a destination; user approves before /api/agents/actions creates them
   sideEffects?: Array<{ kind: 'note'|'calendar'|'email'; status: 'created'|'drafted'|'blocked'; title?: string; id?: string }>
   tokensUsed: number
   durationMs: number
@@ -567,10 +572,43 @@ type RunResult = {
 }
 ```
 
-`destination` exists because `message` is populated for **both** inbox writes and diary
-writes, so its presence cannot identify the surface. The run toast reads `destination`
-to decide between the inbox and diary surfaces.
-```
+`output[].destination` is reported per row rather than once per run because a run can
+write several surfaces, and the calendar destination does not always produce a calendar
+row. `RunResult` has no `message` field: a single object could not say which surface it
+belonged to, which is what previously let the toast announce a note as an inbox message.
+
+### Output destinations
+
+`Agent.output` and `AgentTemplate.defaultOutput` are **`AgentOutputType[]`**, non-empty.
+An agent configured `['message', 'calendar']` writes both on every run. Each type maps to
+exactly one surface (`resolveOutputDestinations` in `apps/backend/src/lib/output-destination.ts`,
+which also dedupes and fixes the write order `inbox → notes → calendar`):
+
+| `output` value | Destination  | Row created                             | Entity         |
+| -------------- | ------------ | --------------------------------------- | -------------- |
+| `message`      | `inbox`      | `${agentName} output`                   | `AgentMessage` |
+| `note`         | `notes`      | first line of output as the card title  | `Task`         |
+| `calendar`     | `calendar`   | one `Appointment` per dated `[EVENT]`   | `Appointment`  |
+
+`email` was retired: it resolved to the inbox anyway, so the migration maps existing
+`email` agents to `['message']` and no agent loses a delivery surface.
+
+Two rules keep a multi-destination run honest:
+
+- **Calendar without a date writes a note.** An `Appointment` needs a `date`, and the
+  only source of one is an `[EVENT]` line carrying `YYYY-MM-DD`. With no dated event the
+  calendar destination writes a `Task` instead and flags `fallbackFrom: 'calendar'`, so
+  the toast says "Notes" rather than claiming a calendar entry exists. When the `note`
+  destination already wrote the same text, it does not write a second copy.
+- **Dated events are withheld from `pendingActions`.** Otherwise the approval modal would
+  let the user approve the same `[EVENT]` line the calendar already wrote, creating a
+  duplicate appointment.
+
+Because `calendar` depends entirely on the model emitting a dated `[EVENT]` line,
+`buildSystemPrompt` adds an explicit instruction to do so whenever `calendar` is selected.
+Unknown or unset types are dropped rather than guessed; an agent whose set is empty is
+rejected by both the Zod body schema (`outputSchema`, `.min(1)`) and `updateAgent`, and
+creation falls back to `['message']` rather than storing a set that discards every run.
 
 ### Templates / tools / messages (implemented)
 

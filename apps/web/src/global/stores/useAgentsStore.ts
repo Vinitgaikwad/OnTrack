@@ -12,16 +12,21 @@ import {
   type AgentToolDto,
   type AgentActionItem,
   type CreateAgentInput,
-  type RunResultDto,
   type OutputDestination,
+  type OutputType,
+  type RunOutputRecord,
+  type RunResultDto,
 } from '../repositories/agents.repository'
+
+export type { OutputDestination } from '../repositories/agents.repository'
 import {
   listTemplates as listTemplatesReq,
   type AgentTemplateDto,
 } from '../repositories/templates.repository'
 import { useToastStore } from './useToastStore'
 import { useAgentMessagesStore } from './useAgentMessagesStore'
-import { useDiaryStore } from './useDiaryStore'
+import { useCalendarStore } from './useCalendarStore'
+import { useNotesStore } from './useNotesStore'
 
 export type Agent = {
   id: string
@@ -35,7 +40,8 @@ export type Agent = {
   enabled: boolean
   triggerType: 'manual' | 'schedule'
   sources: string[]
-  output: 'message' | 'note' | 'email'
+  /** Every selected destination. Never empty — an agent with none would drop all output. */
+  output: OutputType[]
   draftOnly: boolean
   modelKeyId?: string | null
   maxTokens: number
@@ -66,7 +72,7 @@ export type AgentTemplate = {
   defaultPrompt: string
   defaultSources: string[]
   defaultTools: string[]
-  defaultOutput: 'message' | 'note' | 'email'
+  defaultOutput: OutputType[]
   configSchema?: Record<string, unknown> | null
   sortOrder: number
 }
@@ -74,8 +80,10 @@ export type AgentTemplate = {
 export type RunResult = {
   runId: string
   status: string
-  destination: OutputDestination
-  message?: { id: string; title: string; body: string }
+  /** Destinations configured on the agent, in write order. */
+  destinations: OutputDestination[]
+  /** One entry per row written, across all destinations. */
+  output: RunOutputRecord[]
   pendingActions?: AgentActionItem[]
   sideEffects?: string[]
   tokensUsed: number
@@ -214,7 +222,7 @@ export const useAgentsStore = create<AgentsStore>()(
           enabled: true,
           triggerType: 'manual',
           sources: input.sources ?? [],
-          output: input.output ?? 'message',
+          output: input.output ?? ['message'],
           draftOnly: input.draftOnly ?? false,
           modelKeyId: input.modelKeyId ?? null,
           maxTokens: input.maxTokens ?? 4096,
@@ -282,18 +290,24 @@ export const useAgentsStore = create<AgentsStore>()(
           }))
 
           // The run wrote to the server but these stores short-circuit on
-          // loadStatus === 'loaded', so the inbox/diary kept showing stale
-          // data and the run looked like it produced nothing.
-          if (result.status === 'success') {
-            void useAgentMessagesStore.getState().refresh()
-            void useDiaryStore.getState().refresh()
+          // loadStatus === 'loaded', so the inbox/notes/calendar kept showing
+          // stale data and the run looked like it produced nothing. Each store is
+          // refreshed per reported destination rather than unconditionally.
+          const written = result.output ?? []
+          const touched = (destination: string) =>
+            written.some((record) => record.destination === destination)
+
+          if (result.status === 'success' && written.length > 0) {
+            if (touched('inbox')) void useAgentMessagesStore.getState().refresh()
+            if (touched('notes')) void useNotesStore.getState().refresh()
+            if (touched('calendar')) void useCalendarStore.getState().refresh()
           }
 
           return {
             runId: result.runId,
             status: result.status,
-            destination: result.destination ?? 'none',
-            message: result.message,
+            destinations: result.destinations ?? [],
+            output: written,
             pendingActions: result.pendingActions,
             sideEffects: result.sideEffects,
             tokensUsed: result.tokensUsed,

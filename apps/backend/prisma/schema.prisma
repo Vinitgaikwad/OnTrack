@@ -86,7 +86,7 @@ enum AgentTriggerType {
 enum AgentOutputType {
   message
   note
-  email
+  calendar
 }
 
 model Task {
@@ -155,7 +155,9 @@ model Agent {
   timezone    String           @default("UTC")
 
   sources     String[]         @default([])
-  output      AgentOutputType  @default(message)
+  /// Surfaces this agent's run output is written to. A set, not a single choice:
+  /// one run can land in several places at once.
+  output      AgentOutputType[] @default([message])
   prompt      String?
   draftOnly   Boolean          @default(true)
 
@@ -186,7 +188,7 @@ model AgentTemplate {
   defaultPrompt  String
   defaultSources String[]         @default([])
   defaultTools   String[]         @default([])
-  defaultOutput  AgentOutputType  @default(message)
+  defaultOutput  AgentOutputType[] @default([message])
   configSchema   Json?
   sortOrder      Int              @default(0)
   createdAt      DateTime         @default(now())

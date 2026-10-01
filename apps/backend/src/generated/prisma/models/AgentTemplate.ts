@@ -44,7 +44,6 @@ export type AgentTemplateMinAggregateOutputType = {
   requiresOAuth: string | null
   defaultRole: string | null
   defaultPrompt: string | null
-  defaultOutput: $Enums.AgentOutputType | null
   sortOrder: number | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -60,7 +59,6 @@ export type AgentTemplateMaxAggregateOutputType = {
   requiresOAuth: string | null
   defaultRole: string | null
   defaultPrompt: string | null
-  defaultOutput: $Enums.AgentOutputType | null
   sortOrder: number | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -105,7 +103,6 @@ export type AgentTemplateMinAggregateInputType = {
   requiresOAuth?: true
   defaultRole?: true
   defaultPrompt?: true
-  defaultOutput?: true
   sortOrder?: true
   createdAt?: true
   updatedAt?: true
@@ -121,7 +118,6 @@ export type AgentTemplateMaxAggregateInputType = {
   requiresOAuth?: true
   defaultRole?: true
   defaultPrompt?: true
-  defaultOutput?: true
   sortOrder?: true
   createdAt?: true
   updatedAt?: true
@@ -245,7 +241,7 @@ export type AgentTemplateGroupByOutputType = {
   defaultPrompt: string
   defaultSources: string[]
   defaultTools: string[]
-  defaultOutput: $Enums.AgentOutputType
+  defaultOutput: $Enums.AgentOutputType[]
   configSchema: runtime.JsonValue | null
   sortOrder: number
   createdAt: Date
@@ -287,7 +283,7 @@ export type AgentTemplateWhereInput = {
   defaultPrompt?: Prisma.StringFilter<"AgentTemplate"> | string
   defaultSources?: Prisma.StringNullableListFilter<"AgentTemplate">
   defaultTools?: Prisma.StringNullableListFilter<"AgentTemplate">
-  defaultOutput?: Prisma.EnumAgentOutputTypeFilter<"AgentTemplate"> | $Enums.AgentOutputType
+  defaultOutput?: Prisma.EnumAgentOutputTypeNullableListFilter<"AgentTemplate">
   configSchema?: Prisma.JsonNullableFilter<"AgentTemplate">
   sortOrder?: Prisma.IntFilter<"AgentTemplate"> | number
   createdAt?: Prisma.DateTimeFilter<"AgentTemplate"> | Date | string
@@ -330,7 +326,7 @@ export type AgentTemplateWhereUniqueInput = Prisma.AtLeast<{
   defaultPrompt?: Prisma.StringFilter<"AgentTemplate"> | string
   defaultSources?: Prisma.StringNullableListFilter<"AgentTemplate">
   defaultTools?: Prisma.StringNullableListFilter<"AgentTemplate">
-  defaultOutput?: Prisma.EnumAgentOutputTypeFilter<"AgentTemplate"> | $Enums.AgentOutputType
+  defaultOutput?: Prisma.EnumAgentOutputTypeNullableListFilter<"AgentTemplate">
   configSchema?: Prisma.JsonNullableFilter<"AgentTemplate">
   sortOrder?: Prisma.IntFilter<"AgentTemplate"> | number
   createdAt?: Prisma.DateTimeFilter<"AgentTemplate"> | Date | string
@@ -377,7 +373,7 @@ export type AgentTemplateScalarWhereWithAggregatesInput = {
   defaultPrompt?: Prisma.StringWithAggregatesFilter<"AgentTemplate"> | string
   defaultSources?: Prisma.StringNullableListFilter<"AgentTemplate">
   defaultTools?: Prisma.StringNullableListFilter<"AgentTemplate">
-  defaultOutput?: Prisma.EnumAgentOutputTypeWithAggregatesFilter<"AgentTemplate"> | $Enums.AgentOutputType
+  defaultOutput?: Prisma.EnumAgentOutputTypeNullableListFilter<"AgentTemplate">
   configSchema?: Prisma.JsonNullableWithAggregatesFilter<"AgentTemplate">
   sortOrder?: Prisma.IntWithAggregatesFilter<"AgentTemplate"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"AgentTemplate"> | Date | string
@@ -396,7 +392,7 @@ export type AgentTemplateCreateInput = {
   defaultPrompt: string
   defaultSources?: Prisma.AgentTemplateCreatedefaultSourcesInput | string[]
   defaultTools?: Prisma.AgentTemplateCreatedefaultToolsInput | string[]
-  defaultOutput?: $Enums.AgentOutputType
+  defaultOutput?: Prisma.AgentTemplateCreatedefaultOutputInput | $Enums.AgentOutputType[]
   configSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sortOrder?: number
   createdAt?: Date | string
@@ -416,7 +412,7 @@ export type AgentTemplateUncheckedCreateInput = {
   defaultPrompt: string
   defaultSources?: Prisma.AgentTemplateCreatedefaultSourcesInput | string[]
   defaultTools?: Prisma.AgentTemplateCreatedefaultToolsInput | string[]
-  defaultOutput?: $Enums.AgentOutputType
+  defaultOutput?: Prisma.AgentTemplateCreatedefaultOutputInput | $Enums.AgentOutputType[]
   configSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sortOrder?: number
   createdAt?: Date | string
@@ -436,7 +432,7 @@ export type AgentTemplateUpdateInput = {
   defaultPrompt?: Prisma.StringFieldUpdateOperationsInput | string
   defaultSources?: Prisma.AgentTemplateUpdatedefaultSourcesInput | string[]
   defaultTools?: Prisma.AgentTemplateUpdatedefaultToolsInput | string[]
-  defaultOutput?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  defaultOutput?: Prisma.AgentTemplateUpdatedefaultOutputInput | $Enums.AgentOutputType[]
   configSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -456,7 +452,7 @@ export type AgentTemplateUncheckedUpdateInput = {
   defaultPrompt?: Prisma.StringFieldUpdateOperationsInput | string
   defaultSources?: Prisma.AgentTemplateUpdatedefaultSourcesInput | string[]
   defaultTools?: Prisma.AgentTemplateUpdatedefaultToolsInput | string[]
-  defaultOutput?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  defaultOutput?: Prisma.AgentTemplateUpdatedefaultOutputInput | $Enums.AgentOutputType[]
   configSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -476,7 +472,7 @@ export type AgentTemplateCreateManyInput = {
   defaultPrompt: string
   defaultSources?: Prisma.AgentTemplateCreatedefaultSourcesInput | string[]
   defaultTools?: Prisma.AgentTemplateCreatedefaultToolsInput | string[]
-  defaultOutput?: $Enums.AgentOutputType
+  defaultOutput?: Prisma.AgentTemplateCreatedefaultOutputInput | $Enums.AgentOutputType[]
   configSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sortOrder?: number
   createdAt?: Date | string
@@ -495,7 +491,7 @@ export type AgentTemplateUpdateManyMutationInput = {
   defaultPrompt?: Prisma.StringFieldUpdateOperationsInput | string
   defaultSources?: Prisma.AgentTemplateUpdatedefaultSourcesInput | string[]
   defaultTools?: Prisma.AgentTemplateUpdatedefaultToolsInput | string[]
-  defaultOutput?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  defaultOutput?: Prisma.AgentTemplateUpdatedefaultOutputInput | $Enums.AgentOutputType[]
   configSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -514,7 +510,7 @@ export type AgentTemplateUncheckedUpdateManyInput = {
   defaultPrompt?: Prisma.StringFieldUpdateOperationsInput | string
   defaultSources?: Prisma.AgentTemplateUpdatedefaultSourcesInput | string[]
   defaultTools?: Prisma.AgentTemplateUpdatedefaultToolsInput | string[]
-  defaultOutput?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  defaultOutput?: Prisma.AgentTemplateUpdatedefaultOutputInput | $Enums.AgentOutputType[]
   configSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -559,7 +555,6 @@ export type AgentTemplateMaxOrderByAggregateInput = {
   requiresOAuth?: Prisma.SortOrder
   defaultRole?: Prisma.SortOrder
   defaultPrompt?: Prisma.SortOrder
-  defaultOutput?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -575,7 +570,6 @@ export type AgentTemplateMinOrderByAggregateInput = {
   requiresOAuth?: Prisma.SortOrder
   defaultRole?: Prisma.SortOrder
   defaultPrompt?: Prisma.SortOrder
-  defaultOutput?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -609,6 +603,10 @@ export type AgentTemplateCreatedefaultToolsInput = {
   set: string[]
 }
 
+export type AgentTemplateCreatedefaultOutputInput = {
+  set: $Enums.AgentOutputType[]
+}
+
 export type AgentTemplateUpdatedefaultSourcesInput = {
   set?: string[]
   push?: string | string[]
@@ -617,6 +615,11 @@ export type AgentTemplateUpdatedefaultSourcesInput = {
 export type AgentTemplateUpdatedefaultToolsInput = {
   set?: string[]
   push?: string | string[]
+}
+
+export type AgentTemplateUpdatedefaultOutputInput = {
+  set?: $Enums.AgentOutputType[]
+  push?: $Enums.AgentOutputType | $Enums.AgentOutputType[]
 }
 
 export type AgentTemplateCreateWithoutAgentsInput = {
@@ -631,7 +634,7 @@ export type AgentTemplateCreateWithoutAgentsInput = {
   defaultPrompt: string
   defaultSources?: Prisma.AgentTemplateCreatedefaultSourcesInput | string[]
   defaultTools?: Prisma.AgentTemplateCreatedefaultToolsInput | string[]
-  defaultOutput?: $Enums.AgentOutputType
+  defaultOutput?: Prisma.AgentTemplateCreatedefaultOutputInput | $Enums.AgentOutputType[]
   configSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sortOrder?: number
   createdAt?: Date | string
@@ -650,7 +653,7 @@ export type AgentTemplateUncheckedCreateWithoutAgentsInput = {
   defaultPrompt: string
   defaultSources?: Prisma.AgentTemplateCreatedefaultSourcesInput | string[]
   defaultTools?: Prisma.AgentTemplateCreatedefaultToolsInput | string[]
-  defaultOutput?: $Enums.AgentOutputType
+  defaultOutput?: Prisma.AgentTemplateCreatedefaultOutputInput | $Enums.AgentOutputType[]
   configSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sortOrder?: number
   createdAt?: Date | string
@@ -685,7 +688,7 @@ export type AgentTemplateUpdateWithoutAgentsInput = {
   defaultPrompt?: Prisma.StringFieldUpdateOperationsInput | string
   defaultSources?: Prisma.AgentTemplateUpdatedefaultSourcesInput | string[]
   defaultTools?: Prisma.AgentTemplateUpdatedefaultToolsInput | string[]
-  defaultOutput?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  defaultOutput?: Prisma.AgentTemplateUpdatedefaultOutputInput | $Enums.AgentOutputType[]
   configSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -704,7 +707,7 @@ export type AgentTemplateUncheckedUpdateWithoutAgentsInput = {
   defaultPrompt?: Prisma.StringFieldUpdateOperationsInput | string
   defaultSources?: Prisma.AgentTemplateUpdatedefaultSourcesInput | string[]
   defaultTools?: Prisma.AgentTemplateUpdatedefaultToolsInput | string[]
-  defaultOutput?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  defaultOutput?: Prisma.AgentTemplateUpdatedefaultOutputInput | $Enums.AgentOutputType[]
   configSchema?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -845,7 +848,7 @@ export type $AgentTemplatePayload<ExtArgs extends runtime.Types.Extensions.Inter
     defaultPrompt: string
     defaultSources: string[]
     defaultTools: string[]
-    defaultOutput: $Enums.AgentOutputType
+    defaultOutput: $Enums.AgentOutputType[]
     configSchema: runtime.JsonValue | null
     sortOrder: number
     createdAt: Date
@@ -1285,7 +1288,7 @@ export interface AgentTemplateFieldRefs {
   readonly defaultPrompt: Prisma.FieldRef<"AgentTemplate", 'String'>
   readonly defaultSources: Prisma.FieldRef<"AgentTemplate", 'String[]'>
   readonly defaultTools: Prisma.FieldRef<"AgentTemplate", 'String[]'>
-  readonly defaultOutput: Prisma.FieldRef<"AgentTemplate", 'AgentOutputType'>
+  readonly defaultOutput: Prisma.FieldRef<"AgentTemplate", 'AgentOutputType[]'>
   readonly configSchema: Prisma.FieldRef<"AgentTemplate", 'Json'>
   readonly sortOrder: Prisma.FieldRef<"AgentTemplate", 'Int'>
   readonly createdAt: Prisma.FieldRef<"AgentTemplate", 'DateTime'>

@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { Check, ChevronDown } from 'lucide-react'
 import type { Agent, AgentTemplate } from '../../global/stores/useAgentsStore'
 import { useAgentsStore } from '../../global/stores/useAgentsStore'
+import type { OutputType } from '../../global/repositories/agents.repository'
+import { DestinationPicker } from './DestinationPicker'
 import { useModelKeysStore } from '../../global/stores/useModelKeysStore'
 import { useToastStore } from '../../global/stores/useToastStore'
 import { useIntegrationsStore } from '../../global/stores/useIntegrationsStore'
@@ -40,8 +42,6 @@ const PREFERENCE_SUGGESTIONS = [
 
 const ROLES = ['Coach', 'Reminder', 'Tracker', 'Listener', 'Nagger', 'Summarizer', 'Curator', 'Planner']
 
-const OUTPUT_OPTIONS = ['message', 'note', 'email'] as const
-
 export function AgentEditor({ open, initial, template, onClose, onSave }: AgentEditorProps) {
   const createAgent = useAgentsStore((state) => state.createAgent)
   const updateAgent = useAgentsStore((state) => state.updateAgent)
@@ -61,7 +61,9 @@ export function AgentEditor({ open, initial, template, onClose, onSave }: AgentE
   const [modelKeyId, setModelKeyId] = useState<string>(initial?.modelKeyId ?? '')
   const [maxTokens, setMaxTokens] = useState(initial?.maxTokens ?? 2000)
   const [draftOnly, setDraftOnly] = useState(initial?.draftOnly ?? false)
-  const [output, setOutput] = useState<string>(initial?.output ?? template?.defaultOutput ?? 'message')
+  const [output, setOutput] = useState<OutputType[]>(
+    initial?.output ?? template?.defaultOutput ?? ['message']
+  )
 
   const [showModelKeyModal, setShowModelKeyModal] = useState(false)
   const [advancedOpen, setAdvancedOpen] = useState(false)
@@ -148,7 +150,7 @@ export function AgentEditor({ open, initial, template, onClose, onSave }: AgentE
         modelKeyId: modelKeyId || null,
         maxTokens,
         draftOnly,
-        output: output as 'message' | 'note' | 'email',
+        output,
       })
       pushToast({ title: `${name.trim()} updated`, level: 'info' })
     } else {
@@ -160,7 +162,7 @@ export function AgentEditor({ open, initial, template, onClose, onSave }: AgentE
         description: description.trim(),
         preferences,
         sources: template?.defaultSources ?? [],
-        output: output as 'message' | 'note' | 'email',
+        output,
         draftOnly,
         modelKeyId: modelKeyId || undefined,
         maxTokens,
@@ -368,23 +370,7 @@ export function AgentEditor({ open, initial, template, onClose, onSave }: AgentE
               )}
             </Field>
 
-            <Field label="Deliver results to" hint="Where the agent sends its output">
-              <div className="flex gap-2">
-                {OUTPUT_OPTIONS.map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => setOutput(opt)}
-                    className={`rounded-xl px-4 py-2 text-sm font-medium capitalize transition ${
-                      output === opt
-                        ? 'bg-(--accent) text-white'
-                        : 'bg-(--surface-2) text-(--text-muted) hover:bg-(--border)'
-                    }`}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            </Field>
+            <DestinationPicker selected={output} onChange={setOutput} />
           </div>
         </div>
 

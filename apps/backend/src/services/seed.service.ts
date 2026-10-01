@@ -1,4 +1,4 @@
-import type { Prisma, PrismaClient } from '../generated/prisma/client'
+import type { AgentOutputType, Prisma, PrismaClient } from '../generated/prisma/client'
 
 type Db = PrismaClient | Prisma.TransactionClient
 
@@ -13,7 +13,7 @@ const DEFAULT_TEMPLATES = [
     defaultRole: 'Email summarizer and triage assistant',
     defaultPrompt:
       'Read my recent emails and provide a concise summary of the most important messages. Highlight action items, deadlines, and key updates. Group by priority.',
-    defaultOutput: 'message' as const,
+    defaultOutput: ['message'] as AgentOutputType[],
     sortOrder: 1,
     defaultTools: ['email_read', 'summarize'],
     defaultSources: [],
@@ -28,7 +28,7 @@ const DEFAULT_TEMPLATES = [
     defaultRole: 'Job search and career opportunity tracker',
     defaultPrompt:
       'Search for the latest job listings relevant to my profile and preferences. List the top opportunities with company name, role, and a direct link. Highlight the most promising matches.',
-    defaultOutput: 'note' as const,
+    defaultOutput: ['note'] as AgentOutputType[],
     sortOrder: 2,
     defaultTools: ['web_fetch', 'note_write'],
     defaultSources: [],
@@ -43,7 +43,7 @@ const DEFAULT_TEMPLATES = [
     defaultRole: 'Daily news curator and digest creator',
     defaultPrompt:
       'Fetch the latest tech and industry news. Provide a brief summary of each story, noting why it matters. Include links where available.',
-    defaultOutput: 'message' as const,
+    defaultOutput: ['message'] as AgentOutputType[],
     sortOrder: 3,
     defaultTools: ['news_read', 'summarize'],
     defaultSources: ['hn'],
@@ -99,7 +99,7 @@ export type DefaultAgentSeed = {
   description: string
   preferences: string[]
   sources: string[]
-  output: 'message' | 'note' | 'email'
+  output: AgentOutputType[]
   tools: string[]
   maxTokens?: number
 }
@@ -138,7 +138,7 @@ These lines are hidden from your digest and shown to the user as proposed additi
 `,
     preferences: ['Keeps it short', 'Only valid action items'],
     sources: [],
-    output: 'message',
+    output: ['message', 'calendar'],
     tools: ['email_read', 'classify', 'calendar_write', 'note_write', 'task_move'],
     maxTokens: 2200,
   },
@@ -173,7 +173,7 @@ A ranked bullet list (strongest first) ending with a short "3 strongest matches"
 `,
     preferences: ['Remote friendly', 'Verified links only'],
     sources: [],
-    output: 'message',
+    output: ['message', 'note'],
     tools: ['job_search', 'web_fetch', 'note_write'],
     maxTokens: 2400,
   },
@@ -208,7 +208,7 @@ A titled bullet list: **Story** — one-line summary — why it matters — link
 `,
     preferences: ['Software & AI', 'Top stories only'],
     sources: ['hn'],
-    output: 'message',
+    output: ['message', 'note'],
     tools: ['news_read', 'web_fetch', 'summarize'],
     maxTokens: 2000,
   },

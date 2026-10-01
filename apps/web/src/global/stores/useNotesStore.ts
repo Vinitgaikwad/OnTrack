@@ -33,6 +33,14 @@ export type NotesStore = {
   board: TaskColumn
   loadStatus: LoadStatus
   ensureLoaded: () => Promise<void>
+  /**
+   * Re-read the board from the server, bypassing the `loadStatus` guard.
+   *
+   * Callers that wrote outside this store (an agent run delivering to `notes`)
+   * need this; `ensureLoaded` would short-circuit on `'loaded'` and leave the
+   * board stale.
+   */
+  refresh: () => Promise<void>
   addTask: (task: { title: string; text: string; priority: TaskPriority; dueDate: string | null }) => void
   updateTask: (id: string, patch: Partial<Pick<NoteTask, 'title' | 'text' | 'priority' | 'dueDate'>>) => void
   removeTask: (id: string) => void
@@ -160,6 +168,19 @@ export const useNotesStore = create<NotesState>()(
           if (resets.length > 0) void syncDailyResets(resets)
         } catch (error) {
           set({ loadStatus: 'error' })
+          pushSyncError(error)
+        }
+      },
+
+      refresh: async () => {
+        const epoch = get().epoch
+        try {
+          const fetched = await fetchBoard()
+          if (get().epoch !== epoch) return
+          const { board, resets } = reconcileDailyBoard(fetched)
+          set({ board })
+          if (resets.length > 0) void syncDailyResets(resets)
+        } catch (error) {
           pushSyncError(error)
         }
       },

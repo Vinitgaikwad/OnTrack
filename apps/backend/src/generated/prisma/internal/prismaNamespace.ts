@@ -1978,16 +1978,16 @@ export type ListEnumAgentTriggerTypeFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
- * Reference to a field of type 'AgentOutputType'
+ * Reference to a field of type 'AgentOutputType[]'
  */
-export type EnumAgentOutputTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AgentOutputType'>
+export type ListEnumAgentOutputTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AgentOutputType[]'>
     
 
 
 /**
- * Reference to a field of type 'AgentOutputType[]'
+ * Reference to a field of type 'AgentOutputType'
  */
-export type ListEnumAgentOutputTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AgentOutputType[]'>
+export type EnumAgentOutputTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AgentOutputType'>
     
 
 

@@ -4,6 +4,7 @@ import type { AgentActionItem } from '../../global/repositories/agents.repositor
 import { confirmActionItems } from '../../global/repositories/agents.repository'
 import { useCalendarStore } from '../../global/stores/useCalendarStore'
 import { useDiaryStore } from '../../global/stores/useDiaryStore'
+import { useNotesStore } from '../../global/stores/useNotesStore'
 import { useToastStore } from '../../global/stores/useToastStore'
 import { Modal } from '../../global/ui/Modal'
 import { Button } from '../../global/ui/Button'
@@ -67,10 +68,14 @@ export function RunConfirmModal({ open, agentName, items, onCancel, onDone }: Ru
         message: 'Calendar, tasks, and notes now reflect your changes.',
         level: 'info',
       })
+      // These stores short-circuit on loadStatus === 'loaded', so reset first or
+      // the newly approved items never appear. Approved `task` items land on the
+      // Notes board, which has its own guard.
       useCalendarStore.setState({ loadStatus: 'idle' })
       void useCalendarStore.getState().ensureLoaded()
       useDiaryStore.setState({ loadStatus: 'idle' })
       void useDiaryStore.getState().ensureLoaded()
+      void useNotesStore.getState().refresh()
       onDone()
     } catch {
       useToastStore.getState().push({
