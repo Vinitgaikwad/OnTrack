@@ -9,6 +9,7 @@ import { AgentEditor } from './AgentEditor'
 import { TemplateGallery } from './TemplateGallery'
 import { AgentInbox } from './AgentInbox'
 import { RunConfirmModal } from './RunConfirmModal'
+import { describeWrittenDestinations, getDestination } from './output-destinations'
 import type { AgentActionItem } from '../../global/repositories/agents.repository'
 import { Card } from '../../global/ui/Card'
 import { Button } from '../../global/ui/Button'
@@ -111,7 +112,6 @@ export function AgentsPage() {
         setPendingRun({ agentName: agent.name, items: result.pendingActions })
         return
       }
-      // Never fail silently: say where the output went, or that there was none.
       if (result.status === 'failed') {
         pushToast({
           title: `${agent.name} failed`,
@@ -120,28 +120,28 @@ export function AgentsPage() {
         })
         return
       }
-      if (result.destination === 'diary') {
+
+      // Say which surfaces actually took the output, by name. Derived from the
+      // rows written rather than the agent's configuration, so the calendar
+      // destination's note fallback is reported honestly.
+      const where = describeWrittenDestinations(result.output)
+      if (where) {
         pushToast({
           title: `${agent.name} finished`,
-          message: 'Saved to your diary, not the inbox.',
+          message: `Saved to your ${where.toLowerCase()}.`,
           level: 'info',
         })
-        return
-      }
-      if (result.destination === 'inbox' && result.message) {
+      } else {
         pushToast({
           title: `${agent.name} finished`,
-          message: 'Output added to your inbox.',
+          message: 'Ran successfully but produced nothing to save, and there is nothing to approve.',
           level: 'info',
         })
-        setTab('inbox')
-        return
       }
-      pushToast({
-        title: `${agent.name} finished`,
-        message: 'Ran successfully but produced nothing to save, and there is nothing to approve.',
-        level: 'info',
-      })
+
+      // Take the user to the inbox when that is where the output went, since
+      // that is the tab they are not currently looking at.
+      if (result.output.some((record) => record.destination === 'inbox')) setTab('inbox')
     } catch {
       // store already surfaced the error via toast
     }
@@ -308,10 +308,35 @@ export function AgentsPage() {
                       </div>
                     ) : null}
 
-                    <div className="mt-3 flex items-center gap-2 text-[11px] text-(--text-muted)">
-                      <Clock size={12} />
-                      <span>Last run: {timeAgo(agent.lastRunAt)}</span>
+                    <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-(--text-muted)">
+                      <span className="flex items-center gap-2">
+                        <Clock size={12} />
+                        Last run: {timeAgo(agent.lastRunAt)}
+                      </span>
                     </div>
+
+                    {agent.output.length > 0 ? (
+                      <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                        <span className="text-[11px] text-(--text-muted)">Saves to</span>
+                        {agent.output.map((type) => {
+                          const meta = getDestination(type)
+                          const MetaIcon = meta.icon
+                          return (
+                            <span
+                              key={type}
+                              className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium"
+                              style={{
+                                backgroundColor: `color-mix(in srgb, ${meta.color} 14%, transparent)`,
+                                color: meta.color,
+                              }}
+                            >
+                              <MetaIcon size={11} />
+                              {meta.label}
+                            </span>
+                          )
+                        })}
+                      </div>
+                    ) : null}
 
                     <div className="mt-3 flex items-center justify-between">
                       <label className="flex cursor-pointer items-center gap-2">

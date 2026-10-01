@@ -1,5 +1,8 @@
 import { api } from '../lib/api'
 
+/** A place an agent's run output can be written. Mirrors the backend enum. */
+export type OutputType = 'message' | 'note' | 'calendar'
+
 export type AgentDto = {
   id: string
   templateId?: string | null
@@ -12,7 +15,8 @@ export type AgentDto = {
   enabled: boolean
   triggerType: 'manual' | 'schedule'
   sources: string[]
-  output: 'message' | 'note' | 'email'
+  /** Every selected destination. Never empty — an agent with none would drop all output. */
+  output: OutputType[]
   prompt?: string | null
   draftOnly: boolean
   modelKeyId?: string | null
@@ -41,7 +45,7 @@ export type CreateAgentInput = {
   preferences?: string[]
   templateId?: string
   sources?: string[]
-  output?: 'message' | 'note' | 'email'
+  output?: OutputType[]
   draftOnly?: boolean
   modelKeyId?: string
   maxTokens?: number
@@ -76,18 +80,29 @@ export type AgentRunDto = {
 }
 
 /**
- * Where a run's output was written.
+ * The surface a written row actually landed on.
  *
- * Mirrors the backend `OutputDestination`. Never infer this from `message` being
- * present — a diary entry also produces a message object.
+ * Mirrors the backend `OutputDestination`. A run writes to every destination the
+ * agent selected, so this is a list — and `fallbackFrom` marks a row that
+ * satisfied a different destination than the one configured (the calendar
+ * destination writes a note when the output carries no date).
  */
-export type OutputDestination = 'inbox' | 'diary' | 'none'
+export type OutputDestination = 'inbox' | 'notes' | 'calendar'
+
+export type RunOutputRecord = {
+  destination: OutputDestination
+  id: string
+  title: string
+  fallbackFrom?: OutputDestination
+}
 
 export type RunResultDto = {
   runId: string
   status: string
-  destination?: OutputDestination
-  message?: { id: string; title: string; body: string }
+  /** Destinations configured on the agent, in write order. */
+  destinations?: OutputDestination[]
+  /** One entry per row written, across all destinations. */
+  output?: RunOutputRecord[]
   pendingActions?: AgentActionItem[]
   sideEffects?: string[]
   tokensUsed: number

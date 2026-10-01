@@ -1,4 +1,5 @@
 import { api } from '../lib/api'
+import type { OutputType } from './agents.repository'
 
 export type AgentTemplateDto = {
   id: string
@@ -12,7 +13,8 @@ export type AgentTemplateDto = {
   defaultPrompt: string
   defaultSources: string[]
   defaultTools: string[]
-  defaultOutput: 'message' | 'note' | 'email'
+  /** Destinations a new agent starts with. A set, like `Agent.output`. */
+  defaultOutput: OutputType[]
   configSchema?: Record<string, unknown> | null
   sortOrder: number
 }
