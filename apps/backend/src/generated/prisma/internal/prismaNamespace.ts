@@ -1674,7 +1674,6 @@ export const AgentScalarFieldEnum = {
   color: 'color',
   description: 'description',
   preferences: 'preferences',
-  enabled: 'enabled',
   triggerType: 'triggerType',
   schedule: 'schedule',
   timezone: 'timezone',

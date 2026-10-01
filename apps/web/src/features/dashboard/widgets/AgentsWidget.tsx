@@ -14,7 +14,6 @@ export function AgentsWidget({ onRemove, compact = false }: AgentsWidgetProps) {
   const agents = useAgentsStore((state) => state.agents)
   const runAgent = useAgentsStore((state) => state.runAgent)
   const runningAgentId = useAgentsStore((state) => state.runningAgentId)
-  const enabled = agents.filter((agent) => agent.enabled)
 
   const [pendingRun, setPendingRun] = useState<{ agentName: string; items: AgentActionItem[] } | null>(null)
 
@@ -31,11 +30,11 @@ export function AgentsWidget({ onRemove, compact = false }: AgentsWidgetProps) {
 
   return (
     <WidgetCard title="Agents" icon={<Bot size={15} />} onRemove={onRemove} compact={compact}>
-      {enabled.length === 0 ? (
+      {agents.length === 0 ? (
         <p className="text-sm text-(--text-muted)">No agents on duty. Create one.</p>
       ) : (
         <ul className="space-y-1">
-          {enabled.slice(0, 3).map((agent) => {
+          {agents.slice(0, 3).map((agent) => {
             const isRunning = runningAgentId === agent.id
             const isAnotherRunning = runningAgentId !== null && !isRunning
             return (

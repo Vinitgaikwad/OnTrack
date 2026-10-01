@@ -53,7 +53,6 @@ export function AgentsPage() {
   const ensureLoaded = useAgentsStore((state) => state.ensureLoaded)
   const ensureTemplatesLoaded = useAgentsStore((state) => state.ensureTemplatesLoaded)
   const deleteAgent = useAgentsStore((state) => state.deleteAgent)
-  const updateAgent = useAgentsStore((state) => state.updateAgent)
   const runAgent = useAgentsStore((state) => state.runAgent)
   const runningAgentId = useAgentsStore((state) => state.runningAgentId)
 
@@ -338,23 +337,7 @@ export function AgentsPage() {
                       </div>
                     ) : null}
 
-                    <div className="mt-3 flex items-center justify-between">
-                      <label className="flex cursor-pointer items-center gap-2">
-                        <button
-                          onClick={() => updateAgent(agent.id, { enabled: !agent.enabled })}
-                          className={`relative h-5 w-9 rounded-full transition ${
-                            agent.enabled ? 'bg-(--success)' : 'bg-(--border-strong)'
-                          }`}
-                        >
-                          <span
-                            className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${
-                              agent.enabled ? 'left-[18px]' : 'left-0.5'
-                            }`}
-                          />
-                        </button>
-                        <span className="text-xs text-(--text-muted)">{agent.enabled ? 'Enabled' : 'Disabled'}</span>
-                      </label>
-
+                    <div className="mt-3 flex items-center justify-end">
                       <Button
                         size="sm"
                         disabled={isAnotherRunning}

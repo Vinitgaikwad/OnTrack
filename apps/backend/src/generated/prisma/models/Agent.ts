@@ -45,7 +45,6 @@ export type AgentMinAggregateOutputType = {
   icon: string | null
   color: string | null
   description: string | null
-  enabled: boolean | null
   triggerType: $Enums.AgentTriggerType | null
   schedule: string | null
   timezone: string | null
@@ -69,7 +68,6 @@ export type AgentMaxAggregateOutputType = {
   icon: string | null
   color: string | null
   description: string | null
-  enabled: boolean | null
   triggerType: $Enums.AgentTriggerType | null
   schedule: string | null
   timezone: string | null
@@ -94,7 +92,6 @@ export type AgentCountAggregateOutputType = {
   color: number
   description: number
   preferences: number
-  enabled: number
   triggerType: number
   schedule: number
   timezone: number
@@ -132,7 +129,6 @@ export type AgentMinAggregateInputType = {
   icon?: true
   color?: true
   description?: true
-  enabled?: true
   triggerType?: true
   schedule?: true
   timezone?: true
@@ -156,7 +152,6 @@ export type AgentMaxAggregateInputType = {
   icon?: true
   color?: true
   description?: true
-  enabled?: true
   triggerType?: true
   schedule?: true
   timezone?: true
@@ -181,7 +176,6 @@ export type AgentCountAggregateInputType = {
   color?: true
   description?: true
   preferences?: true
-  enabled?: true
   triggerType?: true
   schedule?: true
   timezone?: true
@@ -295,7 +289,6 @@ export type AgentGroupByOutputType = {
   color: string
   description: string
   preferences: string[]
-  enabled: boolean
   triggerType: $Enums.AgentTriggerType
   schedule: string | null
   timezone: string
@@ -345,7 +338,6 @@ export type AgentWhereInput = {
   color?: Prisma.StringFilter<"Agent"> | string
   description?: Prisma.StringFilter<"Agent"> | string
   preferences?: Prisma.StringNullableListFilter<"Agent">
-  enabled?: Prisma.BoolFilter<"Agent"> | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFilter<"Agent"> | $Enums.AgentTriggerType
   schedule?: Prisma.StringNullableFilter<"Agent"> | string | null
   timezone?: Prisma.StringFilter<"Agent"> | string
@@ -378,7 +370,6 @@ export type AgentOrderByWithRelationInput = {
   color?: Prisma.SortOrder
   description?: Prisma.SortOrder
   preferences?: Prisma.SortOrder
-  enabled?: Prisma.SortOrder
   triggerType?: Prisma.SortOrder
   schedule?: Prisma.SortOrderInput | Prisma.SortOrder
   timezone?: Prisma.SortOrder
@@ -414,7 +405,6 @@ export type AgentWhereUniqueInput = Prisma.AtLeast<{
   color?: Prisma.StringFilter<"Agent"> | string
   description?: Prisma.StringFilter<"Agent"> | string
   preferences?: Prisma.StringNullableListFilter<"Agent">
-  enabled?: Prisma.BoolFilter<"Agent"> | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFilter<"Agent"> | $Enums.AgentTriggerType
   schedule?: Prisma.StringNullableFilter<"Agent"> | string | null
   timezone?: Prisma.StringFilter<"Agent"> | string
@@ -447,7 +437,6 @@ export type AgentOrderByWithAggregationInput = {
   color?: Prisma.SortOrder
   description?: Prisma.SortOrder
   preferences?: Prisma.SortOrder
-  enabled?: Prisma.SortOrder
   triggerType?: Prisma.SortOrder
   schedule?: Prisma.SortOrderInput | Prisma.SortOrder
   timezone?: Prisma.SortOrder
@@ -482,7 +471,6 @@ export type AgentScalarWhereWithAggregatesInput = {
   color?: Prisma.StringWithAggregatesFilter<"Agent"> | string
   description?: Prisma.StringWithAggregatesFilter<"Agent"> | string
   preferences?: Prisma.StringNullableListFilter<"Agent">
-  enabled?: Prisma.BoolWithAggregatesFilter<"Agent"> | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeWithAggregatesFilter<"Agent"> | $Enums.AgentTriggerType
   schedule?: Prisma.StringNullableWithAggregatesFilter<"Agent"> | string | null
   timezone?: Prisma.StringWithAggregatesFilter<"Agent"> | string
@@ -507,7 +495,6 @@ export type AgentCreateInput = {
   color: string
   description: string
   preferences?: Prisma.AgentCreatepreferencesInput | string[]
-  enabled?: boolean
   triggerType?: $Enums.AgentTriggerType
   schedule?: string | null
   timezone?: string
@@ -539,7 +526,6 @@ export type AgentUncheckedCreateInput = {
   color: string
   description: string
   preferences?: Prisma.AgentCreatepreferencesInput | string[]
-  enabled?: boolean
   triggerType?: $Enums.AgentTriggerType
   schedule?: string | null
   timezone?: string
@@ -567,7 +553,6 @@ export type AgentUpdateInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -599,7 +584,6 @@ export type AgentUncheckedUpdateInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -629,7 +613,6 @@ export type AgentCreateManyInput = {
   color: string
   description: string
   preferences?: Prisma.AgentCreatepreferencesInput | string[]
-  enabled?: boolean
   triggerType?: $Enums.AgentTriggerType
   schedule?: string | null
   timezone?: string
@@ -654,7 +637,6 @@ export type AgentUpdateManyMutationInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -680,7 +662,6 @@ export type AgentUncheckedUpdateManyInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -725,7 +706,6 @@ export type AgentCountOrderByAggregateInput = {
   color?: Prisma.SortOrder
   description?: Prisma.SortOrder
   preferences?: Prisma.SortOrder
-  enabled?: Prisma.SortOrder
   triggerType?: Prisma.SortOrder
   schedule?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
@@ -756,7 +736,6 @@ export type AgentMaxOrderByAggregateInput = {
   icon?: Prisma.SortOrder
   color?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  enabled?: Prisma.SortOrder
   triggerType?: Prisma.SortOrder
   schedule?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
@@ -780,7 +759,6 @@ export type AgentMinOrderByAggregateInput = {
   icon?: Prisma.SortOrder
   color?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  enabled?: Prisma.SortOrder
   triggerType?: Prisma.SortOrder
   schedule?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
@@ -1012,7 +990,6 @@ export type AgentCreateWithoutUserInput = {
   color: string
   description: string
   preferences?: Prisma.AgentCreatepreferencesInput | string[]
-  enabled?: boolean
   triggerType?: $Enums.AgentTriggerType
   schedule?: string | null
   timezone?: string
@@ -1042,7 +1019,6 @@ export type AgentUncheckedCreateWithoutUserInput = {
   color: string
   description: string
   preferences?: Prisma.AgentCreatepreferencesInput | string[]
-  enabled?: boolean
   triggerType?: $Enums.AgentTriggerType
   schedule?: string | null
   timezone?: string
@@ -1101,7 +1077,6 @@ export type AgentScalarWhereInput = {
   color?: Prisma.StringFilter<"Agent"> | string
   description?: Prisma.StringFilter<"Agent"> | string
   preferences?: Prisma.StringNullableListFilter<"Agent">
-  enabled?: Prisma.BoolFilter<"Agent"> | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFilter<"Agent"> | $Enums.AgentTriggerType
   schedule?: Prisma.StringNullableFilter<"Agent"> | string | null
   timezone?: Prisma.StringFilter<"Agent"> | string
@@ -1126,7 +1101,6 @@ export type AgentCreateWithoutTemplateInput = {
   color: string
   description: string
   preferences?: Prisma.AgentCreatepreferencesInput | string[]
-  enabled?: boolean
   triggerType?: $Enums.AgentTriggerType
   schedule?: string | null
   timezone?: string
@@ -1156,7 +1130,6 @@ export type AgentUncheckedCreateWithoutTemplateInput = {
   color: string
   description: string
   preferences?: Prisma.AgentCreatepreferencesInput | string[]
-  enabled?: boolean
   triggerType?: $Enums.AgentTriggerType
   schedule?: string | null
   timezone?: string
@@ -1210,7 +1183,6 @@ export type AgentCreateWithoutModelKeyInput = {
   color: string
   description: string
   preferences?: Prisma.AgentCreatepreferencesInput | string[]
-  enabled?: boolean
   triggerType?: $Enums.AgentTriggerType
   schedule?: string | null
   timezone?: string
@@ -1241,7 +1213,6 @@ export type AgentUncheckedCreateWithoutModelKeyInput = {
   color: string
   description: string
   preferences?: Prisma.AgentCreatepreferencesInput | string[]
-  enabled?: boolean
   triggerType?: $Enums.AgentTriggerType
   schedule?: string | null
   timezone?: string
@@ -1294,7 +1265,6 @@ export type AgentCreateWithoutToolsInput = {
   color: string
   description: string
   preferences?: Prisma.AgentCreatepreferencesInput | string[]
-  enabled?: boolean
   triggerType?: $Enums.AgentTriggerType
   schedule?: string | null
   timezone?: string
@@ -1325,7 +1295,6 @@ export type AgentUncheckedCreateWithoutToolsInput = {
   color: string
   description: string
   preferences?: Prisma.AgentCreatepreferencesInput | string[]
-  enabled?: boolean
   triggerType?: $Enums.AgentTriggerType
   schedule?: string | null
   timezone?: string
@@ -1368,7 +1337,6 @@ export type AgentUpdateWithoutToolsInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1399,7 +1367,6 @@ export type AgentUncheckedUpdateWithoutToolsInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1426,7 +1393,6 @@ export type AgentCreateWithoutRunsInput = {
   color: string
   description: string
   preferences?: Prisma.AgentCreatepreferencesInput | string[]
-  enabled?: boolean
   triggerType?: $Enums.AgentTriggerType
   schedule?: string | null
   timezone?: string
@@ -1457,7 +1423,6 @@ export type AgentUncheckedCreateWithoutRunsInput = {
   color: string
   description: string
   preferences?: Prisma.AgentCreatepreferencesInput | string[]
-  enabled?: boolean
   triggerType?: $Enums.AgentTriggerType
   schedule?: string | null
   timezone?: string
@@ -1500,7 +1465,6 @@ export type AgentUpdateWithoutRunsInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1531,7 +1495,6 @@ export type AgentUncheckedUpdateWithoutRunsInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1558,7 +1521,6 @@ export type AgentCreateWithoutMessagesInput = {
   color: string
   description: string
   preferences?: Prisma.AgentCreatepreferencesInput | string[]
-  enabled?: boolean
   triggerType?: $Enums.AgentTriggerType
   schedule?: string | null
   timezone?: string
@@ -1589,7 +1551,6 @@ export type AgentUncheckedCreateWithoutMessagesInput = {
   color: string
   description: string
   preferences?: Prisma.AgentCreatepreferencesInput | string[]
-  enabled?: boolean
   triggerType?: $Enums.AgentTriggerType
   schedule?: string | null
   timezone?: string
@@ -1632,7 +1593,6 @@ export type AgentUpdateWithoutMessagesInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1663,7 +1623,6 @@ export type AgentUncheckedUpdateWithoutMessagesInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1691,7 +1650,6 @@ export type AgentCreateManyUserInput = {
   color: string
   description: string
   preferences?: Prisma.AgentCreatepreferencesInput | string[]
-  enabled?: boolean
   triggerType?: $Enums.AgentTriggerType
   schedule?: string | null
   timezone?: string
@@ -1716,7 +1674,6 @@ export type AgentUpdateWithoutUserInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1746,7 +1703,6 @@ export type AgentUncheckedUpdateWithoutUserInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1775,7 +1731,6 @@ export type AgentUncheckedUpdateManyWithoutUserInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1801,7 +1756,6 @@ export type AgentCreateManyTemplateInput = {
   color: string
   description: string
   preferences?: Prisma.AgentCreatepreferencesInput | string[]
-  enabled?: boolean
   triggerType?: $Enums.AgentTriggerType
   schedule?: string | null
   timezone?: string
@@ -1826,7 +1780,6 @@ export type AgentUpdateWithoutTemplateInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1856,7 +1809,6 @@ export type AgentUncheckedUpdateWithoutTemplateInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1885,7 +1837,6 @@ export type AgentUncheckedUpdateManyWithoutTemplateInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1912,7 +1863,6 @@ export type AgentCreateManyModelKeyInput = {
   color: string
   description: string
   preferences?: Prisma.AgentCreatepreferencesInput | string[]
-  enabled?: boolean
   triggerType?: $Enums.AgentTriggerType
   schedule?: string | null
   timezone?: string
@@ -1936,7 +1886,6 @@ export type AgentUpdateWithoutModelKeyInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1967,7 +1916,6 @@ export type AgentUncheckedUpdateWithoutModelKeyInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1996,7 +1944,6 @@ export type AgentUncheckedUpdateManyWithoutModelKeyInput = {
   color?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   preferences?: Prisma.AgentUpdatepreferencesInput | string[]
-  enabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   triggerType?: Prisma.EnumAgentTriggerTypeFieldUpdateOperationsInput | $Enums.AgentTriggerType
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2071,7 +2018,6 @@ export type AgentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   color?: boolean
   description?: boolean
   preferences?: boolean
-  enabled?: boolean
   triggerType?: boolean
   schedule?: boolean
   timezone?: boolean
@@ -2105,7 +2051,6 @@ export type AgentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   color?: boolean
   description?: boolean
   preferences?: boolean
-  enabled?: boolean
   triggerType?: boolean
   schedule?: boolean
   timezone?: boolean
@@ -2135,7 +2080,6 @@ export type AgentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   color?: boolean
   description?: boolean
   preferences?: boolean
-  enabled?: boolean
   triggerType?: boolean
   schedule?: boolean
   timezone?: boolean
@@ -2165,7 +2109,6 @@ export type AgentSelectScalar = {
   color?: boolean
   description?: boolean
   preferences?: boolean
-  enabled?: boolean
   triggerType?: boolean
   schedule?: boolean
   timezone?: boolean
@@ -2182,7 +2125,7 @@ export type AgentSelectScalar = {
   updatedAt?: boolean
 }
 
-export type AgentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "templateId" | "name" | "role" | "icon" | "color" | "description" | "preferences" | "enabled" | "triggerType" | "schedule" | "timezone" | "sources" | "output" | "prompt" | "draftOnly" | "modelKeyId" | "maxTokens" | "lastRunAt" | "nextRunAt" | "runCount" | "createdAt" | "updatedAt", ExtArgs["result"]["agent"]>
+export type AgentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "templateId" | "name" | "role" | "icon" | "color" | "description" | "preferences" | "triggerType" | "schedule" | "timezone" | "sources" | "output" | "prompt" | "draftOnly" | "modelKeyId" | "maxTokens" | "lastRunAt" | "nextRunAt" | "runCount" | "createdAt" | "updatedAt", ExtArgs["result"]["agent"]>
 export type AgentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   runs?: boolean | Prisma.Agent$runsArgs<ExtArgs>
@@ -2223,7 +2166,6 @@ export type $AgentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     color: string
     description: string
     preferences: string[]
-    enabled: boolean
     triggerType: $Enums.AgentTriggerType
     schedule: string | null
     timezone: string
@@ -2680,7 +2622,6 @@ export interface AgentFieldRefs {
   readonly color: Prisma.FieldRef<"Agent", 'String'>
   readonly description: Prisma.FieldRef<"Agent", 'String'>
   readonly preferences: Prisma.FieldRef<"Agent", 'String[]'>
-  readonly enabled: Prisma.FieldRef<"Agent", 'Boolean'>
   readonly triggerType: Prisma.FieldRef<"Agent", 'AgentTriggerType'>
   readonly schedule: Prisma.FieldRef<"Agent", 'String'>
   readonly timezone: Prisma.FieldRef<"Agent", 'String'>

@@ -179,7 +179,7 @@ fetch). Definitions live in `seed.service.ts` (`DEFAULT_AGENTS`, `seedDefaultAge
 
 | Entity        | Source fields (JSON, camelCase)                                                                                              | Notes |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------- | ----- |
-| `Agent`       | `id, name, role, icon, color, description, preferences[], enabled, templateId?, triggerType, sources[], output[], prompt?, draftOnly, modelKeyId?, maxTokens, lastRunAt?, runCount, createdAt, updatedAt, tools?[]` | `triggerType`/`schedule`/`timezone` reserved for v3; **`output` is a SET of destinations** (`message\|note\|calendar`, non-empty), so one run writes to every selected surface — see "Output destinations" below; **`description` is a Markdown doc and is what the runner sends to the LLM as system instructions** (replaces `prompt`, retained for legacy only); creating from a template copies `defaultRole` and seeds `defaultPrompt` into the editable `description` + `AgentTool` rows |
+| `Agent`       | `id, name, role, icon, color, description, preferences[], templateId?, triggerType, sources[], output[], prompt?, draftOnly, modelKeyId?, maxTokens, lastRunAt?, runCount, createdAt, updatedAt, tools?[]` | `triggerType`/`schedule`/`timezone` reserved for v3; **there is no `enabled` flag** — with no scheduler an agent could never run itself, so the toggle could only ever have meant "you cannot press Run" (dropped in `20261001120000_drop_agent_enabled`); **`output` is a SET of destinations** (`message\|note\|calendar`, non-empty), so one run writes to every selected surface — see "Output destinations" below; **`description` is a Markdown doc and is what the runner sends to the LLM as system instructions** (replaces `prompt`, retained for legacy only); creating from a template copies `defaultRole` and seeds `defaultPrompt` into the editable `description` + `AgentTool` rows |
 | `AgentTemplate` | `id, slug, name, description, category, icon, requiresOAuth?, defaultRole, defaultPrompt, defaultSources[], defaultTools[], defaultOutput, configSchema?, sortOrder` | 3 seeded: `email-summarizer`, `job-tracker`, `news-provider` (upserted on first `/api/templates` hit) |
 | `AgentTool`    | `id, agentId, toolName, enabled, config?`                                                                                   | per-agent tool row; `toolName` ∈ registry (14 tools) |
 | `ModelKey`     | `id, provider, label, defaultModel, baseUrl?, createdAt`                                                                    | **`apiKeyEnc` never leaves the server** (AES-256-GCM, `MODEL_KEY_ENCRYPTION_KEY`); POST live-validates against **that key's own provider** (free endpoint) and stores the resolved `baseUrl` |
@@ -320,7 +320,6 @@ model Agent {
   color        String
   description  String
   preferences  String[]        @default([])
-  enabled      Boolean         @default(true)
   triggerType  AgentTriggerType @default(manual) // reserved (v3+)
   schedule     String?                            // reserved (v3+)
   timezone     String           @default("UTC")   // reserved (v3+)
@@ -538,7 +537,7 @@ Validation: `date` `YYYY-MM-DD`, `month` `YYYY-MM`, `mood` ∈ `great|good|okay|
 | GET    | `/api/agents/:id`       | —                            | `{ data: Agent }`                         |
 | PATCH  | `/api/agents/:id`       | any subset of the above      | `{ data: Agent }` (at least one field)    |
 | DELETE | `/api/agents/:id`       | —                            | `204` (cascades runs/messages/tools)      |
-| POST   | `/api/agents/:id/run`   | —                            | `{ data: RunResult }`; `400 DISABLED`, `404`, `409 CONFLICT` (in-flight), `429 RATE_LIMIT` |
+| POST   | `/api/agents/:id/run`   | —                            | `{ data: RunResult }`; `404`, `409 CONFLICT` (in-flight), `429 RATE_LIMIT` |
 | GET    | `/api/agents/:id/runs`  | `?limit&offset`              | `{ data: { runs: RunListItem[], hasMore } }` |
 | POST   | `/api/agents/actions`   | `{ items: ActionItem[] }`    | `{ data: { created: { kind, id }[] } }` — creates `Appointment` (`task` → `kind:'task'`, `event` → `kind:'appointment'`) and `DiaryEntry` (`note`, tagged `agent-output`); triggered only after the user approves proposed items in the UI |
 

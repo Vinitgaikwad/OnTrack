@@ -148,7 +148,6 @@ model Agent {
   color       String
   description String
   preferences String[]        @default([])
-  enabled     Boolean         @default(true)
 
   triggerType AgentTriggerType @default(manual)
   schedule    String?

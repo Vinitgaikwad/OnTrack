@@ -31,7 +31,6 @@ export function TodayPage() {
 
   const plan = `${todayEntries.length} thing${todayEntries.length === 1 ? '' : 's'} planned for today`
   const latestEntry = entries[0]
-  const enabledAgents = agents.filter((agent) => agent.enabled)
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -156,11 +155,11 @@ export function TodayPage() {
               Manage <ArrowRight size={12} className="inline" />
             </Link>
           </div>
-          {enabledAgents.length === 0 ? (
+          {agents.length === 0 ? (
             <p className="py-4 text-sm text-(--text-muted)">No agents on duty. Create one.</p>
           ) : (
             <div className="flex flex-col gap-1.5">
-              {enabledAgents.slice(0, 3).map((agent) => (
+              {agents.slice(0, 3).map((agent) => (
                 <div key={agent.id} className="flex items-center gap-2.5 rounded-xl bg-(--surface-2) px-3 py-2">
                   <span
                     className="h-2.5 w-2.5 rounded-full"
