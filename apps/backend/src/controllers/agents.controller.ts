@@ -11,6 +11,14 @@ const idSchema = z.string().min(1).max(100)
 
 const badParam = (c: Context) => fail(c, 'VALIDATION', 'Invalid agent id', 400)
 
+/**
+ * The set of places a run's output may be written.
+ *
+ * `.min(1)` because an agent with no destination makes every run a silent no-op —
+ * `updateAgent` rejects the same case in the service, this is the wire-level guard.
+ */
+const outputSchema = z.array(z.enum(['message', 'note', 'calendar'])).min(1).max(3)
+
 const createAgentSchema = z.object({
   name: z.string().min(1).max(100),
   role: z.string(),
@@ -21,7 +29,7 @@ const createAgentSchema = z.object({
   templateId: z.string().optional(),
   prompt: z.string().optional(),
   sources: z.array(z.string()).optional(),
-  output: z.enum(['message', 'note', 'email']).optional(),
+  output: outputSchema.optional(),
   draftOnly: z.boolean().optional(),
   modelKeyId: z.string().nullable().optional(),
   maxTokens: z.number().int().min(500).max(8000).optional(),
@@ -37,7 +45,7 @@ const updateAgentSchema = z
     preferences: z.array(z.string()).optional(),
     prompt: z.string().optional(),
     sources: z.array(z.string()).optional(),
-    output: z.enum(['message', 'note', 'email']).optional(),
+    output: outputSchema.optional(),
     draftOnly: z.boolean().optional(),
     modelKeyId: z.string().nullable().optional(),
     maxTokens: z.number().int().min(500).max(8000).optional(),

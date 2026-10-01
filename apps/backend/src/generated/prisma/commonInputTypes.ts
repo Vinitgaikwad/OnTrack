@@ -250,13 +250,6 @@ export type EnumAgentTriggerTypeFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumAgentTriggerTypeFilter<$PrismaModel> | $Enums.AgentTriggerType
 }
 
-export type EnumAgentOutputTypeFilter<$PrismaModel = never> = {
-  equals?: $Enums.AgentOutputType | Prisma.EnumAgentOutputTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.AgentOutputType[] | Prisma.ListEnumAgentOutputTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.AgentOutputType[] | Prisma.ListEnumAgentOutputTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumAgentOutputTypeFilter<$PrismaModel> | $Enums.AgentOutputType
-}
-
 export type EnumAgentTriggerTypeWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.AgentTriggerType | Prisma.EnumAgentTriggerTypeFieldRefInput<$PrismaModel>
   in?: $Enums.AgentTriggerType[] | Prisma.ListEnumAgentTriggerTypeFieldRefInput<$PrismaModel>
@@ -265,16 +258,6 @@ export type EnumAgentTriggerTypeWithAggregatesFilter<$PrismaModel = never> = {
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAgentTriggerTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAgentTriggerTypeFilter<$PrismaModel>
-}
-
-export type EnumAgentOutputTypeWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.AgentOutputType | Prisma.EnumAgentOutputTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.AgentOutputType[] | Prisma.ListEnumAgentOutputTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.AgentOutputType[] | Prisma.ListEnumAgentOutputTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumAgentOutputTypeWithAggregatesFilter<$PrismaModel> | $Enums.AgentOutputType
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumAgentOutputTypeFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumAgentOutputTypeFilter<$PrismaModel>
 }
 
 export type JsonNullableFilter<$PrismaModel = never> =
@@ -577,13 +560,6 @@ export type NestedEnumAgentTriggerTypeFilter<$PrismaModel = never> = {
   not?: Prisma.NestedEnumAgentTriggerTypeFilter<$PrismaModel> | $Enums.AgentTriggerType
 }
 
-export type NestedEnumAgentOutputTypeFilter<$PrismaModel = never> = {
-  equals?: $Enums.AgentOutputType | Prisma.EnumAgentOutputTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.AgentOutputType[] | Prisma.ListEnumAgentOutputTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.AgentOutputType[] | Prisma.ListEnumAgentOutputTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumAgentOutputTypeFilter<$PrismaModel> | $Enums.AgentOutputType
-}
-
 export type NestedEnumAgentTriggerTypeWithAggregatesFilter<$PrismaModel = never> = {
   equals?: $Enums.AgentTriggerType | Prisma.EnumAgentTriggerTypeFieldRefInput<$PrismaModel>
   in?: $Enums.AgentTriggerType[] | Prisma.ListEnumAgentTriggerTypeFieldRefInput<$PrismaModel>
@@ -592,16 +568,6 @@ export type NestedEnumAgentTriggerTypeWithAggregatesFilter<$PrismaModel = never>
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumAgentTriggerTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumAgentTriggerTypeFilter<$PrismaModel>
-}
-
-export type NestedEnumAgentOutputTypeWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.AgentOutputType | Prisma.EnumAgentOutputTypeFieldRefInput<$PrismaModel>
-  in?: $Enums.AgentOutputType[] | Prisma.ListEnumAgentOutputTypeFieldRefInput<$PrismaModel>
-  notIn?: $Enums.AgentOutputType[] | Prisma.ListEnumAgentOutputTypeFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumAgentOutputTypeWithAggregatesFilter<$PrismaModel> | $Enums.AgentOutputType
-  _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumAgentOutputTypeFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumAgentOutputTypeFilter<$PrismaModel>
 }
 
 export type NestedJsonNullableFilter<$PrismaModel = never> =

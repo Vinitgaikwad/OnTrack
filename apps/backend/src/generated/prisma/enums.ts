@@ -59,7 +59,7 @@ export type AgentTriggerType = (typeof AgentTriggerType)[keyof typeof AgentTrigg
 export const AgentOutputType = {
   message: 'message',
   note: 'note',
-  email: 'email'
+  calendar: 'calendar'
 } as const
 
 export type AgentOutputType = (typeof AgentOutputType)[keyof typeof AgentOutputType]

@@ -49,7 +49,6 @@ export type AgentMinAggregateOutputType = {
   triggerType: $Enums.AgentTriggerType | null
   schedule: string | null
   timezone: string | null
-  output: $Enums.AgentOutputType | null
   prompt: string | null
   draftOnly: boolean | null
   modelKeyId: string | null
@@ -74,7 +73,6 @@ export type AgentMaxAggregateOutputType = {
   triggerType: $Enums.AgentTriggerType | null
   schedule: string | null
   timezone: string | null
-  output: $Enums.AgentOutputType | null
   prompt: string | null
   draftOnly: boolean | null
   modelKeyId: string | null
@@ -138,7 +136,6 @@ export type AgentMinAggregateInputType = {
   triggerType?: true
   schedule?: true
   timezone?: true
-  output?: true
   prompt?: true
   draftOnly?: true
   modelKeyId?: true
@@ -163,7 +160,6 @@ export type AgentMaxAggregateInputType = {
   triggerType?: true
   schedule?: true
   timezone?: true
-  output?: true
   prompt?: true
   draftOnly?: true
   modelKeyId?: true
@@ -304,7 +300,7 @@ export type AgentGroupByOutputType = {
   schedule: string | null
   timezone: string
   sources: string[]
-  output: $Enums.AgentOutputType
+  output: $Enums.AgentOutputType[]
   prompt: string | null
   draftOnly: boolean
   modelKeyId: string | null
@@ -354,7 +350,7 @@ export type AgentWhereInput = {
   schedule?: Prisma.StringNullableFilter<"Agent"> | string | null
   timezone?: Prisma.StringFilter<"Agent"> | string
   sources?: Prisma.StringNullableListFilter<"Agent">
-  output?: Prisma.EnumAgentOutputTypeFilter<"Agent"> | $Enums.AgentOutputType
+  output?: Prisma.EnumAgentOutputTypeNullableListFilter<"Agent">
   prompt?: Prisma.StringNullableFilter<"Agent"> | string | null
   draftOnly?: Prisma.BoolFilter<"Agent"> | boolean
   modelKeyId?: Prisma.StringNullableFilter<"Agent"> | string | null
@@ -423,7 +419,7 @@ export type AgentWhereUniqueInput = Prisma.AtLeast<{
   schedule?: Prisma.StringNullableFilter<"Agent"> | string | null
   timezone?: Prisma.StringFilter<"Agent"> | string
   sources?: Prisma.StringNullableListFilter<"Agent">
-  output?: Prisma.EnumAgentOutputTypeFilter<"Agent"> | $Enums.AgentOutputType
+  output?: Prisma.EnumAgentOutputTypeNullableListFilter<"Agent">
   prompt?: Prisma.StringNullableFilter<"Agent"> | string | null
   draftOnly?: Prisma.BoolFilter<"Agent"> | boolean
   modelKeyId?: Prisma.StringNullableFilter<"Agent"> | string | null
@@ -491,7 +487,7 @@ export type AgentScalarWhereWithAggregatesInput = {
   schedule?: Prisma.StringNullableWithAggregatesFilter<"Agent"> | string | null
   timezone?: Prisma.StringWithAggregatesFilter<"Agent"> | string
   sources?: Prisma.StringNullableListFilter<"Agent">
-  output?: Prisma.EnumAgentOutputTypeWithAggregatesFilter<"Agent"> | $Enums.AgentOutputType
+  output?: Prisma.EnumAgentOutputTypeNullableListFilter<"Agent">
   prompt?: Prisma.StringNullableWithAggregatesFilter<"Agent"> | string | null
   draftOnly?: Prisma.BoolWithAggregatesFilter<"Agent"> | boolean
   modelKeyId?: Prisma.StringNullableWithAggregatesFilter<"Agent"> | string | null
@@ -516,7 +512,7 @@ export type AgentCreateInput = {
   schedule?: string | null
   timezone?: string
   sources?: Prisma.AgentCreatesourcesInput | string[]
-  output?: $Enums.AgentOutputType
+  output?: Prisma.AgentCreateoutputInput | $Enums.AgentOutputType[]
   prompt?: string | null
   draftOnly?: boolean
   maxTokens?: number
@@ -548,7 +544,7 @@ export type AgentUncheckedCreateInput = {
   schedule?: string | null
   timezone?: string
   sources?: Prisma.AgentCreatesourcesInput | string[]
-  output?: $Enums.AgentOutputType
+  output?: Prisma.AgentCreateoutputInput | $Enums.AgentOutputType[]
   prompt?: string | null
   draftOnly?: boolean
   modelKeyId?: string | null
@@ -576,7 +572,7 @@ export type AgentUpdateInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxTokens?: Prisma.IntFieldUpdateOperationsInput | number
@@ -608,7 +604,7 @@ export type AgentUncheckedUpdateInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   modelKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -638,7 +634,7 @@ export type AgentCreateManyInput = {
   schedule?: string | null
   timezone?: string
   sources?: Prisma.AgentCreatesourcesInput | string[]
-  output?: $Enums.AgentOutputType
+  output?: Prisma.AgentCreateoutputInput | $Enums.AgentOutputType[]
   prompt?: string | null
   draftOnly?: boolean
   modelKeyId?: string | null
@@ -663,7 +659,7 @@ export type AgentUpdateManyMutationInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxTokens?: Prisma.IntFieldUpdateOperationsInput | number
@@ -689,7 +685,7 @@ export type AgentUncheckedUpdateManyInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   modelKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -709,6 +705,14 @@ export type AgentListRelationFilter = {
 
 export type AgentOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type EnumAgentOutputTypeNullableListFilter<$PrismaModel = never> = {
+  equals?: $Enums.AgentOutputType[] | Prisma.ListEnumAgentOutputTypeFieldRefInput<$PrismaModel> | null
+  has?: $Enums.AgentOutputType | Prisma.EnumAgentOutputTypeFieldRefInput<$PrismaModel> | null
+  hasEvery?: $Enums.AgentOutputType[] | Prisma.ListEnumAgentOutputTypeFieldRefInput<$PrismaModel>
+  hasSome?: $Enums.AgentOutputType[] | Prisma.ListEnumAgentOutputTypeFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
 }
 
 export type AgentCountOrderByAggregateInput = {
@@ -756,7 +760,6 @@ export type AgentMaxOrderByAggregateInput = {
   triggerType?: Prisma.SortOrder
   schedule?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
-  output?: Prisma.SortOrder
   prompt?: Prisma.SortOrder
   draftOnly?: Prisma.SortOrder
   modelKeyId?: Prisma.SortOrder
@@ -781,7 +784,6 @@ export type AgentMinOrderByAggregateInput = {
   triggerType?: Prisma.SortOrder
   schedule?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
-  output?: Prisma.SortOrder
   prompt?: Prisma.SortOrder
   draftOnly?: Prisma.SortOrder
   modelKeyId?: Prisma.SortOrder
@@ -853,6 +855,10 @@ export type AgentCreatesourcesInput = {
   set: string[]
 }
 
+export type AgentCreateoutputInput = {
+  set: $Enums.AgentOutputType[]
+}
+
 export type AgentUpdatepreferencesInput = {
   set?: string[]
   push?: string | string[]
@@ -867,8 +873,9 @@ export type AgentUpdatesourcesInput = {
   push?: string | string[]
 }
 
-export type EnumAgentOutputTypeFieldUpdateOperationsInput = {
-  set?: $Enums.AgentOutputType
+export type AgentUpdateoutputInput = {
+  set?: $Enums.AgentOutputType[]
+  push?: $Enums.AgentOutputType | $Enums.AgentOutputType[]
 }
 
 export type AgentCreateNestedManyWithoutTemplateInput = {
@@ -1010,7 +1017,7 @@ export type AgentCreateWithoutUserInput = {
   schedule?: string | null
   timezone?: string
   sources?: Prisma.AgentCreatesourcesInput | string[]
-  output?: $Enums.AgentOutputType
+  output?: Prisma.AgentCreateoutputInput | $Enums.AgentOutputType[]
   prompt?: string | null
   draftOnly?: boolean
   maxTokens?: number
@@ -1040,7 +1047,7 @@ export type AgentUncheckedCreateWithoutUserInput = {
   schedule?: string | null
   timezone?: string
   sources?: Prisma.AgentCreatesourcesInput | string[]
-  output?: $Enums.AgentOutputType
+  output?: Prisma.AgentCreateoutputInput | $Enums.AgentOutputType[]
   prompt?: string | null
   draftOnly?: boolean
   modelKeyId?: string | null
@@ -1099,7 +1106,7 @@ export type AgentScalarWhereInput = {
   schedule?: Prisma.StringNullableFilter<"Agent"> | string | null
   timezone?: Prisma.StringFilter<"Agent"> | string
   sources?: Prisma.StringNullableListFilter<"Agent">
-  output?: Prisma.EnumAgentOutputTypeFilter<"Agent"> | $Enums.AgentOutputType
+  output?: Prisma.EnumAgentOutputTypeNullableListFilter<"Agent">
   prompt?: Prisma.StringNullableFilter<"Agent"> | string | null
   draftOnly?: Prisma.BoolFilter<"Agent"> | boolean
   modelKeyId?: Prisma.StringNullableFilter<"Agent"> | string | null
@@ -1124,7 +1131,7 @@ export type AgentCreateWithoutTemplateInput = {
   schedule?: string | null
   timezone?: string
   sources?: Prisma.AgentCreatesourcesInput | string[]
-  output?: $Enums.AgentOutputType
+  output?: Prisma.AgentCreateoutputInput | $Enums.AgentOutputType[]
   prompt?: string | null
   draftOnly?: boolean
   maxTokens?: number
@@ -1154,7 +1161,7 @@ export type AgentUncheckedCreateWithoutTemplateInput = {
   schedule?: string | null
   timezone?: string
   sources?: Prisma.AgentCreatesourcesInput | string[]
-  output?: $Enums.AgentOutputType
+  output?: Prisma.AgentCreateoutputInput | $Enums.AgentOutputType[]
   prompt?: string | null
   draftOnly?: boolean
   modelKeyId?: string | null
@@ -1208,7 +1215,7 @@ export type AgentCreateWithoutModelKeyInput = {
   schedule?: string | null
   timezone?: string
   sources?: Prisma.AgentCreatesourcesInput | string[]
-  output?: $Enums.AgentOutputType
+  output?: Prisma.AgentCreateoutputInput | $Enums.AgentOutputType[]
   prompt?: string | null
   draftOnly?: boolean
   maxTokens?: number
@@ -1239,7 +1246,7 @@ export type AgentUncheckedCreateWithoutModelKeyInput = {
   schedule?: string | null
   timezone?: string
   sources?: Prisma.AgentCreatesourcesInput | string[]
-  output?: $Enums.AgentOutputType
+  output?: Prisma.AgentCreateoutputInput | $Enums.AgentOutputType[]
   prompt?: string | null
   draftOnly?: boolean
   maxTokens?: number
@@ -1292,7 +1299,7 @@ export type AgentCreateWithoutToolsInput = {
   schedule?: string | null
   timezone?: string
   sources?: Prisma.AgentCreatesourcesInput | string[]
-  output?: $Enums.AgentOutputType
+  output?: Prisma.AgentCreateoutputInput | $Enums.AgentOutputType[]
   prompt?: string | null
   draftOnly?: boolean
   maxTokens?: number
@@ -1323,7 +1330,7 @@ export type AgentUncheckedCreateWithoutToolsInput = {
   schedule?: string | null
   timezone?: string
   sources?: Prisma.AgentCreatesourcesInput | string[]
-  output?: $Enums.AgentOutputType
+  output?: Prisma.AgentCreateoutputInput | $Enums.AgentOutputType[]
   prompt?: string | null
   draftOnly?: boolean
   modelKeyId?: string | null
@@ -1366,7 +1373,7 @@ export type AgentUpdateWithoutToolsInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxTokens?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1397,7 +1404,7 @@ export type AgentUncheckedUpdateWithoutToolsInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   modelKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1424,7 +1431,7 @@ export type AgentCreateWithoutRunsInput = {
   schedule?: string | null
   timezone?: string
   sources?: Prisma.AgentCreatesourcesInput | string[]
-  output?: $Enums.AgentOutputType
+  output?: Prisma.AgentCreateoutputInput | $Enums.AgentOutputType[]
   prompt?: string | null
   draftOnly?: boolean
   maxTokens?: number
@@ -1455,7 +1462,7 @@ export type AgentUncheckedCreateWithoutRunsInput = {
   schedule?: string | null
   timezone?: string
   sources?: Prisma.AgentCreatesourcesInput | string[]
-  output?: $Enums.AgentOutputType
+  output?: Prisma.AgentCreateoutputInput | $Enums.AgentOutputType[]
   prompt?: string | null
   draftOnly?: boolean
   modelKeyId?: string | null
@@ -1498,7 +1505,7 @@ export type AgentUpdateWithoutRunsInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxTokens?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1529,7 +1536,7 @@ export type AgentUncheckedUpdateWithoutRunsInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   modelKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1556,7 +1563,7 @@ export type AgentCreateWithoutMessagesInput = {
   schedule?: string | null
   timezone?: string
   sources?: Prisma.AgentCreatesourcesInput | string[]
-  output?: $Enums.AgentOutputType
+  output?: Prisma.AgentCreateoutputInput | $Enums.AgentOutputType[]
   prompt?: string | null
   draftOnly?: boolean
   maxTokens?: number
@@ -1587,7 +1594,7 @@ export type AgentUncheckedCreateWithoutMessagesInput = {
   schedule?: string | null
   timezone?: string
   sources?: Prisma.AgentCreatesourcesInput | string[]
-  output?: $Enums.AgentOutputType
+  output?: Prisma.AgentCreateoutputInput | $Enums.AgentOutputType[]
   prompt?: string | null
   draftOnly?: boolean
   modelKeyId?: string | null
@@ -1630,7 +1637,7 @@ export type AgentUpdateWithoutMessagesInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxTokens?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1661,7 +1668,7 @@ export type AgentUncheckedUpdateWithoutMessagesInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   modelKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1689,7 +1696,7 @@ export type AgentCreateManyUserInput = {
   schedule?: string | null
   timezone?: string
   sources?: Prisma.AgentCreatesourcesInput | string[]
-  output?: $Enums.AgentOutputType
+  output?: Prisma.AgentCreateoutputInput | $Enums.AgentOutputType[]
   prompt?: string | null
   draftOnly?: boolean
   modelKeyId?: string | null
@@ -1714,7 +1721,7 @@ export type AgentUpdateWithoutUserInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxTokens?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1744,7 +1751,7 @@ export type AgentUncheckedUpdateWithoutUserInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   modelKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1773,7 +1780,7 @@ export type AgentUncheckedUpdateManyWithoutUserInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   modelKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1799,7 +1806,7 @@ export type AgentCreateManyTemplateInput = {
   schedule?: string | null
   timezone?: string
   sources?: Prisma.AgentCreatesourcesInput | string[]
-  output?: $Enums.AgentOutputType
+  output?: Prisma.AgentCreateoutputInput | $Enums.AgentOutputType[]
   prompt?: string | null
   draftOnly?: boolean
   modelKeyId?: string | null
@@ -1824,7 +1831,7 @@ export type AgentUpdateWithoutTemplateInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxTokens?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1854,7 +1861,7 @@ export type AgentUncheckedUpdateWithoutTemplateInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   modelKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1883,7 +1890,7 @@ export type AgentUncheckedUpdateManyWithoutTemplateInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   modelKeyId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1910,7 +1917,7 @@ export type AgentCreateManyModelKeyInput = {
   schedule?: string | null
   timezone?: string
   sources?: Prisma.AgentCreatesourcesInput | string[]
-  output?: $Enums.AgentOutputType
+  output?: Prisma.AgentCreateoutputInput | $Enums.AgentOutputType[]
   prompt?: string | null
   draftOnly?: boolean
   maxTokens?: number
@@ -1934,7 +1941,7 @@ export type AgentUpdateWithoutModelKeyInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxTokens?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1965,7 +1972,7 @@ export type AgentUncheckedUpdateWithoutModelKeyInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxTokens?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1994,7 +2001,7 @@ export type AgentUncheckedUpdateManyWithoutModelKeyInput = {
   schedule?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
   sources?: Prisma.AgentUpdatesourcesInput | string[]
-  output?: Prisma.EnumAgentOutputTypeFieldUpdateOperationsInput | $Enums.AgentOutputType
+  output?: Prisma.AgentUpdateoutputInput | $Enums.AgentOutputType[]
   prompt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   draftOnly?: Prisma.BoolFieldUpdateOperationsInput | boolean
   maxTokens?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2221,7 +2228,11 @@ export type $AgentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     schedule: string | null
     timezone: string
     sources: string[]
-    output: $Enums.AgentOutputType
+    /**
+     * Surfaces this agent's run output is written to. A set, not a single choice:
+     * one run can land in several places at once.
+     */
+    output: $Enums.AgentOutputType[]
     prompt: string | null
     draftOnly: boolean
     modelKeyId: string | null
@@ -2674,7 +2685,7 @@ export interface AgentFieldRefs {
   readonly schedule: Prisma.FieldRef<"Agent", 'String'>
   readonly timezone: Prisma.FieldRef<"Agent", 'String'>
   readonly sources: Prisma.FieldRef<"Agent", 'String[]'>
-  readonly output: Prisma.FieldRef<"Agent", 'AgentOutputType'>
+  readonly output: Prisma.FieldRef<"Agent", 'AgentOutputType[]'>
   readonly prompt: Prisma.FieldRef<"Agent", 'String'>
   readonly draftOnly: Prisma.FieldRef<"Agent", 'Boolean'>
   readonly modelKeyId: Prisma.FieldRef<"Agent", 'String'>

@@ -15,7 +15,9 @@ import { fetchNewsForAgent } from './news.service'
 import { fetchRecentEmails } from './gmail.service'
 import { getGmailAccessToken } from './integrations.service'
 import { createMessage } from './messages.service'
-import { resolveOutputDestination, type OutputDestination } from '../lib/output-destination'
+import { createAppointment } from './appointment.service'
+import { createTask } from './task.service'
+import { resolveOutputDestinations, type OutputDestination } from '../lib/output-destination'
 
 const DAILY_RUN_LIMIT = 50
 
@@ -70,64 +72,138 @@ async function gatherContext(
 }
 
 /**
- * Persist a run's output on the surface the agent's `output` column names.
+ * One record an output destination actually wrote.
  *
- * The returned `destination` is derived from the same value that picked the
- * write, so the caller can never be told "inbox" for a diary entry.
+ * `destination` is the surface the row landed on, which is not always the one
+ * that was configured: the calendar destination falls back to a note when the
+ * output carries no date, and says so via `fallbackFrom`.
+ */
+type OutputRecord = {
+  destination: OutputDestination
+  id: string
+  title: string
+  /** Set when this row satisfies a different destination than the one configured. */
+  fallbackFrom?: OutputDestination
+}
+
+type WriteOutputResult = {
+  /** Destinations configured on the agent, in write order. */
+  destinations: OutputDestination[]
+  /** One entry per row written, across every destination. */
+  records: OutputRecord[]
+  /**
+   * Pending actions a destination already materialised. They are withheld from
+   * `RunResult.pendingActions` so the approval modal cannot create a second copy.
+   */
+  consumed: PendingAction[]
+}
+
+const CALENDAR_COLOR = '#8b5cf6'
+
+/** First meaningful line of the output, used as a note/appointment title. */
+function titleFromOutput(agentName: string, text: string): string {
+  const line = text
+    .split('\n')
+    .map((value) => value.replace(/^#+\s*/, '').replace(/[*_`]/g, '').trim())
+    .find((value) => value.length > 0)
+  if (!line) return `${agentName} update`
+  return line.length > 80 ? `${line.slice(0, 77)}...` : line
+}
+
+/**
+ * Persist a run's output on every surface the agent's `output` column names.
  *
- * @param db - Prisma client used for the write
+ * Writes are ordered and fail fast: the first destination that throws aborts the
+ * rest, and the caller reports the run as failed. Each row carries the surface it
+ * actually landed on, so the caller can never be told "inbox" for a calendar entry.
+ *
+ * @param db - Prisma client used for the writes
  * @param userId - Owner of the output
  * @param agentId - Agent the output belongs to
- * @param outputType - The agent's `output` column
- * @param aiText - Output text to store
- * @param agentName - Agent name, used in the note title
- * @returns The stored record and its destination, or null for an unknown output type
+ * @param outputTypes - The agent's `output` column
+ * @param aiText - Output text, with machine marker lines already stripped
+ * @param agentName - Agent name, used in inbox message titles
+ * @param actions - Parsed marker actions, read for dated calendar events
+ * @returns Per-destination records plus the actions already written
  */
-async function formatOutput(
+async function writeOutput(
   db: PrismaClient,
   userId: string,
   agentId: string,
-  outputType: string,
+  outputTypes: readonly string[],
   aiText: string,
-  agentName: string
-): Promise<{ destination: OutputDestination; id: string; title: string; body: string } | null> {
-  const destination = resolveOutputDestination(outputType)
+  agentName: string,
+  actions: PendingAction[]
+): Promise<WriteOutputResult> {
+  const destinations = resolveOutputDestinations(outputTypes)
+  const records: OutputRecord[] = []
+  const consumed: PendingAction[] = []
+  const wroteNotes = { value: false }
 
-  if (destination === 'inbox') {
-    const message = await createMessage(db, userId, agentId, `${agentName} output`, aiText)
-    return { destination, id: message.id, title: message.title, body: message.body }
+  const writeNote = async (title: string, fallbackFrom?: OutputDestination) => {
+    const task = await createTask(db, userId, {
+      title,
+      text: aiText,
+      priority: 'medium',
+      dueDate: null,
+    })
+    records.push({
+      destination: 'notes',
+      id: task.id,
+      title,
+      ...(fallbackFrom ? { fallbackFrom } : {}),
+    })
+    wroteNotes.value = true
   }
 
-  if (destination === 'diary') {
-    const today = new Date().toISOString().slice(0, 10)
-    const entry = await db.diaryEntry.create({
-      data: {
-        userId,
-        title: `${agentName} — ${today}`,
-        content: aiText,
-        mood: 'good',
-        tags: ['agent-output'],
-        date: today,
-        hidden: false,
-      },
-    })
-    return {
-      destination,
-      id: entry.id,
-      title: `${agentName} — ${today}`,
-      body: aiText,
+  for (const destination of destinations) {
+    if (destination === 'inbox') {
+      const message = await createMessage(db, userId, agentId, `${agentName} output`, aiText)
+      records.push({ destination: 'inbox', id: message.id, title: message.title })
+      continue
+    }
+
+    if (destination === 'notes') {
+      await writeNote(titleFromOutput(agentName, aiText))
+      continue
+    }
+
+    const dated = actions.filter((action) => action.kind === 'event' && action.date)
+    if (dated.length === 0) {
+      // Nothing to schedule. Writing an undated event would put a phantom row on
+      // the calendar, so the output becomes a note instead — unless the notes
+      // destination already wrote this same text, in which case it is covered.
+      if (!wroteNotes.value) {
+        await writeNote(titleFromOutput(agentName, aiText), 'calendar')
+      }
+      continue
+    }
+
+    for (const event of dated) {
+      const appointment = await createAppointment(db, userId, {
+        kind: 'appointment',
+        title: event.title,
+        date: event.date!,
+        startTime: event.startTime ?? '09:00',
+        endTime: event.endTime ?? null,
+        color: CALENDAR_COLOR,
+        notes: event.note ?? '',
+      })
+      records.push({ destination: 'calendar', id: appointment.id, title: event.title })
+      consumed.push(event)
     }
   }
 
-  return null
+  return { destinations, records, consumed }
 }
 
 export type RunResult = {
   runId: string
   status: 'success' | 'failed'
-  /** Where the output was written. Never inferred from `message` being present. */
-  destination: OutputDestination
-  message?: { id: string; title: string; body: string }
+  /** Destinations configured on the agent, in write order. */
+  destinations: OutputDestination[]
+  /** Every row written, across all destinations. Never inferred from `output`. */
+  output: RunOutputRecord[]
   pendingActions?: PendingAction[]
   sideEffects?: Array<{
     kind: 'note' | 'calendar' | 'email'
@@ -138,6 +214,15 @@ export type RunResult = {
   tokensUsed: number
   durationMs: number
   error?: string
+}
+
+/** A row an output destination wrote, as reported to the client. */
+export type RunOutputRecord = {
+  destination: OutputDestination
+  id: string
+  title: string
+  /** Set when the row satisfies a different destination than the one configured. */
+  fallbackFrom?: OutputDestination
 }
 
 export type RunListItem = {
@@ -244,13 +329,14 @@ export async function runAgent(
       const explanation =
         'This agent needs Gmail, but no Google account is connected. ' +
         'Open the agent, choose Connect Gmail, then run it again.'
-      const noticeId = await formatOutput(
+      const written = await writeOutput(
         db,
         userId,
         agentId,
         agent.output,
         explanation,
-        agent.name
+        agent.name,
+        []
       )
       await db.agentRun.update({
         where: { id: run.id },
@@ -263,8 +349,8 @@ export async function runAgent(
       return {
         runId: run.id,
         status: 'success',
-        destination: resolveOutputDestination(agent.output),
-        ...(noticeId ? { message: noticeId } : {}),
+        destinations: written.destinations,
+        output: written.records,
         tokensUsed: 0,
         durationMs: Date.now() - started,
       }
@@ -301,7 +387,15 @@ export async function runAgent(
     const pendingActions = parseActionItems(aiText)
     const cleanedText = stripActionLines(aiText)
 
-    const messageId = await formatOutput(db, userId, agentId, agent.output, cleanedText, agent.name)
+    const written = await writeOutput(
+      db,
+      userId,
+      agentId,
+      agent.output,
+      cleanedText,
+      agent.name,
+      pendingActions
+    )
 
     await db.agentRun.update({
       where: { id: run.id },
@@ -321,14 +415,16 @@ export async function runAgent(
       },
     })
 
+    // Dated events the calendar destination already wrote are withheld, so the
+    // approval modal cannot create a duplicate appointment for the same line.
+    const remaining = pendingActions.filter((action) => !written.consumed.includes(action))
+
     return {
       runId: run.id,
       status: 'success',
-      destination: resolveOutputDestination(agent.output),
-      ...(messageId
-        ? { message: { id: messageId.id, title: messageId.title, body: messageId.body } }
-        : {}),
-      ...(pendingActions.length > 0 ? { pendingActions } : {}),
+      destinations: written.destinations,
+      output: written.records,
+      ...(remaining.length > 0 ? { pendingActions: remaining } : {}),
       tokensUsed,
       durationMs: Date.now() - started,
     }
@@ -347,7 +443,8 @@ export async function runAgent(
     return {
       runId: run.id,
       status: 'failed',
-      destination: 'none',
+      destinations: [],
+      output: [],
       tokensUsed: 0,
       durationMs: Date.now() - started,
       error: errorMsg,

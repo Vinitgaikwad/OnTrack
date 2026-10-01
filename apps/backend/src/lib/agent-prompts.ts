@@ -22,7 +22,8 @@ export type AgentPromptInput = {
   description: string
   prompt?: string | null
   sources: string[]
-  output: string
+  /** The agent's selected output destinations, e.g. `['message', 'calendar']`. */
+  output: readonly string[]
   preferences: string[]
 }
 
@@ -62,7 +63,15 @@ export function buildSystemPrompt(agent: AgentPromptInput): string {
 
   if (agent.sources.length > 0) parts.push(`\nData sources: ${agent.sources.join(', ')}`)
   if (agent.preferences.length > 0) parts.push(`\nPreferences: ${agent.preferences.join(', ')}`)
-  parts.push(`\nOutput format: ${agent.output}.`)
+  const destinations = agent.output.join(', ')
+  parts.push(`\nYour output is delivered to: ${destinations}.`)
+  if (agent.output.includes('calendar')) {
+    parts.push(
+      `\nBecause your output goes to the calendar, every item that has a concrete date ` +
+        `or deadline must appear as an [EVENT] line carrying that date. That date is the ` +
+        `only thing that places an entry on the calendar, so never write it as prose.`
+    )
+  }
   parts.push(`\nBe concise, actionable, and structured. When listing items, use bullet points.`)
   parts.push(MACHINE_FORMAT_CONTRACT)
   return parts.join('')
