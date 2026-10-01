@@ -178,9 +178,6 @@ export const AgentScalarFieldEnum = {
   color: 'color',
   description: 'description',
   preferences: 'preferences',
-  triggerType: 'triggerType',
-  schedule: 'schedule',
-  timezone: 'timezone',
   sources: 'sources',
   output: 'output',
   prompt: 'prompt',
@@ -188,7 +185,6 @@ export const AgentScalarFieldEnum = {
   modelKeyId: 'modelKeyId',
   maxTokens: 'maxTokens',
   lastRunAt: 'lastRunAt',
-  nextRunAt: 'nextRunAt',
   runCount: 'runCount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

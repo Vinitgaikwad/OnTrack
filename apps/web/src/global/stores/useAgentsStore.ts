@@ -37,7 +37,6 @@ export type Agent = {
   color: string
   description: string
   preferences: string[]
-  triggerType: 'manual' | 'schedule'
   sources: string[]
   /** Every selected destination. Never empty — an agent with none would drop all output. */
   output: OutputType[]
@@ -117,7 +116,6 @@ const toAgent = (dto: AgentDto): Agent => ({
   color: dto.color,
   description: dto.description,
   preferences: dto.preferences,
-  triggerType: dto.triggerType,
   sources: dto.sources,
   output: dto.output,
   draftOnly: dto.draftOnly,
@@ -217,7 +215,6 @@ export const useAgentsStore = create<AgentsStore>()(
           color: input.color,
           description: input.description,
           preferences: input.preferences ?? [],
-          triggerType: 'manual',
           sources: input.sources ?? [],
           output: input.output ?? ['message'],
           draftOnly: input.draftOnly ?? false,

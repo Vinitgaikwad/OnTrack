@@ -1674,9 +1674,6 @@ export const AgentScalarFieldEnum = {
   color: 'color',
   description: 'description',
   preferences: 'preferences',
-  triggerType: 'triggerType',
-  schedule: 'schedule',
-  timezone: 'timezone',
   sources: 'sources',
   output: 'output',
   prompt: 'prompt',
@@ -1684,7 +1681,6 @@ export const AgentScalarFieldEnum = {
   modelKeyId: 'modelKeyId',
   maxTokens: 'maxTokens',
   lastRunAt: 'lastRunAt',
-  nextRunAt: 'nextRunAt',
   runCount: 'runCount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -1959,20 +1955,6 @@ export type EnumMoodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'Mood[]'
  */
 export type ListEnumMoodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Mood[]'>
-    
-
-
-/**
- * Reference to a field of type 'AgentTriggerType'
- */
-export type EnumAgentTriggerTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AgentTriggerType'>
-    
-
-
-/**
- * Reference to a field of type 'AgentTriggerType[]'
- */
-export type ListEnumAgentTriggerTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AgentTriggerType[]'>
     
 
 
