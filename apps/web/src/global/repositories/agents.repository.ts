@@ -12,7 +12,6 @@ export type AgentDto = {
   color: string
   description: string
   preferences: string[]
-  triggerType: 'manual' | 'schedule'
   sources: string[]
   /** Every selected destination. Never empty — an agent with none would drop all output. */
   output: OutputType[]
