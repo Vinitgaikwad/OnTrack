@@ -78,11 +78,6 @@ enum Mood {
   rough
 }
 
-enum AgentTriggerType {
-  manual
-  schedule
-}
-
 enum AgentOutputType {
   message
   note
@@ -148,11 +143,6 @@ model Agent {
   color       String
   description String
   preferences String[]        @default([])
-  enabled     Boolean         @default(true)
-
-  triggerType AgentTriggerType @default(manual)
-  schedule    String?
-  timezone    String           @default("UTC")
 
   sources     String[]         @default([])
   /// Surfaces this agent's run output is written to. A set, not a single choice:
@@ -164,7 +154,6 @@ model Agent {
   modelKeyId  String?
   maxTokens   Int              @default(2000)
   lastRunAt   DateTime?
-  nextRunAt   DateTime?
   runCount    Int              @default(0)
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt

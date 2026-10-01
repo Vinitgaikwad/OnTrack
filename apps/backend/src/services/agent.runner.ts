@@ -285,7 +285,6 @@ export async function runAgent(
     include: { modelKey: true, tools: true },
   })
   if (!agent) throw new AppError('NOT_FOUND', 'Agent not found.', 404)
-  if (!agent.enabled) throw new AppError('BAD_REQUEST', 'Agent is disabled.', 400)
 
   let apiKey = env.OPENROUTER_API_KEY
   let baseUrl = DEFAULT_BASE_URL
