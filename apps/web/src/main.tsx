@@ -2,9 +2,11 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { App } from './App'
 import { enableCrossWindowSync } from './global/lib/crossWindowSync'
+import { purgeLegacyDiaryCache } from './global/stores/useDiaryStore'
 import { subscribeAuthEvents, useUserStore } from './global/stores/useUserStore'
 import './index.css'
 
+purgeLegacyDiaryCache()
 enableCrossWindowSync()
 subscribeAuthEvents()
 void useUserStore.getState().restoreSession()

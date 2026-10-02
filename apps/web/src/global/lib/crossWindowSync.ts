@@ -1,7 +1,6 @@
 import { useAgentsStore } from '../stores/useAgentsStore'
 import { useCalendarStore } from '../stores/useCalendarStore'
 import { useDashboardStore } from '../stores/useDashboardStore'
-import { useDiaryStore } from '../stores/useDiaryStore'
 import { useNotesStore } from '../stores/useNotesStore'
 import { useThemeStore } from '../stores/useThemeStore'
 import { useTimerStore } from '../stores/useTimerStore'
@@ -15,11 +14,12 @@ type SyncableStore = {
   }
 }
 
+// Persisted stores only. The diary store is server-only (see useDiaryStore), so
+// it has no persisted slice to rehydrate and is deliberately absent.
 const STORES: Array<{ key: string; store: SyncableStore }> = [
   { key: 'ontrack-notes', store: useNotesStore as unknown as SyncableStore },
   { key: 'ontrack-calendar', store: useCalendarStore as unknown as SyncableStore },
   { key: 'ontrack-timer', store: useTimerStore as unknown as SyncableStore },
-  { key: 'ontrack-diary', store: useDiaryStore as unknown as SyncableStore },
   { key: 'ontrack-agents', store: useAgentsStore as unknown as SyncableStore },
   { key: 'ontrack-model-keys', store: useModelKeysStore as unknown as SyncableStore },
   { key: 'ontrack-agent-messages', store: useAgentMessagesStore as unknown as SyncableStore },
