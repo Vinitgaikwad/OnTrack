@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import {
   OUTPUT_DESTINATION_ORDER,
+  filterPendingActionsByDestination,
   resolveOutputDestination,
   resolveOutputDestinations,
 } from '../apps/backend/src/lib/output-destination.ts'
@@ -17,6 +18,7 @@ const storeSource = await readFile('apps/web/src/global/stores/useAgentsStore.ts
 const serviceSource = await readFile('apps/backend/src/services/agents.service.ts', 'utf8')
 const controllerSource = await readFile('apps/backend/src/controllers/agents.controller.ts', 'utf8')
 const promptsSource = await readFile('apps/backend/src/lib/agent-prompts.ts', 'utf8')
+const seedSource = await readFile('apps/backend/src/services/seed.service.ts', 'utf8')
 const schemaSource = await readFile('apps/backend/prisma/schema.prisma', 'utf8')
 const migrationSource = await readFile(
   'apps/backend/prisma/migrations/20260911120000_agent_output_destinations/migration.sql',
@@ -94,7 +96,7 @@ test('the calendar destination falls back to a note only when no date was found'
 test('events the calendar already wrote are withheld from the approval modal', () => {
   // Otherwise approving the run would create a second appointment for the same
   // [EVENT] line.
-  assert.match(runnerSource, /pendingActions\.filter\(\(action\) => !written\.consumed\.includes\(action\)\)/)
+  assert.match(runnerSource, /const remaining = proposed\.filter\(\(action\) => !written\.consumed\.includes\(action\)\)/)
 })
 
 test('every successful run reports destinations and the rows written', () => {
@@ -191,4 +193,94 @@ test('a calendar destination tells the model the date is what places the entry',
   // the prompt has to make that dependency explicit.
   assert.match(promptsSource, /agent\.output\.includes\('calendar'\)/)
   assert.match(promptsSource, /\[EVENT\] line carrying that date/)
+})
+
+// --- proposed actions are gated on the same destinations ---
+
+type Proposal = { kind: 'task' | 'event' | 'note'; title: string }
+
+const TASK: Proposal = { kind: 'task', title: 'Reply to Ada' }
+const EVENT: Proposal = { kind: 'event', title: 'Standup' }
+const NOTE: Proposal = { kind: 'note', title: 'Invoice due' }
+
+test('an inbox-only agent proposes nothing, so the approval modal never opens', () => {
+  // The reported bug: the marker contract is appended to every system prompt, so
+  // the model always emits [TASK]/[EVENT]/[NOTE] lines. Gating them on `output`
+  // is the only thing that stops an Inbox-only agent being asked to approve
+  // additions to surfaces it was never given.
+  assert.deepEqual(filterPendingActionsByDestination([TASK, EVENT, NOTE], ['message']), [])
+})
+
+test('a proposal is kept only when the surface it writes to is selected', () => {
+  // task and event both become Appointment rows; note becomes a DiaryEntry and is
+  // gated on the Notes destination as the opt-in for proposing onto boards.
+  assert.deepEqual(filterPendingActionsByDestination([TASK, EVENT], ['message', 'calendar']), [TASK, EVENT])
+  assert.deepEqual(filterPendingActionsByDestination([EVENT], ['message', 'note']), [])
+  assert.deepEqual(filterPendingActionsByDestination([TASK], ['message', 'note']), [])
+  assert.deepEqual(filterPendingActionsByDestination([NOTE], ['message', 'note']), [NOTE])
+  assert.deepEqual(filterPendingActionsByDestination([NOTE], ['message', 'calendar']), [])
+})
+
+test('a partly-selected agent keeps only the proposals it can service', () => {
+  assert.deepEqual(filterPendingActionsByDestination([TASK, EVENT, NOTE], ['message', 'calendar']), [
+    TASK,
+    EVENT,
+  ])
+  assert.deepEqual(filterPendingActionsByDestination([TASK, EVENT, NOTE], ['note']), [NOTE])
+})
+
+test('the gate drops an unrecognised proposal kind instead of passing it through', () => {
+  assert.deepEqual(
+    filterPendingActionsByDestination([{ kind: 'info', title: 'FYI' }], ['message', 'note', 'calendar']),
+    []
+  )
+})
+
+test('the gate takes output types, not destination names', () => {
+  // `notes` is a destination, not an `output` column value — accepting it would
+  // let a malformed column silently gate on nothing.
+  assert.deepEqual(filterPendingActionsByDestination([NOTE], ['message', 'notes']), [])
+})
+
+test('the gate keeps proposal order and does not mutate its input', () => {
+  const input = [NOTE, TASK, EVENT]
+  const filtered = filterPendingActionsByDestination(input, ['message', 'note'])
+  assert.deepEqual(filtered, [NOTE])
+  assert.deepEqual(input, [NOTE, TASK, EVENT])
+})
+
+test('the runner gates proposals before it hands them to the approval modal', () => {
+  // Only dated events the calendar already wrote were filtered out, so every
+  // other marker line reached the modal regardless of `output`.
+  assert.match(runnerSource, /const proposed = filterPendingActionsByDestination\(pendingActions, agent\.output\)/)
+  assert.match(runnerSource, /const remaining = proposed\.filter\(\(action\) => !written\.consumed\.includes\(action\)\)/)
+})
+
+test('refreshing a seeded agent never rewrites the destinations the user picked', () => {
+  // `description` and `maxTokens` are prompt content the app owns and refreshes.
+  // `output` is a user preference: refreshing it silently restored a destination
+  // the user had just unchecked.
+  const refreshBlock = seedSource.split('if (exists.draftOnly) {')[1]?.split('continue')[0] ?? ''
+  assert.ok(refreshBlock.length > 0, 'the draftOnly refresh block must exist')
+  assert.match(refreshBlock, /description: def\.description,/)
+  assert.doesNotMatch(refreshBlock, /output:/)
+})
+
+test('the seeded Email Summarizer matches its own template destinations', () => {
+  // The two disagreed: the email-summarizer template delivered `['message']`
+  // while the seeded agent delivered `['message','calendar']`, so a new user's
+  // email agent wrote a Note on every run that produced no dated event.
+  // (job-tracker and news-provider still disagree — see DATAMODEL.md.)
+  const templateOutput = seedSource.match(/slug: 'email-summarizer'[\s\S]*?defaultOutput: (\[[^\]]*\])/)?.[1]
+  assert.ok(templateOutput, 'the email-summarizer template must declare defaultOutput')
+
+  const seeded = seedSource.split('export const DEFAULT_AGENTS')[1] ?? ''
+  const emailAgentOutput = seeded.match(/name: 'Email Summarizer'[\s\S]*?output: (\[[^\]]*\])/)?.[1]
+  assert.ok(emailAgentOutput, 'the seeded Email Summarizer must declare output')
+
+  assert.equal(
+    emailAgentOutput.replace(/\s+/g, ''),
+    templateOutput.replace(/\s+/g, ''),
+    'the seeded Email Summarizer and its template must deliver to the same surfaces'
+  )
 })

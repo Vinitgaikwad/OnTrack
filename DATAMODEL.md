@@ -177,6 +177,16 @@ and lazily backfilled in `agentsService.listAgents` the first time a user is in 
 (idempotent by exact name — deleting one does not bring it back; deleting all does, on the next
 fetch). Definitions live in `seed.service.ts` (`DEFAULT_AGENTS`, `seedDefaultAgents`).
 
+The seed pass refreshes `description` and `maxTokens` on an existing `draftOnly` agent, but
+**never `output`** — destinations are a user preference, and refreshing them restored surfaces the
+user had just unchecked.
+
+**Known drift:** a seeded agent and its own template do not all agree on `output`.
+`email-summarizer` is aligned (`['message']` both sides). `job-tracker` ships `['note']` but its
+seeded agent is `['message','note']`; `news-provider` ships `['message']` but its seeded agent is
+`['message','note']`. An untouched seeded agent therefore delivers to surfaces the gallery version
+of the same agent would not.
+
 | Entity        | Source fields (JSON, camelCase)                                                                                              | Notes |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------- | ----- |
 | `Agent`       | `id, name, role, icon, color, description, preferences[], templateId?, sources[], output[], prompt?, draftOnly, modelKeyId?, maxTokens, lastRunAt?, runCount, createdAt, updatedAt, tools?[]` | **there is no `enabled` flag and no scheduling fields** — with no cron trigger and no `scheduled()` handler an agent could never run itself, so the toggle could only ever have meant "you cannot press Run" (dropped in `20261001120000_drop_agent_enabled`), and `triggerType`/`schedule`/`timezone`/`nextRunAt` only described a scheduler that was never built (dropped in `20261001130000_drop_dead_scheduler_fields`); **`output` is a SET of destinations** (`message\|note\|calendar`, non-empty), so one run writes to every selected surface — see "Output destinations" below; **`description` is a Markdown doc and is what the runner sends to the LLM as system instructions** (replaces `prompt`, retained for legacy only); creating from a template copies `defaultRole` and seeds `defaultPrompt` into the editable `description` + `AgentTool` rows |
@@ -534,7 +544,7 @@ Validation: `date` `YYYY-MM-DD`, `month` `YYYY-MM`, `mood` ∈ `great|good|okay|
 | DELETE | `/api/agents/:id`       | —                            | `204` (cascades runs/messages/tools)      |
 | POST   | `/api/agents/:id/run`   | —                            | `{ data: RunResult }`; `404`, `409 CONFLICT` (in-flight), `429 RATE_LIMIT` |
 | GET    | `/api/agents/:id/runs`  | `?limit&offset`              | `{ data: { runs: RunListItem[], hasMore } }` |
-| POST   | `/api/agents/actions`   | `{ items: ActionItem[] }`    | `{ data: { created: { kind, id }[] } }` — creates `Appointment` (`task` → `kind:'task'`, `event` → `kind:'appointment'`) and `DiaryEntry` (`note`, tagged `agent-output`); triggered only after the user approves proposed items in the UI |
+| POST   | `/api/agents/actions`   | `{ items: ActionItem[] }`    | `{ data: { created: { kind, id }[] } }` — creates `Appointment` (`task` → `kind:'task'`, `event` → `kind:'appointment'`) and `DiaryEntry` (`note`, tagged `agent-output`); triggered only after the user approves proposed items in the UI, and the runner only ever proposes items whose surface the agent delivers to (see "Output destinations") |
 
 ```ts
 type ActionItem = {
@@ -558,7 +568,7 @@ type RunResult = {
     title: string
     fallbackFrom?: 'inbox' | 'notes' | 'calendar' // set when it stands in for another destination
   }>
-  pendingActions?: ActionItem[] // [TASK]/[EVENT]/[NOTE] lines NOT already written by a destination; user approves before /api/agents/actions creates them
+  pendingActions?: ActionItem[] // [TASK]/[EVENT]/[NOTE] lines NOT already written by a destination AND whose surface the agent delivers to; user approves before /api/agents/actions creates them
   sideEffects?: Array<{ kind: 'note'|'calendar'|'email'; status: 'created'|'drafted'|'blocked'; title?: string; id?: string }>
   tokensUsed: number
   durationMs: number
@@ -587,7 +597,7 @@ which also dedupes and fixes the write order `inbox → notes → calendar`):
 `email` was retired: it resolved to the inbox anyway, so the migration maps existing
 `email` agents to `['message']` and no agent loses a delivery surface.
 
-Two rules keep a multi-destination run honest:
+Three rules keep a multi-destination run honest:
 
 - **Calendar without a date writes a note.** An `Appointment` needs a `date`, and the
   only source of one is an `[EVENT]` line carrying `YYYY-MM-DD`. With no dated event the
@@ -597,6 +607,15 @@ Two rules keep a multi-destination run honest:
 - **Dated events are withheld from `pendingActions`.** Otherwise the approval modal would
   let the user approve the same `[EVENT]` line the calendar already wrote, creating a
   duplicate appointment.
+- **Proposals are gated on `output`.** `MACHINE_FORMAT_CONTRACT` is appended to *every*
+  system prompt and always asks for `[TASK]`/`[EVENT]`/`[NOTE]` lines, so the model emits
+  them regardless of what the user selected. `filterPendingActionsByDestination` (same file)
+  drops any proposal whose surface the agent does not deliver to:
+  `task` and `event` gate on `calendar` (both become `Appointment` rows), and `note` gates
+  on `notes` — a `note` becomes a `DiaryEntry`, and Diary is not a selectable destination,
+  so selecting Notes is the opt-in for proposing onto boards at all. A kind with no mapping
+  is dropped rather than offered. Without this gate an inbox-only agent still got an
+  "Approve agent additions" modal full of notes and tasks on every run.
 
 Because `calendar` depends entirely on the model emitting a dated `[EVENT]` line,
 `buildSystemPrompt` adds an explicit instruction to do so whenever `calendar` is selected.
