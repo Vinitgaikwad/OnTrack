@@ -138,7 +138,7 @@ These lines are hidden from your digest and shown to the user as proposed additi
 `,
     preferences: ['Keeps it short', 'Only valid action items'],
     sources: [],
-    output: ['message', 'calendar'],
+    output: ['message'],
     tools: ['email_read', 'classify', 'calendar_write', 'note_write', 'task_move'],
     maxTokens: 2200,
   },
@@ -221,12 +221,16 @@ export async function seedDefaultAgents(db: Db, userId: string): Promise<void> {
       if (exists) {
         // Refresh seeded defaults (draftOnly: true) with the latest prompt/mode;
         // never touch agents the user has customized (draftOnly: false).
+        //
+        // `output` is deliberately NOT refreshed. It is a user preference, not
+        // prompt content: refreshing it restored destinations the user had just
+        // unchecked, so an agent set to Inbox-only silently went back to writing
+        // notes again on the next seed pass.
         if (exists.draftOnly) {
           await tx.agent.update({
             where: { id: exists.id },
             data: {
               description: def.description,
-              output: def.output,
               maxTokens: def.maxTokens ?? exists.maxTokens,
             },
           })

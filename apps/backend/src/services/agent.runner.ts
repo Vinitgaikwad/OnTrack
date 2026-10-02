@@ -17,7 +17,7 @@ import { getGmailAccessToken } from './integrations.service'
 import { createMessage } from './messages.service'
 import { createAppointment } from './appointment.service'
 import { createTask } from './task.service'
-import { resolveOutputDestinations, type OutputDestination } from '../lib/output-destination'
+import { resolveOutputDestinations, filterPendingActionsByDestination, type OutputDestination } from '../lib/output-destination'
 
 const DAILY_RUN_LIMIT = 50
 
@@ -414,9 +414,14 @@ export async function runAgent(
       },
     })
 
-    // Dated events the calendar destination already wrote are withheld, so the
-    // approval modal cannot create a duplicate appointment for the same line.
-    const remaining = pendingActions.filter((action) => !written.consumed.includes(action))
+    // Two filters, because the marker contract is appended to every system
+    // prompt regardless of `output`. Events the calendar destination already
+    // wrote are withheld so the approval modal cannot duplicate them, and the
+    // rest are withheld when the agent was not configured for the surface they
+    // would land on. Without the second filter an inbox-only agent was offered
+    // every [TASK]/[NOTE] line the model happened to write.
+    const proposed = filterPendingActionsByDestination(pendingActions, agent.output)
+    const remaining = proposed.filter((action) => !written.consumed.includes(action))
 
     return {
       runId: run.id,
