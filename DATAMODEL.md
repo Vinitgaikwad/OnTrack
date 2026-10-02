@@ -27,7 +27,7 @@ this file in sync (see the rule in `AGENTS.md`).
 | `ontrack-user`                      | `AppUser`, session     | `User`         | **Yes — auth (live)**       |
 | `ontrack-notes`                     | `NoteTask`, board      | `Task`         | **Yes (live)**              |
 | `ontrack-calendar`                  | `Appointment`, `CalendarEventKind` | `Appointment` | **Yes (live)**            |
-| `ontrack-diary`                     | `DiaryEntry`           | `DiaryEntry`   | **Yes (live)**              |
+| _(none — server-only)_             | `DiaryEntry`           | `DiaryEntry`   | **Yes (live)** — no local copy |
 | `ontrack-agents`                    | `Agent` + templates    | `Agent`,`AgentTemplate` | **Yes (live)**     |
 | `ontrack-model-keys`                | `ModelKey`             | `ModelKey`     | **Yes (live)**              |
 | `ontrack-agent-messages`            | `AgentMessage` (inbox) | `AgentMessage` | **Yes (live)**              |
@@ -146,9 +146,13 @@ visible). `PATCH`/`DELETE` on a still-hidden entry (direct API call) still requi
 (`HIDDEN_ENTRY` 403 when missing, `INVALID_PASSWORD` 403 when wrong) — the frontend never hits
 this path because it routes hidden-entry mutations through the reveal modal first.
 
-**Sync semantics:** optimistic, mirroring notes/calendar. First `ensureLoaded()` on a fresh
-server seeds the legacy `ontrack-diary` localStorage cache up (one-time, only when the server has
-zero entries). The list is **month-paginated** (5-row pages, `date DESC, createdAt DESC`); the
+**Sync semantics:** optimistic, mirroring notes/calendar. The store is **server-only** — no
+`localStorage` key, no entry in `enableCrossWindowSync()`. Diary entries are private per account,
+and a `localStorage` key is shared by every account signing in on the same machine, so a cached
+copy leaked the previous user's entries. `purgeLegacyDiaryCache()` (called from `main.tsx`) deletes
+the old `ontrack-diary` key so the plaintext does not linger on disk. `ensureLoaded()` fetches only
+the newest row, which is all `entries[0]` (Today page + dashboard widget) needs. The list is
+**month-paginated** (5-row pages, `date DESC, createdAt DESC`); the
 month dropdown covers the last 24 months up to the newest entry month. The store keeps the union
 of loaded months in `entries` (sorted); `entries[0]` is therefore the globally newest entry and
 feeds the Today page + dashboard widget (hidden latest → "Hidden entry" placeholder).
